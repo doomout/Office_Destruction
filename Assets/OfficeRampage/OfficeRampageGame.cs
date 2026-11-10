@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 namespace OfficeRampage
 {
     /// <summary>Self-contained prototype. The saved scene contains only this bootstrap.</summary>
-    public sealed class OfficeRampageGame : MonoBehaviour
+    public sealed partial class OfficeRampageGame : MonoBehaviour
     {
         private sealed class Room
         {
@@ -22,17 +22,15 @@ namespace OfficeRampage
         private readonly Queue<GameObject> debris = new Queue<GameObject>();
         private readonly string[] weaponNames = { "SLEDGEHAMMER", "SHOTGUN", "ROCKET LAUNCHER" };
         private readonly float[] cooldowns = { .48f, .7f, 1.15f };
-        private Transform world, player, avatar, weapon, boss;
+        private Transform world, player, avatar, weapon;
         private CharacterController controller;
         private Camera view;
         private Room current;
         private float remaining, hp, yaw, pitch, vertical, cooldown, comboLeft, noticeLeft;
-        private float bossHealth, bossPhaseTime, invulnerability, swing, shake;
-        private Vector3 bossChargeDirection;
-        private int weaponIndex, combo, score, bossPhase;
+        private float invulnerability, swing, shake;
+        private int weaponIndex, combo, score;
         private bool ended, won, paused, bossFight;
         private string notice = "";
-        private Transform bossWarning;
         private GUIStyle titleStyle, labelStyle, smallStyle, centeredStyle;
         private float originalTimeScale;
         private OfficeAudio audioBus;
@@ -58,15 +56,15 @@ namespace OfficeRampage
             audioBus.ResetRun();
             if (world != null) { world.gameObject.SetActive(false); Destroy(world.gameObject); }
             rooms.Clear();
+            defenders.Clear(); bossUnit = null; bossChair = null; finalRoomSealed = false;
             oilPuddles.Clear(); slowedByOil = false;
             debris.Clear();
             world = new GameObject("Generated Office Rampage").transform;
             world.SetParent(transform);
             remaining = 120; hp = 100; yaw = 0; pitch = 13; vertical = 0;
-            score = combo = weaponIndex = bossPhase = 0;
+            score = combo = weaponIndex = 0;
             cooldown = comboLeft = invulnerability = swing = shake = 0;
             ended = won = paused = bossFight = false;
-            boss = bossWarning = null;
             for (int i = layoutOrder.Length - 1; i > 0; i--)
             {
                 int j = Random.Range(0, i + 1);
@@ -165,11 +163,10 @@ namespace OfficeRampage
 
         private Room BuildRoom(int number, float start)
         {
-            bool arena = number == 6;
-            var layout = arena ? null : OfficeLayout.Create(layoutOrder[number - 1], Random.Range(0, int.MaxValue));
+            bool arena = number == 5;
+            var layout = arena ? OfficeLayout.CreateExecutive() : OfficeLayout.Create(layoutOrder[number - 1], Random.Range(0, int.MaxValue));
             var room = new Room { number = number, start = start,
-                width = arena ? 24 : layout.width, end = start + (arena ? 28 : layout.length),
-                layoutName = arena ? "CEO ARENA" : layout.name };
+                width = layout.width, end = start + layout.length, layoutName = layout.name };
             rooms.Add(room);
             var root = new GameObject(arena ? "CEO arena" : "Office " + number).transform;
             root.SetParent(world);
@@ -208,7 +205,7 @@ namespace OfficeRampage
             sign.fontSize = 48;
             sign.color = Color.white;
 
-            if (!arena)
+            if (layout != null)
             {
                 foreach (var wall in layout.walls)
                 {
@@ -241,6 +238,7 @@ namespace OfficeRampage
                 }
                 room.required = Mathf.CeilToInt(room.total * .6f);
             }
+            SetupDefenders(room, layout, root);
             return room;
         }
 
@@ -401,13 +399,12 @@ namespace OfficeRampage
             UpdateCamera();
             if (mouse != null && mouse.leftButton.isPressed && Cursor.lockState == CursorLockMode.Locked && cooldown <= 0) Attack();
             if (ended) return;
-            if (bossFight) UpdateBoss(dt);
-            else if (current.unlocked && player.position.z > current.end - 2 && Mathf.Abs(player.position.x) < 1.8f)
+            SealFinalRoom();
+            if (current.number < 5 && current.unlocked && player.position.z > current.end - 2 && Mathf.Abs(player.position.x) < 1.8f)
             {
                 current = BuildRoom(current.number + 1, current.end);
                 audioBus.ChangeRoom(current.number);
-                if (current.number == 6) BeginBoss();
-                else Notify("OFFICE " + current.number + " / 5  -  KEEP THE COMBO ALIVE!", 3);
+                Notify(current.number == 5 ? "DEFEAT ALL 5 GUARD DOGS TO FACE THE CEO" : "OFFICE " + current.number + " / 5  -  WATCH THE DEFENDERS!", 4);
             }
             if (player.position.y < -8)
             {
@@ -465,8 +462,11 @@ namespace OfficeRampage
                         (!AimHit(origin, toward.normalized, toward.magnitude, out var obstacle) || obstacle.collider.GetComponentInParent<OfficeProp>() == prop))
                         prop.Hit(60, avatar.forward);
                 }
-                if (boss != null && Vector3.Distance(origin, boss.position + Vector3.up) < 3.4f && Vector3.Dot(avatar.forward, (boss.position - player.position).normalized) > .1f) HitBoss(55);
-                if (AimHit(origin, avatar.forward, 2.8f, out var wallHit) && wallHit.collider.GetComponentInParent<OfficeProp>() == null && wallHit.collider.transform != boss)
+                foreach (var enemy in defenders)
+                    if (enemy != null && enemy.Alive && Vector3.Distance(origin + avatar.forward * 1.3f, enemy.AimPoint) < 1.9f &&
+                        Vector3.Dot(avatar.forward, (enemy.AimPoint - origin).normalized) > .05f &&
+                        ClearDefenseSight(origin, enemy.AimPoint, player, enemy.transform)) enemy.Hit(60);
+                if (AimHit(origin, avatar.forward, 2.8f, out var wallHit) && wallHit.collider.GetComponentInParent<OfficeProp>() == null && wallHit.collider.GetComponentInParent<OfficeDefender>() == null)
                     audioBus.Play("wall", .4f, .85f, wallHit.point);
                 return;
             }
@@ -481,7 +481,8 @@ namespace OfficeRampage
                         end = hit.point;
                         var prop = hit.collider.GetComponentInParent<OfficeProp>();
                         if (prop != null) prop.Hit(18, pellet);
-                        if (boss != null && hit.collider.transform == boss) HitBoss(12);
+                        var enemy = hit.collider.GetComponentInParent<OfficeDefender>();
+                        if (enemy != null) enemy.Hit(12);
                     }
                     Trail(origin, end, Cyan);
                 }
@@ -502,7 +503,9 @@ namespace OfficeRampage
                             prop.Hit(100, (prop.transform.position - end).normalized);
                     }
                 }
-                if (boss != null && Vector3.Distance(boss.position + Vector3.up, end) < 4) HitBoss(85);
+                foreach (var enemy in defenders)
+                    if (enemy != null && enemy.Alive && Vector3.Distance(enemy.AimPoint, end) < 3.5f &&
+                        ClearDefenseSight(end - direction * .15f, enemy.AimPoint, player, enemy.transform)) enemy.Hit(100);
                 Impact(end, Orange, -direction, 10);
                 audioBus.Play("explosion", .8f, Random.Range(.9f, 1.05f), end);
             }
@@ -538,7 +541,7 @@ namespace OfficeRampage
             comboLeft = 4;
             score += 100 + Mathf.Min(combo, 20) * 15;
             if (combo % 3 == 0) { remaining += 5; Notify("COMBO " + combo + "   +5 SECONDS", 2); audioBus.Play("combo", .45f); }
-            if (!room.unlocked && room.destroyed >= room.required)
+            if (room.number < 5 && !room.unlocked && room.destroyed >= room.required)
             {
                 room.unlocked = true;
                 room.gate.GetComponent<Collider>().enabled = false;
@@ -570,71 +573,6 @@ namespace OfficeRampage
             }
         }
 
-        private void BeginBoss()
-        {
-            bossFight = true; bossHealth = 900; bossPhaseTime = 1.5f; bossPhase = 0;
-            boss = new GameObject("CEO - final boss").transform;
-            boss.SetParent(world);
-            boss.position = new Vector3(0, 0, current.start + 18);
-            BuildPerson(boss, true);
-            boss.localScale = Vector3.one * 1.5f;
-            var hitbox = boss.gameObject.AddComponent<CapsuleCollider>();
-            hitbox.height = 2; hitbox.radius = .5f; hitbox.center = Vector3.up;
-            bossWarning = Shape(world, "Charge warning", boss.position, new Vector3(1.7f, .025f, 8), Orange, false).transform;
-            bossWarning.gameObject.SetActive(false);
-            Notify("FINAL BOSS: THE CEO - DODGE THE ORANGE CHARGE!", 5);
-        }
-
-        private void UpdateBoss(float dt)
-        {
-            if (boss == null) return;
-            Vector3 toward = player.position - boss.position; toward.y = 0;
-            bossPhaseTime -= dt;
-            if (bossPhase == 0)
-            {
-                if (toward.sqrMagnitude > .01f) boss.rotation = Quaternion.LookRotation(toward);
-                if (toward.magnitude > 2.1f) boss.position += toward.normalized * 2.6f * dt;
-                if (bossPhaseTime <= 0)
-                {
-                    bossPhase = 1; bossPhaseTime = .85f; bossChargeDirection = toward.normalized;
-                    bossWarning.gameObject.SetActive(true);
-                    bossWarning.position = boss.position + bossChargeDirection * 5 + Vector3.up * .03f;
-                    bossWarning.rotation = Quaternion.LookRotation(bossChargeDirection.sqrMagnitude > .01f ? bossChargeDirection : Vector3.forward);
-                    bossWarning.localScale = new Vector3(1.8f, .025f, 11);
-                }
-            }
-            else if (bossPhase == 1)
-            {
-                if (bossPhaseTime <= 0) { bossPhase = 2; bossPhaseTime = .65f; bossWarning.gameObject.SetActive(false); }
-            }
-            else if (bossPhase == 2)
-            {
-                boss.position += bossChargeDirection * 17 * dt;
-                if (bossPhaseTime <= 0) { bossPhase = 3; bossPhaseTime = 1.5f; }
-            }
-            else if (bossPhaseTime <= 0) { bossPhase = 0; bossPhaseTime = 2; }
-            Vector3 p = boss.position;
-            p.x = Mathf.Clamp(p.x, -current.width / 2 + 1, current.width / 2 - 1);
-            p.z = Mathf.Clamp(p.z, current.start + 2, current.end - 2);
-            boss.position = p;
-            if (Vector3.Distance(player.position, boss.position) < 2 && bossPhase != 3) Hurt(bossPhase == 2 ? 25 : 12);
-            // Crossing the threshold seals the arena; the boss fight stays one-on-one.
-            if (player.position.z > current.start + 2 && current.gate.name != "Arena sealed")
-            {
-                Shape(world, "Arena entry seal", new Vector3(0, 1.7f, current.start), new Vector3(3.4f, 3.4f, .35f), Orange);
-                current.gate.name = "Arena sealed";
-            }
-        }
-
-        private void HitBoss(float damage)
-        {
-            if (!bossFight || ended || boss == null) return;
-            bossHealth = Mathf.Max(0, bossHealth - damage);
-            audioBus.Impact(3, false, boss.position + Vector3.up);
-            Impact(boss.position + Vector3.up * 1.7f, Orange, -boss.forward, 2);
-            if (bossHealth <= 0) { score += 5000; End(true); }
-        }
-
         private void Hurt(float damage)
         {
             if (invulnerability > 0 || ended) return;
@@ -664,6 +602,7 @@ namespace OfficeRampage
             Time.timeScale = originalTimeScale;
             LockCursor(false);
             foreach (var material in materials.Values) if (material != null) Destroy(material);
+            if (defenderFont != null) Destroy(defenderFont);
         }
 
         private void Box(Rect rect, Color color)
@@ -732,12 +671,13 @@ namespace OfficeRampage
             Matrix4x4 previous = GUI.matrix;
             float scale = Mathf.Min(Screen.width / 1280f, Screen.height / 720f);
             GUI.matrix = Matrix4x4.TRS(new Vector3((Screen.width - 1280 * scale) / 2, (Screen.height - 720 * scale) / 2), Quaternion.identity, Vector3.one * scale);
-            Box(new Rect(22, 20, 350, 154), new Color(.02f, .04f, .07f, .92f));
+            Box(new Rect(22, 20, 350, 182), new Color(.02f, .04f, .07f, .92f));
             GUI.Label(new Rect(38, 28, 300, 40), "OFFICE / RAMPAGE", titleStyle);
             GUI.Label(new Rect(38, 74, 300, 28), bossFight ? "FINAL FLOOR / THE CEO" : "OFFICE 0" + current.number + " / 05", labelStyle);
-            string objective = bossFight ? "Dodge, then strike during recovery" : "DESTROY " + current.destroyed + " / " + current.required + (current.unlocked ? "  |  EXIT OPEN" : "  |  EXIT LOCKED");
+            string objective = current.number == 5 ? (bossFight ? "FURIOUS CEO / HP " + (bossUnit != null ? Mathf.CeilToInt(bossUnit.Health) : 0) : "GUARD DOGS LEFT: " + LivingDefenders(5, true) + " / 5") : "DESTROY " + current.destroyed + " / " + current.required + (current.unlocked ? "  |  EXIT OPEN" : "  |  EXIT LOCKED");
             GUI.Label(new Rect(38, 108, 300, 24), objective, smallStyle);
             GUI.Label(new Rect(38, 144, 340, 24), current.layoutName + " / " + current.width + " x " + (current.end - current.start) + " m", smallStyle);
+            if (current.number < 5) GUI.Label(new Rect(38, 177, 300, 24), "DEFENDERS LEFT: " + LivingDefenders(current.number), smallStyle);
             Box(new Rect(545, 20, 190, 86), remaining < 20 ? new Color(.65f, .1f, .07f, .95f) : Navy);
             GUI.Label(new Rect(555, 22, 170, 28), "TIME REMAINING", centeredStyle);
             int seconds = Mathf.CeilToInt(remaining);
@@ -746,11 +686,11 @@ namespace OfficeRampage
             GUI.Label(new Rect(1034, 29, 215, 30), "SCORE  " + score.ToString("N0"), labelStyle);
             GUI.Label(new Rect(1034, 65, 215, 26), "COMBO " + combo + "  /  3 = +5s", smallStyle);
             Box(new Rect(1034, 94, 208 * Mathf.Clamp01(comboLeft / 4), 4), Orange);
-            if (noticeLeft > 0 && !ended) GUI.Label(new Rect(260, 185, 760, 40), notice, centeredStyle);
+            if (noticeLeft > 0 && !ended) GUI.Label(new Rect(260, 205, 760, 40), notice, centeredStyle);
             if (bossFight && !ended)
             {
                 Box(new Rect(390, 119, 500, 18), Navy);
-                Box(new Rect(390, 119, 500 * Mathf.Clamp01(bossHealth / 900), 18), Orange);
+                Box(new Rect(390, 119, 500 * Mathf.Clamp01(bossUnit != null ? bossUnit.Health / OfficeDefenseRules.BossHealth : 0), 18), Orange);
             }
             GUI.Label(new Rect(627, 342, 30, 32), "+", titleStyle);
             Box(new Rect(22, 617, 320, 80), Navy);

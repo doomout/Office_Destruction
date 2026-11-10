@@ -33,6 +33,17 @@ namespace OfficeRampage
         public readonly List<Point> furniture = new List<Point>();
         public readonly List<Point> oil = new List<Point>();
 
+        public static OfficeLayout CreateExecutive()
+        {
+            var layout = new OfficeLayout { width = 26, length = 30, name = "EXECUTIVE SUITE" };
+            for (int i = 0; i < 6; i++)
+            {
+                layout.furniture.Add(new Point(-9, 5 + i * 3.7f, i));
+                layout.furniture.Add(new Point(9, 5 + i * 3.7f, 5 - i));
+            }
+            return layout;
+        }
+
         public static OfficeLayout Create(int style, int seed)
         {
             var rng = new Random(seed);
