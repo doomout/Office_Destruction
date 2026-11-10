@@ -1,0 +1,194 @@
+[
+  {
+    "file": "office1.mp3",
+    "seconds": 203.912,
+    "rate": 44100,
+    "channels": 2,
+    "peak": 0.9778,
+    "rms": 0.1606
+  },
+  {
+    "file": "office2.mp3",
+    "seconds": 120.0,
+    "rate": 44100,
+    "channels": 2,
+    "peak": 1.0083,
+    "rms": 0.284
+  },
+  {
+    "file": "office3.ogg",
+    "seconds": 173.591,
+    "rate": 44100,
+    "channels": 2,
+    "peak": 1.0158,
+    "rms": 0.3398
+  },
+  {
+    "file": "office4.ogg",
+    "seconds": 180.001,
+    "rate": 44100,
+    "channels": 2,
+    "peak": 1.512,
+    "rms": 0.2126
+  },
+  {
+    "file": "office5.mp3",
+    "seconds": 203.912,
+    "rate": 44100,
+    "channels": 2,
+    "peak": 0.9943,
+    "rms": 0.169
+  },
+  {
+    "file": "boss.wav",
+    "seconds": 48.937,
+    "rate": 44100,
+    "channels": 2,
+    "peak": 0.9885,
+    "rms": 0.144
+  },
+  {
+    "file": "wood0.ogg",
+    "seconds": 0.313,
+    "rate": 44100,
+    "channels": 2,
+    "peak": 0.8974,
+    "rms": 0.1042
+  },
+  {
+    "file": "wood1.ogg",
+    "seconds": 0.313,
+    "rate": 44100,
+    "channels": 2,
+    "peak": 0.8982,
+    "rms": 0.1029
+  },
+  {
+    "file": "wood2.ogg",
+    "seconds": 0.313,
+    "rate": 44100,
+    "channels": 2,
+    "peak": 0.8942,
+    "rms": 0.1129
+  },
+  {
+    "file": "metal0.ogg",
+    "seconds": 0.168,
+    "rate": 44100,
+    "channels": 2,
+    "peak": 0.8985,
+    "rms": 0.0944
+  },
+  {
+    "file": "metal1.ogg",
+    "seconds": 0.359,
+    "rate": 44100,
+    "channels": 2,
+    "peak": 0.8818,
+    "rms": 0.0659
+  },
+  {
+    "file": "metal2.ogg",
+    "seconds": 0.117,
+    "rate": 44100,
+    "channels": 2,
+    "peak": 0.8723,
+    "rms": 0.1156
+  },
+  {
+    "file": "glass0.ogg",
+    "seconds": 0.241,
+    "rate": 44100,
+    "channels": 2,
+    "peak": 0.8832,
+    "rms": 0.0755
+  },
+  {
+    "file": "glass1.ogg",
+    "seconds": 0.429,
+    "rate": 44100,
+    "channels": 2,
+    "peak": 0.8952,
+    "rms": 0.0545
+  },
+  {
+    "file": "thud.ogg",
+    "seconds": 0.649,
+    "rate": 44100,
+    "channels": 2,
+    "peak": 0.8946,
+    "rms": 0.1261
+  },
+  {
+    "file": "wall.ogg",
+    "seconds": 0.489,
+    "rate": 44100,
+    "channels": 2,
+    "peak": 0.8941,
+    "rms": 0.0738
+  },
+  {
+    "file": "combo.ogg",
+    "seconds": 0.549,
+    "rate": 44100,
+    "channels": 1,
+    "peak": 0.9928,
+    "rms": 0.258
+  },
+  {
+    "file": "door.ogg",
+    "seconds": 1.202,
+    "rate": 44100,
+    "channels": 1,
+    "peak": 0.9299,
+    "rms": 0.1909
+  },
+  {
+    "file": "win.ogg",
+    "seconds": 0.827,
+    "rate": 44100,
+    "channels": 1,
+    "peak": 0.8896,
+    "rms": 0.2509
+  },
+  {
+    "file": "lose.ogg",
+    "seconds": 0.784,
+    "rate": 44100,
+    "channels": 1,
+    "peak": 0.9296,
+    "rms": 0.3129
+  },
+  {
+    "file": "swing.ogg",
+    "seconds": 0.47,
+    "rate": 44100,
+    "channels": 2,
+    "peak": 0.8868,
+    "rms": 0.1779
+  },
+  {
+    "file": "shot.ogg",
+    "seconds": 0.777,
+    "rate": 44100,
+    "channels": 1,
+    "peak": 0.8958,
+    "rms": 0.205
+  },
+  {
+    "file": "rocket.ogg",
+    "seconds": 0.677,
+    "rate": 44100,
+    "channels": 1,
+    "peak": 0.8976,
+    "rms": 0.1383
+  },
+  {
+    "file": "explosion.ogg",
+    "seconds": 2.0,
+    "rate": 44100,
+    "channels": 2,
+    "peak": 0.9019,
+    "rms": 0.126
+  }
+]

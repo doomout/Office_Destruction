@@ -35,6 +35,7 @@ namespace OfficeRampage
         private Transform bossWarning;
         private GUIStyle titleStyle, labelStyle, smallStyle, centeredStyle;
         private float originalTimeScale;
+        private OfficeAudio audioBus;
         private readonly int[] layoutOrder = { 0, 1, 2, 3, 4 };
 
         private static readonly Color Navy = new Color(.035f, .07f, .12f);
@@ -50,6 +51,8 @@ namespace OfficeRampage
         private void ResetRun()
         {
             Time.timeScale = 1;
+            if (audioBus == null) audioBus = gameObject.AddComponent<OfficeAudio>();
+            audioBus.ResetRun();
             if (world != null) { world.gameObject.SetActive(false); Destroy(world.gameObject); }
             rooms.Clear();
             debris.Clear();
@@ -232,6 +235,7 @@ namespace OfficeRampage
             prop.transform.position = position;
             prop.transform.rotation = Quaternion.Euler(0, Random.Range(-12f, 12f), 0);
             prop.game = this; prop.room = room.number;
+            prop.soundMaterial = kind;
             prop.health = kind == 0 ? 55 : 40;
             prop.debrisColor = kind == 0 ? wood : shell;
             room.total++;
@@ -292,10 +296,12 @@ namespace OfficeRampage
         {
             var keys = Keyboard.current;
             var mouse = Mouse.current;
+            if (keys != null && keys.mKey.wasPressedThisFrame) audioBus.Muted = !audioBus.Muted;
             if (keys != null && keys.rKey.wasPressedThisFrame) { ResetRun(); return; }
             if (keys != null && keys.escapeKey.wasPressedThisFrame && !ended)
             {
                 paused = !paused; Time.timeScale = paused ? 0 : 1; LockCursor(!paused);
+                audioBus.SetPaused(paused);
             }
             if (ended || paused) return;
             float dt = Time.deltaTime;
@@ -335,6 +341,7 @@ namespace OfficeRampage
             else if (current.unlocked && player.position.z > current.end - 2 && Mathf.Abs(player.position.x) < 1.8f)
             {
                 current = BuildRoom(current.number + 1, current.end);
+                audioBus.ChangeRoom(current.number);
                 if (current.number == 6) BeginBoss();
                 else Notify("OFFICE " + current.number + " / 5  -  KEEP THE COMBO ALIVE!", 3);
             }
@@ -377,6 +384,7 @@ namespace OfficeRampage
         private void Attack()
         {
             cooldown = cooldowns[weaponIndex]; swing = 1; shake = .8f;
+            audioBus.Weapon(weaponIndex);
             Vector3 origin = player.position + Vector3.up * 1.35f;
             Vector3 aimPoint = view.transform.position + view.transform.forward * 55;
             if (AimHit(view.transform.position, view.transform.forward, 55, out var aim)) aimPoint = aim.point;
@@ -394,6 +402,8 @@ namespace OfficeRampage
                         prop.Hit(60, avatar.forward);
                 }
                 if (boss != null && Vector3.Distance(origin, boss.position + Vector3.up) < 3.4f && Vector3.Dot(avatar.forward, (boss.position - player.position).normalized) > .1f) HitBoss(55);
+                if (AimHit(origin, avatar.forward, 2.8f, out var wallHit) && wallHit.collider.GetComponentInParent<OfficeProp>() == null && wallHit.collider.transform != boss)
+                    audioBus.Play("wall", .4f, .85f, wallHit.point);
                 return;
             }
             if (weaponIndex == 1)
@@ -430,6 +440,7 @@ namespace OfficeRampage
                 }
                 if (boss != null && Vector3.Distance(boss.position + Vector3.up, end) < 4) HitBoss(85);
                 Impact(end, Orange, -direction, 10);
+                audioBus.Play("explosion", .8f, Random.Range(.9f, 1.05f), end);
             }
         }
 
@@ -462,7 +473,7 @@ namespace OfficeRampage
             combo = comboLeft > 0 ? combo + 1 : 1;
             comboLeft = 4;
             score += 100 + Mathf.Min(combo, 20) * 15;
-            if (combo % 3 == 0) { remaining += 5; Notify("COMBO " + combo + "   +5 SECONDS", 2); }
+            if (combo % 3 == 0) { remaining += 5; Notify("COMBO " + combo + "   +5 SECONDS", 2); audioBus.Play("combo", .45f); }
             if (!room.unlocked && room.destroyed >= room.required)
             {
                 room.unlocked = true;
@@ -471,6 +482,7 @@ namespace OfficeRampage
                 room.gate.transform.localScale = new Vector3(3.3f, .12f, .3f);
                 room.gate.transform.position = new Vector3(0, .06f, room.end);
                 Notify("EXIT OPEN - FIND THE CYAN DOOR", 3);
+                audioBus.Play("door", .45f);
             }
         }
 
@@ -534,6 +546,7 @@ namespace OfficeRampage
         {
             if (!bossFight || ended || boss == null) return;
             bossHealth = Mathf.Max(0, bossHealth - damage);
+            audioBus.Impact(3, false, boss.position + Vector3.up);
             Impact(boss.position + Vector3.up * 1.7f, Orange, -boss.forward, 2);
             if (bossHealth <= 0) { score += 5000; End(true); }
         }
@@ -542,10 +555,12 @@ namespace OfficeRampage
         {
             if (invulnerability > 0 || ended) return;
             hp = Mathf.Max(0, hp - damage); invulnerability = 1; shake = 2;
+            audioBus.Play("thud", .7f, .8f);
             if (hp <= 0) End(false);
         }
 
         private void Notify(string message, float duration) { notice = message; noticeLeft = duration; }
+        public void PlayPropSound(int material, bool broken, Vector3 position) { audioBus.Impact(material, broken, position); }
         private void LockCursor(bool locked)
         {
             Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
@@ -554,10 +569,11 @@ namespace OfficeRampage
         private void End(bool victory)
         {
             ended = true; won = victory; LockCursor(false);
+            audioBus.Finish(victory);
         }
         private void OnApplicationFocus(bool focus)
         {
-            if (!focus && !ended && world != null) { paused = true; Time.timeScale = 0; LockCursor(false); }
+            if (!focus && !ended && world != null) { paused = true; Time.timeScale = 0; LockCursor(false); audioBus.SetPaused(true); }
         }
         private void OnDestroy()
         {
@@ -659,7 +675,7 @@ namespace OfficeRampage
             Box(new Rect(38, 667, 285 * hp / 100, 10), invulnerability > 0 ? Orange : Cyan);
             DrawWeaponSlots();
             GUI.Label(new Rect(354, 644, 480, 28), "WASD Move / Mouse Aim / LMB Attack / Space Jump", smallStyle);
-            GUI.Label(new Rect(405, 674, 430, 24), "Shift Sprint / Esc Pause / R Restart", smallStyle);
+            GUI.Label(new Rect(375, 674, 460, 24), "Shift Sprint / Esc Pause / R Restart / M Mute", smallStyle);
             if (ended || paused)
             {
                 Box(new Rect(0, 0, 1280, 720), new Color(.01f, .025f, .045f, .88f));
@@ -668,9 +684,14 @@ namespace OfficeRampage
                 GUI.Label(new Rect(340, 380, 600, 40), "PRESS R FOR A NEW RANDOM RUN", centeredStyle);
                 if (GUI.Button(new Rect(510, 450, 260, 48), paused ? "RESUME" : "PLAY AGAIN"))
                 {
-                    if (paused) { paused = false; Time.timeScale = 1; LockCursor(true); }
+                    if (paused) { paused = false; Time.timeScale = 1; LockCursor(true); audioBus.SetPaused(false); }
                     else ResetRun();
                 }
+                GUI.Label(new Rect(420, 525, 150, 28), "MUSIC", smallStyle);
+                audioBus.MusicVolume = GUI.HorizontalSlider(new Rect(560, 534, 270, 20), audioBus.MusicVolume, 0, .6f);
+                GUI.Label(new Rect(420, 565, 150, 28), "SOUND EFFECTS", smallStyle);
+                audioBus.EffectsVolume = GUI.HorizontalSlider(new Rect(560, 574, 270, 20), audioBus.EffectsVolume, 0, 1);
+                GUI.Label(new Rect(420, 608, 430, 28), audioBus.Muted ? "M: SOUND MUTED" : "M: MUTE ALL SOUND", smallStyle);
             }
             GUI.matrix = previous;
         }

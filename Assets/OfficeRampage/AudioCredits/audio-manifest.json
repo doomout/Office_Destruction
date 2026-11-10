@@ -1,0 +1,218 @@
+[
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Music/office1.mp3",
+    "title": "Singularity (calm)",
+    "author": "vitalezzz",
+    "license": "CC0-1.0",
+    "source": "https://opengameart.org/content/singularity-0",
+    "original": "https://opengameart.org/sites/default/files/singularity_calm_0.mp3",
+    "sha256": "73f5628439c4ebb2a3242f1cf40a194ce3c552caad155646c32dce8b02337d09"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Music/office2.mp3",
+    "title": "Simple Action Beat",
+    "author": "LushoGames",
+    "license": "CC0-1.0",
+    "source": "https://opengameart.org/content/simple-action-beat",
+    "original": "https://opengameart.org/sites/default/files/SimpleBeat_0.mp3",
+    "sha256": "3c13f2554c938c0cce2edc018a5f116da2003d5a02ef7d4a71ae0ec6ca99bdf3"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Music/office3.ogg",
+    "title": "The Hunt",
+    "author": "Sudocolon",
+    "license": "CC0-1.0",
+    "source": "https://opengameart.org/content/the-hunt",
+    "original": "https://opengameart.org/sites/default/files/The%20Hunt.ogg",
+    "sha256": "159806a733bb720f7b3d4fbdf508462d0ca3ef5bf351d41ed17fe27ef1858343"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Music/office4.ogg",
+    "title": "Pressure",
+    "author": "yd",
+    "license": "CC0-1.0",
+    "source": "https://opengameart.org/content/pressure",
+    "original": "https://opengameart.org/sites/default/files/Pressure.ogg",
+    "sha256": "b7bc42d944a60f7d3a0b1f7ad3d94eff784739e4ae833d6d398ce381ceb71bc8"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Music/office5.mp3",
+    "title": "Singularity (action)",
+    "author": "vitalezzz",
+    "license": "CC0-1.0",
+    "source": "https://opengameart.org/content/singularity-0",
+    "original": "https://opengameart.org/sites/default/files/singularity_action_0.mp3",
+    "sha256": "09c93408a9a4ef47b336d7009b8c8c85e6b8946a4bebff17bc43ece8381de310"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Music/boss.wav",
+    "title": "Action Theme Song",
+    "author": "Ogrebane",
+    "license": "CC0-1.0",
+    "source": "https://opengameart.org/content/action-theme-song",
+    "original": "https://opengameart.org/sites/default/files/action%20game%20theme.wav",
+    "sha256": "39aab1deb5a664a7b990cf1d4ad6f2bb136d508eb99967a8d045e201c9d80099"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Sfx/wood0.ogg",
+    "title": "impact-sounds",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "source": "https://kenney.nl/assets/impact-sounds",
+    "original": "Audio/impactWood_heavy_000.ogg",
+    "sha256": "15ff82332f342c30e469215539e1cc57e11b221aa2cf7e11e811d313a9927f3d"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Sfx/wood1.ogg",
+    "title": "impact-sounds",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "source": "https://kenney.nl/assets/impact-sounds",
+    "original": "Audio/impactWood_heavy_001.ogg",
+    "sha256": "f1b07a53ac10c615fff9ba470511fdeb722b5902e1a8520759fc20ad6f546015"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Sfx/wood2.ogg",
+    "title": "impact-sounds",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "source": "https://kenney.nl/assets/impact-sounds",
+    "original": "Audio/impactWood_heavy_002.ogg",
+    "sha256": "ce1e06f2a05f2634c645cb72f6a1623e64bc2d92be34917430a61031fb6597d4"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Sfx/metal0.ogg",
+    "title": "impact-sounds",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "source": "https://kenney.nl/assets/impact-sounds",
+    "original": "Audio/impactMetal_heavy_000.ogg",
+    "sha256": "e07045693e4a2b3d165c424e3dab4c781d9ff8880a386880ac89a51315d7f831"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Sfx/metal1.ogg",
+    "title": "impact-sounds",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "source": "https://kenney.nl/assets/impact-sounds",
+    "original": "Audio/impactMetal_heavy_001.ogg",
+    "sha256": "83554049f81f4db9209379e103c30bfa63f65c42189a03f300b045c2c82e23ae"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Sfx/metal2.ogg",
+    "title": "impact-sounds",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "source": "https://kenney.nl/assets/impact-sounds",
+    "original": "Audio/impactMetal_heavy_002.ogg",
+    "sha256": "b914c8f1eb7c0f34bb165d7c77f4be0351f6be0660c13c53e65424e262e2c093"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Sfx/glass0.ogg",
+    "title": "impact-sounds",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "source": "https://kenney.nl/assets/impact-sounds",
+    "original": "Audio/impactGlass_heavy_000.ogg",
+    "sha256": "b44b39a940e8948e74b9bd3776bff980df43cf220abdaf0d467dc4c43c0244a5"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Sfx/glass1.ogg",
+    "title": "impact-sounds",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "source": "https://kenney.nl/assets/impact-sounds",
+    "original": "Audio/impactGlass_heavy_001.ogg",
+    "sha256": "58686e0e562612cc566791844a10e269f8d1921f4766c14ba43976fd0a429f4e"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Sfx/thud.ogg",
+    "title": "impact-sounds",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "source": "https://kenney.nl/assets/impact-sounds",
+    "original": "Audio/impactPunch_heavy_000.ogg",
+    "sha256": "b33a8f14068aec24ec69ba85e5e87fdc41228975f6a1a3e44a6e7d6fc3d9f8d8"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Sfx/wall.ogg",
+    "title": "impact-sounds",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "source": "https://kenney.nl/assets/impact-sounds",
+    "original": "Audio/impactPlate_heavy_000.ogg",
+    "sha256": "112d4f93ddcc370b410630f971c0f5d991856102da9c76bc5c5540d388e75aaa"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Sfx/combo.ogg",
+    "title": "digital-audio",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "source": "https://kenney.nl/assets/digital-audio",
+    "original": "Audio/highUp.ogg",
+    "sha256": "cbc1c3c7ccf5d7903818144a4c3f5b2ed2385095792f29d8d7c76360ba4fa559"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Sfx/door.ogg",
+    "title": "digital-audio",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "source": "https://kenney.nl/assets/digital-audio",
+    "original": "Audio/powerUp1.ogg",
+    "sha256": "8c361b624b560c0bc30ea3063b71212bc30caebf425c9df2481c13b25561485c"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Sfx/win.ogg",
+    "title": "digital-audio",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "source": "https://kenney.nl/assets/digital-audio",
+    "original": "Audio/threeTone1.ogg",
+    "sha256": "bdf21eb12e65507f091d074886fdac820e1ccae51d060caa168e5567acadb84b"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Sfx/lose.ogg",
+    "title": "digital-audio",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "source": "https://kenney.nl/assets/digital-audio",
+    "original": "Audio/lowDown.ogg",
+    "sha256": "e0215fcfd8b9d7877f74d5c46b239a13d7db0d25998da97b80404931ef9eef5d"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Sfx/swing.ogg",
+    "title": "digital-audio",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "source": "https://kenney.nl/assets/digital-audio",
+    "original": "Audio/phaserDown1.ogg",
+    "sha256": "d2d046cd0247045f8819905fc9719a7237ccbd590b3128ce58a61a81f50d208b"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Sfx/shot.ogg",
+    "title": "sci-fi-sounds",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "source": "https://kenney.nl/assets/sci-fi-sounds",
+    "original": "Audio/explosionCrunch_000.ogg",
+    "sha256": "4b597d658d0ae101f0a030fbeea5fc3a4292ab85f017470a8254a8e7959cbd69"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Sfx/rocket.ogg",
+    "title": "sci-fi-sounds",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "source": "https://kenney.nl/assets/sci-fi-sounds",
+    "original": "Audio/laserLarge_000.ogg",
+    "sha256": "a56d95794cd732d6c2d66ce488c14cf557fe526c282897c9a77675c2bd9b77e6"
+  },
+  {
+    "file": "Assets/OfficeRampage/Resources/OfficeAudio/Sfx/explosion.ogg",
+    "title": "sci-fi-sounds",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "source": "https://kenney.nl/assets/sci-fi-sounds",
+    "original": "Audio/lowFrequency_explosion_000.ogg",
+    "sha256": "3cb48d86dab63140cfb9aaeea4d4a6846abaca5831d157d8adbec0490da26343"
+  }
+]
