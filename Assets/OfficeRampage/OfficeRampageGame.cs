@@ -14,6 +14,7 @@ namespace OfficeRampage
             public GameObject gate;
             public Renderer gateRenderer;
             public bool unlocked;
+            public string layoutName;
         }
 
         private readonly List<Room> rooms = new List<Room>();
@@ -34,6 +35,7 @@ namespace OfficeRampage
         private Transform bossWarning;
         private GUIStyle titleStyle, labelStyle, smallStyle, centeredStyle;
         private float originalTimeScale;
+        private readonly int[] layoutOrder = { 0, 1, 2, 3, 4 };
 
         private static readonly Color Navy = new Color(.035f, .07f, .12f);
         private static readonly Color Cyan = new Color(.12f, .85f, .86f);
@@ -58,6 +60,11 @@ namespace OfficeRampage
             cooldown = comboLeft = invulnerability = swing = shake = 0;
             ended = won = paused = bossFight = false;
             boss = bossWarning = null;
+            for (int i = layoutOrder.Length - 1; i > 0; i--)
+            {
+                int j = Random.Range(0, i + 1);
+                int temp = layoutOrder[i]; layoutOrder[i] = layoutOrder[j]; layoutOrder[j] = temp;
+            }
 
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
             RenderSettings.ambientLight = new Color(.55f, .62f, .72f);
@@ -152,8 +159,10 @@ namespace OfficeRampage
         private Room BuildRoom(int number, float start)
         {
             bool arena = number == 6;
+            var layout = arena ? null : OfficeLayout.Create(layoutOrder[number - 1], Random.Range(0, int.MaxValue));
             var room = new Room { number = number, start = start,
-                width = arena ? 24 : Random.Range(16, 23), end = start + (arena ? 28 : Random.Range(21, 29)) };
+                width = arena ? 24 : layout.width, end = start + (arena ? 28 : layout.length),
+                layoutName = arena ? "CEO ARENA" : layout.name };
             rooms.Add(room);
             var root = new GameObject(arena ? "CEO arena" : "Office " + number).transform;
             root.SetParent(world);
@@ -161,8 +170,9 @@ namespace OfficeRampage
             float middle = (room.start + room.end) / 2;
             var floor = number % 2 == 0 ? new Color(.18f, .24f, .28f) : new Color(.23f, .28f, .32f);
             Shape(root, "Floor", new Vector3(0, -.25f, middle), new Vector3(room.width, .5f, length), floor);
-            for (float z = start + 1; z < room.end; z += 2)
-                Shape(root, "Aisle guide", new Vector3(0, .012f, z), new Vector3(.08f, .018f, 1), Cyan, false);
+            // Only mark the entrance and exit: the player must navigate the partitions.
+            foreach (float z in new[] { start + 1, start + 2, room.end - 2, room.end - 1 })
+                Shape(root, "Door guide", new Vector3(0, .012f, z), new Vector3(.12f, .018f, .65f), Cyan, false);
             for (int s = -1; s <= 1; s += 2)
             {
                 Shape(root, "Side wall", new Vector3(s * (room.width / 2 + .15f), 2, middle), new Vector3(.3f, 4, length), new Color(.55f, .64f, .67f));
@@ -193,15 +203,20 @@ namespace OfficeRampage
 
             if (!arena)
             {
-                // Independent grid cells guarantee a clear central aisle and non-overlapping fixtures.
-                for (float z = start + 6; z < room.end - 3; z += 3.7f)
-                    for (int side = -1; side <= 1; side += 2)
-                        for (float x = 3.2f; x < room.width / 2 - 1.3f; x += 3.5f)
-                        {
-                            int kind = Random.Range(0, 4);
-                            Vector3 p = new Vector3(side * x + Random.Range(-.15f, .15f), 0, z);
-                            SpawnProp(root, room, p, kind);
-                        }
+                foreach (var wall in layout.walls)
+                {
+                    Vector3 position = new Vector3(wall.x, 1.8f, start + wall.z);
+                    // No OfficeProp component: all weapons and the player collide with these walls.
+                    Shape(root, "Indestructible partition", position,
+                        new Vector3(wall.width, 3.6f, wall.depth), new Color(.26f, .32f, .37f));
+                    Shape(root, "Partition warning cap", position + Vector3.up * 1.72f,
+                        new Vector3(wall.width, .12f, wall.depth + .025f), Orange, false);
+                    foreach (float face in new[] { -.24f, .24f })
+                        Shape(root, "Reinforced wall stripe", new Vector3(wall.x, .4f, start + wall.z + face),
+                            new Vector3(wall.width, .12f, .02f), Orange, false);
+                }
+                foreach (var point in layout.furniture)
+                    SpawnProp(root, room, new Vector3(point.x, 0, start + point.z), Random.Range(0, 4));
                 room.required = Mathf.CeilToInt(room.total * .6f);
             }
             return room;
@@ -455,7 +470,7 @@ namespace OfficeRampage
                 room.gateRenderer.sharedMaterial = Mat(Cyan);
                 room.gate.transform.localScale = new Vector3(3.3f, .12f, .3f);
                 room.gate.transform.position = new Vector3(0, .06f, room.end);
-                Notify("EXIT OPEN - FOLLOW THE CYAN AISLE", 3);
+                Notify("EXIT OPEN - FIND THE CYAN DOOR", 3);
             }
         }
 
@@ -555,6 +570,54 @@ namespace OfficeRampage
         {
             GUI.color = color; GUI.DrawTexture(rect, Texture2D.whiteTexture); GUI.color = Color.white;
         }
+
+        private void DrawWeaponSlots()
+        {
+            GUI.Label(new Rect(842, 570, 416, 28), weaponNames[weaponIndex] + "  /  UNLIMITED", smallStyle);
+            string[] captions = { "HAMMER", "SHOTGUN", "ROCKET" };
+            for (int i = 0; i < 3; i++)
+            {
+                float x = 842 + i * 142;
+                bool selected = weaponIndex == i;
+                Color ink = selected ? Color.white : new Color(.55f, .65f, .7f);
+                Box(new Rect(x, 600, 132, 98), selected ? Cyan : new Color(.2f, .28f, .33f));
+                Box(new Rect(x + 2, 602, 128, 94), selected ? new Color(.06f, .19f, .24f) : Navy);
+                GUI.Label(new Rect(x + 9, 604, 22, 24), (i + 1).ToString(), smallStyle);
+                // Vector-like silhouettes stay sharp at every Game view resolution.
+                if (i == 0)
+                {
+                    Box(new Rect(x + 62, 627, 8, 37), Orange);
+                    Box(new Rect(x + 43, 615, 46, 18), ink);
+                    Box(new Rect(x + 39, 613, 8, 22), ink);
+                    Box(new Rect(x + 85, 613, 8, 22), ink);
+                    Box(new Rect(x + 61, 651, 10, 14), ink);
+                }
+                else if (i == 1)
+                {
+                    Box(new Rect(x + 52, 624, 62, 5), ink);
+                    Box(new Rect(x + 52, 631, 62, 5), ink);
+                    Box(new Rect(x + 37, 628, 40, 13), ink);
+                    Box(new Rect(x + 70, 637, 24, 7), Orange);
+                    Box(new Rect(x + 17, 637, 27, 13), Orange);
+                    Box(new Rect(x + 41, 638, 10, 21), ink);
+                    Box(new Rect(x + 53, 642, 14, 3), ink);
+                }
+                else
+                {
+                    Box(new Rect(x + 23, 625, 81, 19), ink);
+                    Box(new Rect(x + 18, 621, 9, 27), Orange);
+                    Box(new Rect(x + 100, 621, 8, 27), Orange);
+                    Box(new Rect(x + 108, 628, 9, 13), ink);
+                    Box(new Rect(x + 48, 644, 9, 16), ink);
+                    Box(new Rect(x + 78, 644, 8, 13), ink);
+                    Box(new Rect(x + 61, 617, 5, 8), ink);
+                    Box(new Rect(x + 56, 613, 19, 5), Cyan);
+                }
+                GUI.Label(new Rect(x + 9, 670, 120, 23), captions[i], smallStyle);
+                if (selected) Box(new Rect(x + 2, 694, 128, 4), Cyan);
+            }
+        }
+
         private void OnGUI()
         {
             if (world == null) return;
@@ -569,11 +632,12 @@ namespace OfficeRampage
             Matrix4x4 previous = GUI.matrix;
             float scale = Mathf.Min(Screen.width / 1280f, Screen.height / 720f);
             GUI.matrix = Matrix4x4.TRS(new Vector3((Screen.width - 1280 * scale) / 2, (Screen.height - 720 * scale) / 2), Quaternion.identity, Vector3.one * scale);
-            Box(new Rect(22, 20, 320, 122), new Color(.02f, .04f, .07f, .92f));
+            Box(new Rect(22, 20, 350, 154), new Color(.02f, .04f, .07f, .92f));
             GUI.Label(new Rect(38, 28, 300, 40), "OFFICE / RAMPAGE", titleStyle);
             GUI.Label(new Rect(38, 74, 300, 28), bossFight ? "FINAL FLOOR / THE CEO" : "OFFICE 0" + current.number + " / 05", labelStyle);
             string objective = bossFight ? "Dodge, then strike during recovery" : "DESTROY " + current.destroyed + " / " + current.required + (current.unlocked ? "  |  EXIT OPEN" : "  |  EXIT LOCKED");
             GUI.Label(new Rect(38, 108, 300, 24), objective, smallStyle);
+            GUI.Label(new Rect(38, 144, 340, 24), current.layoutName + " / " + current.width + " x " + (current.end - current.start) + " m", smallStyle);
             Box(new Rect(545, 20, 190, 86), remaining < 20 ? new Color(.65f, .1f, .07f, .95f) : Navy);
             GUI.Label(new Rect(555, 22, 170, 28), "TIME REMAINING", centeredStyle);
             int seconds = Mathf.CeilToInt(remaining);
@@ -582,7 +646,7 @@ namespace OfficeRampage
             GUI.Label(new Rect(1034, 29, 215, 30), "SCORE  " + score.ToString("N0"), labelStyle);
             GUI.Label(new Rect(1034, 65, 215, 26), "COMBO " + combo + "  /  3 = +5s", smallStyle);
             Box(new Rect(1034, 94, 208 * Mathf.Clamp01(comboLeft / 4), 4), Orange);
-            if (noticeLeft > 0 && !ended) GUI.Label(new Rect(260, 155, 760, 40), notice, centeredStyle);
+            if (noticeLeft > 0 && !ended) GUI.Label(new Rect(260, 185, 760, 40), notice, centeredStyle);
             if (bossFight && !ended)
             {
                 Box(new Rect(390, 119, 500, 18), Navy);
@@ -593,9 +657,7 @@ namespace OfficeRampage
             GUI.Label(new Rect(38, 627, 290, 28), "HEALTH  " + Mathf.CeilToInt(hp), labelStyle);
             Box(new Rect(38, 667, 285, 10), new Color(.2f, .25f, .3f));
             Box(new Rect(38, 667, 285 * hp / 100, 10), invulnerability > 0 ? Orange : Cyan);
-            Box(new Rect(842, 617, 416, 80), Navy);
-            GUI.Label(new Rect(860, 625, 385, 28), "0" + (weaponIndex + 1) + " / " + weaponNames[weaponIndex], labelStyle);
-            GUI.Label(new Rect(860, 662, 385, 24), "1 Hammer     2 Shotgun     3 Rocket  |  Unlimited", smallStyle);
+            DrawWeaponSlots();
             GUI.Label(new Rect(354, 644, 480, 28), "WASD Move / Mouse Aim / LMB Attack / Space Jump", smallStyle);
             GUI.Label(new Rect(405, 674, 430, 24), "Shift Sprint / Esc Pause / R Restart", smallStyle);
             if (ended || paused)
