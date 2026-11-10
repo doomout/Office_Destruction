@@ -21,7 +21,9 @@ namespace OfficeRampage
         public struct Point
         {
             public float x, z;
-            public Point(float x, float z) { this.x = x; this.z = z; }
+            public int kind;
+            public Point(float x, float z, int kind = 0) { this.x = x; this.z = z; this.kind = kind; }
+            public Area Footprint { get { return kind <= 1 ? new Area(x, z, 2.9f, 1.9f) : new Area(x, z, 1.7f, 1.5f); } }
         }
 
         public float width, length;
@@ -29,6 +31,7 @@ namespace OfficeRampage
         public readonly List<Area> walls = new List<Area>();
         public readonly List<Area> route = new List<Area>();
         public readonly List<Point> furniture = new List<Point>();
+        public readonly List<Point> oil = new List<Point>();
 
         public static OfficeLayout Create(int style, int seed)
         {
@@ -68,8 +71,55 @@ namespace OfficeRampage
                     foreach (var wall in plan.walls) if (wall.Overlaps(footprint, .5f)) { blocked = true; break; }
                     if (blocked) continue;
                     foreach (var aisle in plan.route) if (aisle.Overlaps(footprint)) { blocked = true; break; }
-                    if (!blocked) plan.furniture.Add(new Point(x, z));
+                    if (!blocked) plan.furniture.Add(new Point(x, z, plan.furniture.Count % 2));
                 }
+            // Fill spaces that cannot fit a desk with compact office fixtures.
+            // All footprints include the maximum rotation of the generated models.
+            int[] smallKinds = { 4, 2, 3, 5 };
+            for (int i = smallKinds.Length - 1; i > 0; i--)
+            {
+                int j = rng.Next(i + 1);
+                int swap = smallKinds[i]; smallKinds[i] = smallKinds[j]; smallKinds[j] = swap;
+            }
+            int smallCount = 0;
+            for (float z = 1.4f; z < plan.length - 1.2f; z += 1.1f)
+                for (float x = -plan.width / 2 + 1.2f; x < plan.width / 2 - 1; x += 1.1f)
+                {
+                    var point = new Point(x, z, smallKinds[smallCount % smallKinds.Length]);
+                    var footprint = point.Footprint;
+                    bool blocked = false;
+                    foreach (var wall in plan.walls) if (wall.Overlaps(footprint, .35f)) { blocked = true; break; }
+                    if (blocked) continue;
+                    foreach (var aisle in plan.route) if (aisle.Overlaps(footprint)) { blocked = true; break; }
+                    if (blocked) continue;
+                    foreach (var existing in plan.furniture) if (existing.Footprint.Overlaps(footprint, 1.4f)) { blocked = true; break; }
+                    if (!blocked) { plan.furniture.Add(point); smallCount++; }
+                }
+            // Every office includes all six types, even if desks left few small slots.
+            // Replace redundant fixtures with equal-size or smaller missing types.
+            int[] counts = new int[6];
+            foreach (var item in plan.furniture) counts[item.kind]++;
+            for (int kind = 2; kind < 6; kind++)
+                if (counts[kind] == 0)
+                    for (int i = plan.furniture.Count - 1; i >= 0; i--)
+                    {
+                        var item = plan.furniture[i];
+                        if (counts[item.kind] <= 1) continue;
+                        counts[item.kind]--; item.kind = kind; counts[kind]++;
+                        plan.furniture[i] = item;
+                        break;
+                    }
+            // Oil occupies traversable floor, never walls or spawn/exit thresholds.
+            // Its short axis leaves room to skirt it within the reserved aisle.
+            for (int i = 1; i < plan.route.Count - 2; i += 2)
+            {
+                var aisle = plan.route[i];
+                float z = aisle.z - .7f;
+                var patch = new Area(aisle.x, z, 1.3f, 1.5f);
+                bool blocked = z < 4 || z > plan.length - 3;
+                foreach (var wall in plan.walls) if (wall.Overlaps(patch, .2f)) { blocked = true; break; }
+                if (!blocked) plan.oil.Add(new Point(aisle.x, z));
+            }
             return plan;
         }
 

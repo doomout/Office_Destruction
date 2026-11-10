@@ -9,12 +9,13 @@ namespace OfficeRampage
         public float health = 50f;
         public Color debrisColor;
         public int soundMaterial;
+        public int kind;
         private bool broken;
         private float nextImpactSound;
 
         public void Hit(float damage, Vector3 direction)
         {
-            if (broken) return;
+            if (broken || !game.RunActive) return;
             health -= damage;
             if (health <= 0 || Time.time >= nextImpactSound)
             {
@@ -24,9 +25,9 @@ namespace OfficeRampage
             game.Impact(transform.position + Vector3.up, debrisColor, direction, health <= 0 ? 7 : 2);
             if (health > 0) return;
             broken = true;
-            game.PropDestroyed(room);
             // Disable colliders immediately so a second pellet cannot score this object twice.
             gameObject.SetActive(false);
+            game.PropDestroyed(room, kind, transform.position + Vector3.up);
             Destroy(gameObject);
         }
     }

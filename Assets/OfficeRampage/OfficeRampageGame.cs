@@ -36,6 +36,9 @@ namespace OfficeRampage
         private GUIStyle titleStyle, labelStyle, smallStyle, centeredStyle;
         private float originalTimeScale;
         private OfficeAudio audioBus;
+        private readonly List<Vector3> oilPuddles = new List<Vector3>();
+        private bool slowedByOil;
+        public bool RunActive { get { return !ended && !paused; } }
         private readonly int[] layoutOrder = { 0, 1, 2, 3, 4 };
 
         private static readonly Color Navy = new Color(.035f, .07f, .12f);
@@ -55,6 +58,7 @@ namespace OfficeRampage
             audioBus.ResetRun();
             if (world != null) { world.gameObject.SetActive(false); Destroy(world.gameObject); }
             rooms.Clear();
+            oilPuddles.Clear(); slowedByOil = false;
             debris.Clear();
             world = new GameObject("Generated Office Rampage").transform;
             world.SetParent(transform);
@@ -219,7 +223,22 @@ namespace OfficeRampage
                             new Vector3(wall.width, .12f, .02f), Orange, false);
                 }
                 foreach (var point in layout.furniture)
-                    SpawnProp(root, room, new Vector3(point.x, 0, start + point.z), Random.Range(0, 4));
+                    SpawnProp(root, room, new Vector3(point.x, 0, start + point.z), point.kind);
+                foreach (var patch in layout.oil)
+                {
+                    var center = new Vector3(patch.x, 0, start + patch.z);
+                    oilPuddles.Add(center);
+                    Shape(root, "Oil puddle - 50 percent slow", center + Vector3.up * .015f,
+                        new Vector3(1.3f, .012f, 1.5f), new Color(.025f, .025f, .04f), false, PrimitiveType.Cylinder);
+                    Shape(root, "Oil surface sheen", center + new Vector3(.1f, .03f, .08f),
+                        new Vector3(.85f, .003f, .85f), new Color(.14f, .1f, .22f), false, PrimitiveType.Cylinder);
+                    var warning = new GameObject("Oil warning").AddComponent<TextMesh>();
+                    warning.transform.SetParent(root);
+                    warning.transform.position = center + new Vector3(0, .04f, 0);
+                    warning.transform.rotation = Quaternion.Euler(90, 0, 0);
+                    warning.text = "OIL"; warning.anchor = TextAnchor.MiddleCenter;
+                    warning.fontSize = 32; warning.characterSize = .11f; warning.color = new Color(1, .75f, .2f);
+                }
                 room.required = Mathf.CeilToInt(room.total * .6f);
             }
             return room;
@@ -227,7 +246,7 @@ namespace OfficeRampage
 
         private void SpawnProp(Transform root, Room room, Vector3 position, int kind)
         {
-            string[] names = { "Desk", "Computer", "Water cooler", "Printer" };
+            string[] names = { "Desk", "Computer - explosive", "Water cooler - heal", "Copier - explosive", "Filing cabinet", "Potted plant" };
             Color wood = new Color(.62f, .39f, .2f);
             Color shell = new Color(.73f, .8f, .8f);
             var prop = new GameObject(names[kind]).AddComponent<OfficeProp>();
@@ -235,8 +254,9 @@ namespace OfficeRampage
             prop.transform.position = position;
             prop.transform.rotation = Quaternion.Euler(0, Random.Range(-12f, 12f), 0);
             prop.game = this; prop.room = room.number;
-            prop.soundMaterial = kind;
-            prop.health = kind == 0 ? 55 : 40;
+            prop.kind = kind;
+            prop.soundMaterial = kind == OfficeRules.Plant ? 0 : kind;
+            prop.health = kind == OfficeRules.Cabinet ? 90 : kind == OfficeRules.Plant ? 25 : kind == 0 ? 55 : 40;
             prop.debrisColor = kind == 0 ? wood : shell;
             room.total++;
             var t = prop.transform;
@@ -263,13 +283,53 @@ namespace OfficeRampage
                 Shape(t, "Water bottle", new Vector3(0, 1.55f, 0), new Vector3(.55f, .38f, .55f), new Color(.12f, .5f, .85f), true, PrimitiveType.Cylinder);
                 Shape(t, "Tap", new Vector3(0, .92f, -.46f), new Vector3(.23f, .12f, .16f), Cyan);
             }
-            else
+            else if (kind == OfficeRules.Copier)
             {
                 Shape(t, "Printer cabinet", new Vector3(0, .55f, 0), new Vector3(1.2f, 1.1f, 1), shell);
                 Shape(t, "Scanner lid", new Vector3(0, 1.18f, 0), new Vector3(1.3f, .16f, 1.05f), Navy);
                 Shape(t, "Paper output", new Vector3(0, .82f, -.54f), new Vector3(.72f, .13f, .12f), Navy);
                 Shape(t, "Control panel", new Vector3(.35f, 1.29f, -.26f), new Vector3(.3f, .05f, .24f), Cyan);
+                for (int i = 0; i < 2; i++)
+                    Shape(t, "Paper drawer", new Vector3(0, .23f + i * .27f, -.51f), new Vector3(.96f, .2f, .04f), new Color(.48f, .57f, .6f));
             }
+            else if (kind == OfficeRules.Cabinet)
+            {
+                Shape(t, "Steel cabinet", new Vector3(0, 1.05f, 0), new Vector3(1.1f, 2.1f, .7f), new Color(.3f, .42f, .46f));
+                for (int i = 0; i < 4; i++)
+                {
+                    Shape(t, "Drawer", new Vector3(0, .28f + i * .5f, -.37f), new Vector3(.98f, .43f, .04f), shell, false);
+                    Shape(t, "Drawer handle", new Vector3(0, .3f + i * .5f, -.41f), new Vector3(.32f, .06f, .04f), Navy, false);
+                }
+            }
+            else if (kind == OfficeRules.Plant)
+            {
+                prop.debrisColor = new Color(.24f, .58f, .18f);
+                Shape(t, "Plant pot", new Vector3(0, .3f, 0), new Vector3(.7f, .3f, .7f), new Color(.65f, .29f, .15f), true, PrimitiveType.Cylinder);
+                Shape(t, "Stem", new Vector3(0, .9f, 0), new Vector3(.09f, .7f, .09f), wood);
+                for (int i = 0; i < 5; i++)
+                {
+                    float angle = i * Mathf.PI * .4f;
+                    Shape(t, "Leaf", new Vector3(Mathf.Sin(angle) * .25f, 1 + (i % 2) * .2f, Mathf.Cos(angle) * .25f),
+                        new Vector3(.48f, .42f, .48f), new Color(.2f, .55f + i * .025f, .18f), true, PrimitiveType.Sphere);
+                }
+            }
+            if (OfficeRules.IsElectronic(kind) || kind == OfficeRules.WaterCooler)
+            {
+                var label = new GameObject("Break effect label").AddComponent<TextMesh>();
+                label.transform.SetParent(t, false);
+                label.transform.localPosition = new Vector3(0, kind == OfficeRules.WaterCooler ? 2.1f : 1.95f, 0);
+                label.text = kind == OfficeRules.WaterCooler ? "+5 HP" : "-5 HP";
+                label.anchor = TextAnchor.MiddleCenter; label.fontSize = 36; label.characterSize = .09f;
+                label.color = kind == OfficeRules.WaterCooler ? new Color(.2f, 1, .5f) : Orange;
+            }
+        }
+
+        private bool IsStandingOnOil()
+        {
+            Vector3 p = player.position;
+            foreach (var oil in oilPuddles)
+                if (OfficeRules.OnOil(p.x, p.z, p.y, oil.x, oil.z, .65f, .75f)) return true;
+            return false;
         }
 
         private void SetWeapon(int index)
@@ -329,14 +389,18 @@ namespace OfficeRampage
             if (keys != null && keys.spaceKey.wasPressedThisFrame && controller.isGrounded) vertical = 7;
             vertical -= 21 * dt;
             float speed = keys != null && keys.leftShiftKey.isPressed ? 8 : 5.6f;
+            slowedByOil = IsStandingOnOil();
+            speed = OfficeRules.MovementSpeed(speed, slowedByOil);
             Vector3 move = Quaternion.Euler(0, yaw, 0) * new Vector3(input.x, 0, input.y) * speed;
             var collision = controller.Move((move + Vector3.up * vertical) * dt);
+            slowedByOil = IsStandingOnOil();
             if ((collision & CollisionFlags.Above) != 0 && vertical > 0) vertical = 0;
             avatar.rotation = Quaternion.Euler(0, yaw, 0);
             swing = Mathf.MoveTowards(swing, 0, dt * 5);
             weapon.localRotation = Quaternion.Euler(-swing * 60, -swing * 25, 0);
             UpdateCamera();
             if (mouse != null && mouse.leftButton.isPressed && Cursor.lockState == CursorLockMode.Locked && cooldown <= 0) Attack();
+            if (ended) return;
             if (bossFight) UpdateBoss(dt);
             else if (current.unlocked && player.position.z > current.end - 2 && Mathf.Abs(player.position.x) < 1.8f)
             {
@@ -465,7 +529,7 @@ namespace OfficeRampage
             }
         }
 
-        public void PropDestroyed(int roomNumber)
+        public void PropDestroyed(int roomNumber, int kind, Vector3 position)
         {
             if (ended) return;
             var room = rooms.Find(r => r.number == roomNumber);
@@ -483,6 +547,26 @@ namespace OfficeRampage
                 room.gate.transform.position = new Vector3(0, .06f, room.end);
                 Notify("EXIT OPEN - FIND THE CYAN DOOR", 3);
                 audioBus.Play("door", .45f);
+            }
+            float previousHealth = hp;
+            hp = OfficeRules.HealthAfterBreak(hp, kind);
+            if (OfficeRules.IsElectronic(kind))
+            {
+                // Per-object cost, independent of range and the boss-contact invulnerability timer.
+                // This visual explosion does not recursively damage other props.
+                Impact(position, Orange, Vector3.up, 10);
+                audioBus.Play("explosion", .55f, Random.Range(.95f, 1.1f), position);
+                var flash = Shape(world, "Electronic explosion", position, Vector3.one * 1.6f, Orange, false, PrimitiveType.Sphere);
+                Destroy(flash, .12f);
+                shake = 1.5f;
+                Notify("ELECTRONICS EXPLODED  -5 HP", 1.8f);
+                if (hp <= 0) End(false);
+            }
+            else if (kind == OfficeRules.WaterCooler)
+            {
+                Impact(position, new Color(.2f, .9f, .6f), Vector3.up, 7);
+                audioBus.Play("combo", .4f, 1.25f);
+                Notify(hp > previousHealth ? "WATER COOLER  +" + (hp - previousHealth).ToString("0") + " HP" : "WATER COOLER  HP FULL", 1.8f);
             }
         }
 
@@ -671,6 +755,7 @@ namespace OfficeRampage
             GUI.Label(new Rect(627, 342, 30, 32), "+", titleStyle);
             Box(new Rect(22, 617, 320, 80), Navy);
             GUI.Label(new Rect(38, 627, 290, 28), "HEALTH  " + Mathf.CeilToInt(hp), labelStyle);
+            if (slowedByOil && !ended) GUI.Label(new Rect(38, 578, 300, 32), "OIL!  MOVE SPEED 50%", labelStyle);
             Box(new Rect(38, 667, 285, 10), new Color(.2f, .25f, .3f));
             Box(new Rect(38, 667, 285 * hp / 100, 10), invulnerability > 0 ? Orange : Cyan);
             DrawWeaponSlots();
