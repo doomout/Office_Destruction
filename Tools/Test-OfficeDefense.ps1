@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 $source = "using System;`nusing System.Collections.Generic;`n"
 foreach ($file in @('OfficeLayout.cs', 'OfficeDefenseRules.cs', 'OfficeNavigation.cs')) {
     $text = Get-Content (Join-Path $PSScriptRoot "../Assets/OfficeRampage/$file") -Raw -Encoding UTF8
@@ -21,12 +21,12 @@ namespace OfficeRampage
         public static string Run()
         {
             var rng = new Random(42);
-            Require(OfficeDefenseRules.Count(1) == 1 && OfficeDefenseRules.Count(2) == 3 &&
-                OfficeDefenseRules.Count(3) == 3 && OfficeDefenseRules.Count(4) == 3 && OfficeDefenseRules.Count(5) == 5, "Wrong roster sizes");
+            Require(OfficeDefenseRules.Count(1) == 10 && OfficeDefenseRules.Count(2) == 22 &&
+                OfficeDefenseRules.Count(3) == 5 && OfficeDefenseRules.Count(4) == 3 && OfficeDefenseRules.Count(5) == 5, "Wrong roster sizes");
             Require(OfficeDefenseRules.Health(1, 0, rng) == 60 && OfficeDefenseRules.BossHealth == 500, "Guard/CEO health");
-            for (int room = 2; room <= 4; room++)
-                for (int i = 0; i < 3; i++)
-                    Require(OfficeDefenseRules.Health(room, i, rng) == ((room - 2) * 3 + i + 1) * 20, "Rank health");
+            for (int i = 0; i < 22; i++) Require(OfficeDefenseRules.Health(2, i, rng) == (i < 10 ? 20 : i < 17 ? 40 : 60), "Junior rank health");
+            for (int i = 0; i < 5; i++) Require(OfficeDefenseRules.Health(3, i, rng) == (i < 3 ? 100 : 120), "Manager health");
+            for (int i = 0; i < 3; i++) Require(OfficeDefenseRules.Health(4, i, rng) == 140 + i * 20, "Executive health");
             bool low = false, high = false;
             for (int i = 0; i < 10000; i++)
             {
@@ -44,7 +44,7 @@ namespace OfficeRampage
             {
                 var p = style == 5 ? OfficeLayout.CreateExecutive() : OfficeLayout.Create(style, seed);
                 var nav = new OfficeNavigation(p);
-                var spawns = nav.SpawnPoints(style == 5 ? 5 : 3, rng, style == 5);
+                var spawns = nav.SpawnPoints(style == 5 ? 5 : 22, rng, style == 5);
                 foreach (var start in spawns)
                 {
                     CheckPoint(p, start);
