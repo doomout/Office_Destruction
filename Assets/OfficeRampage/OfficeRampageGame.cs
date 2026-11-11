@@ -20,8 +20,8 @@ namespace OfficeRampage
         private readonly List<Room> rooms = new List<Room>();
         private readonly Dictionary<Color, Material> materials = new Dictionary<Color, Material>();
         private readonly Queue<GameObject> debris = new Queue<GameObject>();
-        private readonly string[] weaponNames = { "SLEDGEHAMMER", "SHOTGUN", "ROCKET LAUNCHER" };
-        private readonly float[] cooldowns = { .48f, .7f, 1.15f };
+        private readonly string[] weaponNames = OfficeCombatRules.Weapons;
+        private readonly float[] cooldowns = OfficeCombatRules.Cooldowns;
         private Transform world, player, avatar, weapon;
         private CharacterController controller;
         private Camera view;
@@ -51,6 +51,7 @@ namespace OfficeRampage
 
         private void ResetRun()
         {
+            StopAllCoroutines(); ResetExpansion();
             menuPage = MenuPage.Game;
             Time.timeScale = 1;
             if (audioBus == null) audioBus = gameObject.AddComponent<OfficeAudio>();
@@ -239,6 +240,11 @@ namespace OfficeRampage
                 }
                 room.required = Mathf.CeilToInt(room.total * .6f);
             }
+            foreach (Transform part in root)
+                if (part.name == "Side wall" || part.name == "Exit wall" || part.name == "Entry wall" || part.name == "Entrance" || part.name == "Window")
+                { var renderer = part.GetComponent<Renderer>(); if (renderer != null) renderer.enabled = false; }
+            for (int side = -1; side <= 1; side += 2)
+                Shape(root, "Floor edge", new Vector3(side * room.width / 2, .025f, middle), new Vector3(.12f, .05f, length), Cyan, false);
             SetupDefenders(room, layout, root);
             return room;
         }
@@ -333,22 +339,13 @@ namespace OfficeRampage
 
         private void SetWeapon(int index)
         {
+            if (index < 0 || index > 7 || (index == 7 && (!bfgReady || bfgUsed))) return;
             weaponIndex = index;
             for (int i = weapon.childCount - 1; i >= 0; i--)
             { weapon.GetChild(i).gameObject.SetActive(false); Destroy(weapon.GetChild(i).gameObject); }
             weapon.localPosition = new Vector3(.48f, .95f, .25f);
             weapon.localRotation = Quaternion.identity;
-            if (index == 0)
-            {
-                Shape(weapon, "Hammer handle", new Vector3(0, .12f, .25f), new Vector3(.09f, .1f, .9f), new Color(.5f, .3f, .16f), false);
-                Shape(weapon, "Hammer head", new Vector3(0, .12f, .73f), new Vector3(.6f, .3f, .3f), new Color(.45f, .52f, .58f), false);
-            }
-            else
-            {
-                Shape(weapon, "Stock", Vector3.zero, new Vector3(.2f, .24f, .55f), Orange, false);
-                Shape(weapon, "Barrel", new Vector3(0, .04f, .5f), new Vector3(index == 1 ? .16f : .33f, index == 1 ? .16f : .33f, .9f), Navy, false);
-                Shape(weapon, "Barrel band", new Vector3(0, .04f, .84f), Vector3.one * (index == 1 ? .2f : .38f), Cyan, false);
-            }
+            BuildExpandedWeapon();
         }
 
         private void Update()
@@ -369,6 +366,7 @@ namespace OfficeRampage
             }
             if (ended || paused) return;
             float dt = Time.deltaTime;
+            if (CombatLocked) { UpdateCamera(); return; }
             remaining = Mathf.Max(0, remaining - dt);
             if (remaining <= 0) { End(false); return; }
             cooldown -= dt; comboLeft -= dt; noticeLeft -= dt; invulnerability -= dt;
@@ -387,6 +385,11 @@ namespace OfficeRampage
                 if (keys.digit1Key.wasPressedThisFrame) SetWeapon(0);
                 if (keys.digit2Key.wasPressedThisFrame) SetWeapon(1);
                 if (keys.digit3Key.wasPressedThisFrame) SetWeapon(2);
+                if (keys.digit4Key.wasPressedThisFrame) SetWeapon(3);
+                if (keys.digit5Key.wasPressedThisFrame) SetWeapon(4);
+                if (keys.digit6Key.wasPressedThisFrame) SetWeapon(5);
+                if (keys.digit7Key.wasPressedThisFrame) SetWeapon(6);
+                if (keys.digit8Key.wasPressedThisFrame && bfgReady && !bfgUsed) SetWeapon(7);
             }
             input = Vector2.ClampMagnitude(input, 1);
             if (controller.isGrounded && vertical < 0) vertical = -2;
@@ -404,7 +407,7 @@ namespace OfficeRampage
             weapon.localRotation = Quaternion.Euler(-swing * 60, -swing * 25, 0);
             UpdateCamera();
             if (mouse != null && mouse.leftButton.isPressed && Cursor.lockState == CursorLockMode.Locked && cooldown <= 0) Attack();
-            if (ended) return;
+            if (ended || CombatLocked) return;
             SealFinalRoom();
             if (current.number < 5 && current.unlocked && player.position.z > current.end - 2 && Mathf.Abs(player.position.x) < 1.8f)
             {
@@ -448,74 +451,7 @@ namespace OfficeRampage
             return distance <= range;
         }
 
-        private void Attack()
-        {
-            cooldown = cooldowns[weaponIndex]; swing = 1; shake = .8f;
-            audioBus.Weapon(weaponIndex);
-            Vector3 origin = player.position + Vector3.up * 1.35f;
-            Vector3 aimPoint = view.transform.position + view.transform.forward * 55;
-            if (AimHit(view.transform.position, view.transform.forward, 55, out var aim)) aimPoint = aim.point;
-            Vector3 direction = (aimPoint - origin).normalized;
-            if (weaponIndex == 0)
-            {
-                var targets = new HashSet<OfficeProp>();
-                foreach (var col in Physics.OverlapSphere(origin + avatar.forward * 1.3f, 1.65f))
-                {
-                    var prop = col.GetComponentInParent<OfficeProp>();
-                    if (prop == null || !targets.Add(prop)) continue;
-                    Vector3 toward = prop.transform.position + Vector3.up - origin;
-                    if (Vector3.Dot(avatar.forward, toward.normalized) > .05f &&
-                        (!AimHit(origin, toward.normalized, toward.magnitude, out var obstacle) || obstacle.collider.GetComponentInParent<OfficeProp>() == prop))
-                        prop.Hit(60, avatar.forward);
-                }
-                foreach (var enemy in defenders)
-                    if (enemy != null && enemy.Alive && Vector3.Distance(origin + avatar.forward * 1.3f, enemy.AimPoint) < 1.9f &&
-                        Vector3.Dot(avatar.forward, (enemy.AimPoint - origin).normalized) > .05f &&
-                        ClearDefenseSight(origin, enemy.AimPoint, player, enemy.transform)) enemy.Hit(60);
-                if (AimHit(origin, avatar.forward, 2.8f, out var wallHit) && wallHit.collider.GetComponentInParent<OfficeProp>() == null && wallHit.collider.GetComponentInParent<OfficeDefender>() == null)
-                    audioBus.Play("wall", .4f, .85f, wallHit.point);
-                return;
-            }
-            if (weaponIndex == 1)
-            {
-                for (int i = 0; i < 7; i++)
-                {
-                    Vector3 pellet = (direction + (i == 0 ? Vector3.zero : Random.insideUnitSphere * .055f)).normalized;
-                    Vector3 end = origin + pellet * 35;
-                    if (AimHit(origin, pellet, 35, out var hit))
-                    {
-                        end = hit.point;
-                        var prop = hit.collider.GetComponentInParent<OfficeProp>();
-                        if (prop != null) prop.Hit(18, pellet);
-                        var enemy = hit.collider.GetComponentInParent<OfficeDefender>();
-                        if (enemy != null) enemy.Hit(12);
-                    }
-                    Trail(origin, end, Cyan);
-                }
-            }
-            else
-            {
-                Vector3 end = origin + direction * 40;
-                if (AimHit(origin, direction, 40, out var hit)) end = hit.point;
-                Trail(origin, end, Orange);
-                var targets = new HashSet<OfficeProp>();
-                foreach (var col in Physics.OverlapSphere(end, 3.5f))
-                {
-                    var prop = col.GetComponentInParent<OfficeProp>();
-                    if (prop != null && targets.Add(prop))
-                    {
-                        Vector3 toProp = prop.transform.position + Vector3.up - (end - direction * .15f);
-                        if (!AimHit(end - direction * .15f, toProp.normalized, toProp.magnitude, out var block) || block.collider.GetComponentInParent<OfficeProp>() == prop)
-                            prop.Hit(100, (prop.transform.position - end).normalized);
-                    }
-                }
-                foreach (var enemy in defenders)
-                    if (enemy != null && enemy.Alive && Vector3.Distance(enemy.AimPoint, end) < 3.5f &&
-                        ClearDefenseSight(end - direction * .15f, enemy.AimPoint, player, enemy.transform)) enemy.Hit(100);
-                Impact(end, Orange, -direction, 10);
-                audioBus.Play("explosion", .8f, Random.Range(.9f, 1.05f), end);
-            }
-        }
+        private void Attack() { AttackExpanded(); }
 
         private void Trail(Vector3 start, Vector3 end, Color color)
         {
@@ -581,7 +517,7 @@ namespace OfficeRampage
 
         private void Hurt(float damage)
         {
-            if (invulnerability > 0 || ended) return;
+            if (invulnerability > 0 || ended || CombatLocked) return;
             hp = Mathf.Max(0, hp - damage); invulnerability = 1; shake = 2;
             audioBus.Play("thud", .7f, .8f);
             if (hp <= 0) End(false);
@@ -620,48 +556,14 @@ namespace OfficeRampage
 
         private void DrawWeaponSlots()
         {
-            GUI.Label(new Rect(842, 570, 416, 28), weaponNames[weaponIndex] + "  /  UNLIMITED", smallStyle);
-            string[] captions = { "HAMMER", "SHOTGUN", "ROCKET" };
-            for (int i = 0; i < 3; i++)
+            EnsureMenuStyles();
+            GUI.Label(new Rect(345, 540, 900, 38), weaponNames[weaponIndex] + (weaponIndex == 7 ? " / 1발" : " / 무제한"), menuText);
+            for (int i = 0; i < 8; i++)
             {
-                float x = 842 + i * 142;
-                bool selected = weaponIndex == i;
-                Color ink = selected ? Color.white : new Color(.55f, .65f, .7f);
-                Box(new Rect(x, 600, 132, 98), selected ? Cyan : new Color(.2f, .28f, .33f));
-                Box(new Rect(x + 2, 602, 128, 94), selected ? new Color(.06f, .19f, .24f) : Navy);
-                GUI.Label(new Rect(x + 9, 604, 22, 24), (i + 1).ToString(), smallStyle);
-                // Vector-like silhouettes stay sharp at every Game view resolution.
-                if (i == 0)
-                {
-                    Box(new Rect(x + 62, 627, 8, 37), Orange);
-                    Box(new Rect(x + 43, 615, 46, 18), ink);
-                    Box(new Rect(x + 39, 613, 8, 22), ink);
-                    Box(new Rect(x + 85, 613, 8, 22), ink);
-                    Box(new Rect(x + 61, 651, 10, 14), ink);
-                }
-                else if (i == 1)
-                {
-                    Box(new Rect(x + 52, 624, 62, 5), ink);
-                    Box(new Rect(x + 52, 631, 62, 5), ink);
-                    Box(new Rect(x + 37, 628, 40, 13), ink);
-                    Box(new Rect(x + 70, 637, 24, 7), Orange);
-                    Box(new Rect(x + 17, 637, 27, 13), Orange);
-                    Box(new Rect(x + 41, 638, 10, 21), ink);
-                    Box(new Rect(x + 53, 642, 14, 3), ink);
-                }
-                else
-                {
-                    Box(new Rect(x + 23, 625, 81, 19), ink);
-                    Box(new Rect(x + 18, 621, 9, 27), Orange);
-                    Box(new Rect(x + 100, 621, 8, 27), Orange);
-                    Box(new Rect(x + 108, 628, 9, 13), ink);
-                    Box(new Rect(x + 48, 644, 9, 16), ink);
-                    Box(new Rect(x + 78, 644, 8, 13), ink);
-                    Box(new Rect(x + 61, 617, 5, 8), ink);
-                    Box(new Rect(x + 56, 613, 19, 5), Cyan);
-                }
-                GUI.Label(new Rect(x + 9, 670, 120, 23), captions[i], smallStyle);
-                if (selected) Box(new Rect(x + 2, 694, 128, 4), Cyan);
+                float x = 345 + i * 114;
+                bool locked = i == 7 && (!bfgReady || bfgUsed);
+                Box(new Rect(x, 583, 108, 54), i == weaponIndex ? new Color(.08f, .42f, .43f) : Navy);
+                GUI.Label(new Rect(x + 4, 587, 104, 45), (i + 1) + " " + (locked ? (bfgUsed ? "사용완료" : "잠김") : weaponNames[i]), menuSmall);
             }
         }
 
@@ -709,7 +611,8 @@ namespace OfficeRampage
             Box(new Rect(38, 667, 285 * hp / 100, 10), invulnerability > 0 ? Orange : Cyan);
             DrawWeaponSlots();
             GUI.Label(new Rect(354, 644, 480, 28), "WASD Move / Mouse Aim / LMB Attack / Space Jump", smallStyle);
-            GUI.Label(new Rect(375, 674, 460, 24), "Shift Sprint / Esc Pause / R Restart / M Mute", smallStyle);
+            GUI.Label(new Rect(375, 674, 800, 24), "1-7 Weapons / 8 BFG / Shift Sprint / Esc Pause / R Restart / M Mute", smallStyle);
+            DrawExpansionOverlay();
             if (ended || paused)
             {
                 Box(new Rect(0, 0, 1280, 720), new Color(.01f, .025f, .045f, .88f));

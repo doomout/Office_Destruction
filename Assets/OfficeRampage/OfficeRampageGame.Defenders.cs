@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace OfficeRampage
@@ -46,7 +46,7 @@ namespace OfficeRampage
             Shape(bossChair.transform, "Backrest", new Vector3(0, 1.2f, .48f), new Vector3(1.3f, 1.4f, .2f), Navy, false);
             Shape(bossChair.transform, "Chair base", new Vector3(0, .25f, 0), new Vector3(.2f, .5f, .2f), Color.gray, false);
             bossUnit = CreateDefender(root, room, navigation, bossChair.transform.position + Vector3.up * .08f,
-                "사장", OfficeDefenseRules.BossHealth, false, true);
+                "대표", OfficeDefenseRules.BossHealth, false, true);
             bossUnit.transform.rotation = Quaternion.Euler(0, 180, 0);
         }
 
@@ -69,10 +69,13 @@ namespace OfficeRampage
                     room.number == 3 ? new Color(.42f, .3f, .15f) : new Color(.37f, .12f, .2f);
                 foreach (Transform part in unit.visual)
                     if (part.name == "Jacket" || part.name == "Sleeve") part.GetComponent<Renderer>().sharedMaterial = Mat(uniform);
-                if (unit.guard)
+                if (unit.guard || isBoss)
                 {
-                    Shape(unit.visual, "Security cap", new Vector3(0, 1.94f, .04f), new Vector3(.52f, .13f, .5f), Navy, false);
-                    Shape(unit.visual, "Security badge", new Vector3(-.19f, 1.2f, .2f), new Vector3(.09f, .12f, .03f), Color.yellow, false);
+                    if (unit.guard)
+                    {
+                        Shape(unit.visual, "Security cap", new Vector3(0, 1.94f, .04f), new Vector3(.52f, .13f, .5f), Navy, false);
+                        Shape(unit.visual, "Security badge", new Vector3(-.19f, 1.2f, .2f), new Vector3(.09f, .12f, .03f), Color.yellow, false);
+                    }
                     var baton = Shape(unit.visual, "Baton", new Vector3(.48f, .95f, .43f), new Vector3(.11f, .11f, .9f), new Color(.32f, .16f, .07f), false);
                     baton.transform.localRotation = Quaternion.Euler(-18, 0, 0);
                 }
@@ -92,10 +95,10 @@ namespace OfficeRampage
                 unit.warning.gameObject.SetActive(false);
                 unit.flames = new GameObject("Raging flames").transform;
                 unit.flames.SetParent(unit.visual, false);
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < 24; i++)
                 {
                     float angle = i * Mathf.PI / 5;
-                    Shape(unit.flames, "Flame", new Vector3(Mathf.Sin(angle) * .47f, 1.6f, Mathf.Cos(angle) * .4f),
+                    Shape(unit.flames, "Flame", new Vector3(Mathf.Sin(angle) * .47f, .25f + (i % 6) * .33f, Mathf.Cos(angle) * .4f),
                         new Vector3(.15f, .5f, .15f), i % 2 == 0 ? Orange : Color.yellow, false, PrimitiveType.Sphere);
                 }
                 var glow = new GameObject("Rage glow").AddComponent<Light>();
@@ -103,6 +106,7 @@ namespace OfficeRampage
                 glow.type = LightType.Point; glow.color = Orange; glow.range = 3; glow.intensity = 2;
                 unit.flames.gameObject.SetActive(false);
             }
+            if (!dog && (room.number >= 3 || isBoss)) Shape(unit.visual, "A4 hand", new Vector3(.48f, 1.1f, .22f), new Vector3(.21f, .02f, .297f), Color.white, false);
             unit.Initialize(health, isBoss);
             defenders.Add(unit);
             return unit;
@@ -170,7 +174,7 @@ namespace OfficeRampage
                 bossFight = true;
                 if (bossChair != null) bossChair.SetActive(false);
                 bossUnit.Wake(); audioBus.ChangeRoom(6);
-                Notify("ALL GUARD DOGS DEFEATED - THE CEO IS FURIOUS!", 4);
+                Notify("ALL GUARD DOGS DEFEATED - CEO BATTLE!", 4);
             }
         }
 
@@ -178,7 +182,8 @@ namespace OfficeRampage
         {
             if (current.number != 5 || finalRoomSealed || player.position.z <= current.start + 2) return;
             finalRoomSealed = true;
-            Shape(world, "Final room entry seal", new Vector3(0, 1.7f, current.start), new Vector3(3.4f, 3.4f, .35f), Orange);
+            var seal = Shape(world, "Final room entry seal", new Vector3(0, 2.5f, current.start), new Vector3(current.width, 5f, .35f), Orange);
+            seal.GetComponent<Renderer>().enabled = false;
         }
     }
 }

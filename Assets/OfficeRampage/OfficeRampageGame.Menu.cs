@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace OfficeRampage
 {
@@ -9,6 +9,7 @@ namespace OfficeRampage
         private int difficulty = 1;
         private Font menuFont;
         private GUIStyle menuTitle, menuHeading, menuText, menuSmall, menuButton;
+        private GUIStyle volumeTrack, volumeThumb;
         private const string SettingsPrefix = "OfficeRampage.Menu.";
 
         private void InitializeMenu()
@@ -97,7 +98,7 @@ namespace OfficeRampage
         private void DrawMainPage()
         {
             if (MenuButton(new Rect(80, 215, 400, 65), "사무실 파괴", true)) { SaveMenuSettings(); ResetRun(); return; }
-            if (MenuButton(new Rect(80, 295, 400, 65), "무한 싸움")) menuPage = MenuPage.Endless;
+            if (MenuButton(new Rect(80, 295, 400, 65), "무한파괴")) menuPage = MenuPage.Endless;
             if (MenuButton(new Rect(80, 375, 400, 65), "설정")) menuPage = MenuPage.Settings;
             if (MenuButton(new Rect(80, 455, 400, 65), "스토리")) menuPage = MenuPage.Story;
             if (MenuButton(new Rect(80, 535, 400, 65), "끝내기")) menuPage = MenuPage.Quit;
@@ -105,23 +106,43 @@ namespace OfficeRampage
             Box(new Rect(535, 215, 665, 5), Cyan);
             GUI.Label(new Rect(567, 240, 600, 45), "처음 오셨나요?", menuHeading);
             GUI.Label(new Rect(567, 302, 590, 105), "사무실 물건을 60% 파괴하면 다음 방으로 갈 수 있습니다.\n마지막 방의 경비견과 CEO를 쓰러뜨리세요!", menuText);
-            GUI.Label(new Rect(567, 422, 590, 150), "WASD 이동  ·  마우스 조준  ·  왼쪽 클릭 공격\nSpace 점프  ·  Shift 달리기  ·  1 / 2 / 3 무기\nEsc 일시정지  ·  R 다시 시작  ·  M 음소거", menuText);
+            GUI.Label(new Rect(567, 422, 590, 150), "WASD 이동  ·  마우스 조준  ·  왼쪽 클릭 공격\nSpace 점프  ·  Shift 달리기  ·  1~7 무기 · 8 BFG 18\nEsc 일시정지  ·  R 다시 시작  ·  M 음소거", menuText);
             GUI.Label(new Rect(567, 572, 590, 36), "음량과 제한시간은 ‘설정’에서 바꿀 수 있어요.", menuSmall);
+        }
+
+        // Keep Unity's slider interaction, but draw high-contrast graphics independent of its dark skin.
+        private float DrawVolumeSlider(Rect rect, float value, float maximum)
+        {
+            if (volumeTrack == null)
+            {
+                volumeTrack = new GUIStyle(GUIStyle.none) { fixedHeight = 40, padding = new RectOffset(0, 0, 0, 0), margin = new RectOffset(0, 0, 0, 0) };
+                volumeThumb = new GUIStyle(GUIStyle.none) { fixedWidth = 20, fixedHeight = 40, margin = new RectOffset(0, 0, 0, 0) };
+            }
+            float updated = GUI.HorizontalSlider(rect, value, 0, maximum, volumeTrack, volumeThumb);
+            float left = rect.x + 10;
+            float width = rect.width - 20;
+            float centerY = rect.center.y;
+            float filled = width * Mathf.Clamp01(updated / maximum);
+            Box(new Rect(left, centerY - 5, width, 10), new Color(.48f, .58f, .68f));
+            Box(new Rect(left, centerY - 5, filled, 10), Cyan);
+            Box(new Rect(left + filled - 10, centerY - 15, 20, 30), Color.white);
+            Box(new Rect(left + filled - 5, centerY - 10, 10, 20), Cyan);
+            return updated;
         }
 
         private void DrawSettingsPage()
         {
             GUI.Label(new Rect(80, 210, 600, 45), "설정", menuHeading);
-            GUI.Label(new Rect(80, 280, 520, 35), "사운드", menuHeading);
+            GUI.Label(new Rect(80, 270, 520, 60), "사운드", menuHeading);
             GUI.changed = false;
             GUI.Label(new Rect(80, 340, 230, 35), "음악  " + Mathf.RoundToInt(audioBus.MusicVolume / .6f * 100) + "%", menuText);
-            audioBus.MusicVolume = GUI.HorizontalSlider(new Rect(300, 355, 265, 28), audioBus.MusicVolume, 0, .6f);
+            audioBus.MusicVolume = DrawVolumeSlider(new Rect(300, 337, 265, 40), audioBus.MusicVolume, .6f);
             GUI.Label(new Rect(80, 400, 230, 35), "효과음  " + Mathf.RoundToInt(audioBus.EffectsVolume * 100) + "%", menuText);
-            audioBus.EffectsVolume = GUI.HorizontalSlider(new Rect(300, 415, 265, 28), audioBus.EffectsVolume, 0, 1);
+            audioBus.EffectsVolume = DrawVolumeSlider(new Rect(300, 397, 265, 40), audioBus.EffectsVolume, 1f);
             bool changed = GUI.changed;
             if (MenuButton(new Rect(80, 470, 485, 55), audioBus.Muted ? "전체 소리: 꺼짐 (눌러서 켜기)" : "전체 소리: 켜짐 (눌러서 끄기)"))
             { audioBus.Muted = !audioBus.Muted; changed = true; }
-            GUI.Label(new Rect(650, 280, 500, 40), "난이도 / 시작 제한시간", menuHeading);
+            GUI.Label(new Rect(650, 270, 550, 60), "난이도 / 시작 제한시간", menuHeading);
             for (int i = 0; i < 3; i++)
             {
                 if (MenuButton(new Rect(650, 340 + i * 70, 550, 58),
@@ -139,11 +160,11 @@ namespace OfficeRampage
             if (menuPage == MenuPage.Story)
             {
                 heading = "스토리";
-                body = "끝없는 야근, 쌓이는 업무, 그리고 또 내려온 추가 지시.\n오늘만큼은 참지 않기로 했습니다.\n\n책상과 집기를 부수며 다섯 개의 사무실을 돌파하세요.\n마지막 사무실에서 경비견을 이기고 CEO에게 도전하세요!\n\n전자제품은 폭발해 체력을 깎고, 정수기는 체력을 회복시킵니다.\n제한시간 안에 살아남아 마지막 승부를 끝내세요.";
+                body = "끝없는 야근, 쌓이는 업무, 그리고 또 내려온 추가 지시.\n오늘만큼은 참지 않기로 했습니다.\n\n책상과 집기를 부수며 사무실을 돌파하세요.\n마지막 사무실에서 경비견을 이기고 CEO에게 도전하세요!\n\n전자제품은 폭발해 체력을 깎고, 정수기는 체력을 회복시킵니다.\n제한시간 안에 살아남아 마지막 승부를 끝내세요.";
             }
             else if (menuPage == MenuPage.Endless)
             {
-                heading = "무한 싸움";
+                heading = "무한파괴";
                 body = "준비 중입니다.\n\n현재 플레이할 수 있는 모드는 ‘사무실 파괴’입니다.\n시작 메뉴로 돌아가 사무실 파괴를 선택해 주세요.";
             }
             else

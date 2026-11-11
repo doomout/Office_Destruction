@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace OfficeRampage
@@ -54,28 +54,12 @@ namespace OfficeRampage
                 width = widths[style] + rng.Next(-1, 2),
                 length = lengths[style] + rng.Next(-1, 2), name = names[style]
             };
-            int side = rng.Next(2) == 0 ? -1 : 1;
-            float lastX = 0, lastZ = 3;
-            const float gapWidth = 3.6f;
-            // Alternate doorways force turns. No random wall can seal a compartment.
-            for (float z = 7; z < plan.length - 5; z += 7)
-            {
-                float gapX = side * (plan.width / 2 - 3);
-                float gapLeft = gapX - gapWidth / 2;
-                float gapRight = gapX + gapWidth / 2;
-                float leftWidth = gapLeft + plan.width / 2;
-                float rightWidth = plan.width / 2 - gapRight;
-                plan.walls.Add(new Area(-plan.width / 2 + leftWidth / 2, z, leftWidth, .45f));
-                plan.walls.Add(new Area(gapRight + rightWidth / 2, z, rightWidth, .45f));
-                plan.AddRoute(lastX, lastZ, gapX, lastZ);
-                plan.AddRoute(gapX, lastZ, gapX, z + 2);
-                lastX = gapX; lastZ = z + 2; side = -side;
-            }
-            plan.AddRoute(lastX, lastZ, 0, lastZ);
-            plan.AddRoute(0, lastZ, 0, plan.length);
-            plan.AddRoute(0, 0, 0, 3);
-            for (float z = 4.8f; z < plan.length - 3; z += 3.6f)
-                for (float x = -plan.width / 2 + 2; x < plan.width / 2 - 1.7f; x += 4.2f)
+            plan.width = Math.Max(32, plan.width); plan.length = Math.Max(34, plan.length);
+            plan.name = "OPEN OFFICE";
+            plan.AddRoute(0, 0, 0, plan.length);
+            plan.AddRoute(-plan.width / 2, plan.length / 2, plan.width / 2, plan.length / 2);
+            for (float z = 4.8f; z < plan.length - 3; z += 6f)
+                for (float x = -plan.width / 2 + 2; x < plan.width / 2 - 1.7f; x += 6f)
                 {
                     var footprint = new Area(x, z, 2.9f, 1.9f);
                     bool blocked = false;
@@ -93,8 +77,8 @@ namespace OfficeRampage
                 int swap = smallKinds[i]; smallKinds[i] = smallKinds[j]; smallKinds[j] = swap;
             }
             int smallCount = 0;
-            for (float z = 1.4f; z < plan.length - 1.2f; z += 1.1f)
-                for (float x = -plan.width / 2 + 1.2f; x < plan.width / 2 - 1; x += 1.1f)
+            for (float z = 1.4f; z < plan.length - 1.2f; z += 3.5f)
+                for (float x = -plan.width / 2 + 1.2f; x < plan.width / 2 - 1; x += 3.5f)
                 {
                     var point = new Point(x, z, smallKinds[smallCount % smallKinds.Length]);
                     var footprint = point.Footprint;
@@ -120,17 +104,9 @@ namespace OfficeRampage
                         plan.furniture[i] = item;
                         break;
                     }
-            // Oil occupies traversable floor, never walls or spawn/exit thresholds.
-            // Its short axis leaves room to skirt it within the reserved aisle.
-            for (int i = 1; i < plan.route.Count - 2; i += 2)
-            {
-                var aisle = plan.route[i];
-                float z = aisle.z - .7f;
-                var patch = new Area(aisle.x, z, 1.3f, 1.5f);
-                bool blocked = z < 4 || z > plan.length - 3;
-                foreach (var wall in plan.walls) if (wall.Overlaps(patch, .2f)) { blocked = true; break; }
-                if (!blocked) plan.oil.Add(new Point(aisle.x, z));
-            }
+            // Keep oil hazards on the central reserved aisle after removing the partitions.
+            for (float z = 7; z < plan.length - 4; z += 8)
+                plan.oil.Add(new Point(0, z));
             return plan;
         }
 
