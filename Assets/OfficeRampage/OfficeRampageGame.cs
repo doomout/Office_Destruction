@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -36,7 +36,7 @@ namespace OfficeRampage
         private OfficeAudio audioBus;
         private readonly List<Vector3> oilPuddles = new List<Vector3>();
         private bool slowedByOil;
-        public bool RunActive { get { return !ended && !paused; } }
+        public bool RunActive { get { return menuPage == MenuPage.Game && !ended && !paused; } }
         private readonly int[] layoutOrder = { 0, 1, 2, 3, 4 };
 
         private static readonly Color Navy = new Color(.035f, .07f, .12f);
@@ -46,11 +46,12 @@ namespace OfficeRampage
         private void Start()
         {
             originalTimeScale = Time.timeScale;
-            ResetRun();
+            InitializeMenu();
         }
 
         private void ResetRun()
         {
+            menuPage = MenuPage.Game;
             Time.timeScale = 1;
             if (audioBus == null) audioBus = gameObject.AddComponent<OfficeAudio>();
             audioBus.ResetRun();
@@ -61,7 +62,7 @@ namespace OfficeRampage
             debris.Clear();
             world = new GameObject("Generated Office Rampage").transform;
             world.SetParent(transform);
-            remaining = 120; hp = 100; yaw = 0; pitch = 13; vertical = 0;
+            remaining = OfficeMenuRules.Duration(difficulty); hp = 100; yaw = 0; pitch = 13; vertical = 0;
             score = combo = weaponIndex = 0;
             cooldown = comboLeft = invulnerability = swing = shake = 0;
             ended = won = paused = bossFight = false;
@@ -353,8 +354,13 @@ namespace OfficeRampage
         private void Update()
         {
             var keys = Keyboard.current;
+            if (menuPage != MenuPage.Game)
+            {
+                if (keys != null && keys.escapeKey.wasPressedThisFrame) menuPage = MenuPage.Main;
+                return;
+            }
             var mouse = Mouse.current;
-            if (keys != null && keys.mKey.wasPressedThisFrame) audioBus.Muted = !audioBus.Muted;
+            if (keys != null && keys.mKey.wasPressedThisFrame) { audioBus.Muted = !audioBus.Muted; SaveMenuSettings(); }
             if (keys != null && keys.rKey.wasPressedThisFrame) { ResetRun(); return; }
             if (keys != null && keys.escapeKey.wasPressedThisFrame && !ended)
             {
@@ -595,10 +601,12 @@ namespace OfficeRampage
         }
         private void OnApplicationFocus(bool focus)
         {
-            if (!focus && !ended && world != null) { paused = true; Time.timeScale = 0; LockCursor(false); audioBus.SetPaused(true); }
+            if (!focus && menuPage == MenuPage.Game && !ended && world != null) { paused = true; Time.timeScale = 0; LockCursor(false); audioBus.SetPaused(true); }
         }
         private void OnDestroy()
         {
+            SaveMenuSettings();
+            if (menuFont != null) Destroy(menuFont);
             Time.timeScale = originalTimeScale;
             LockCursor(false);
             foreach (var material in materials.Values) if (material != null) Destroy(material);
@@ -659,6 +667,7 @@ namespace OfficeRampage
 
         private void OnGUI()
         {
+            if (menuPage != MenuPage.Game) { DrawFrontEnd(); return; }
             if (world == null) return;
             if (titleStyle == null)
             {
@@ -712,11 +721,14 @@ namespace OfficeRampage
                     if (paused) { paused = false; Time.timeScale = 1; LockCursor(true); audioBus.SetPaused(false); }
                     else ResetRun();
                 }
+                DrawReturnToMenu();
+                GUI.changed = false;
                 GUI.Label(new Rect(420, 525, 150, 28), "MUSIC", smallStyle);
                 audioBus.MusicVolume = GUI.HorizontalSlider(new Rect(560, 534, 270, 20), audioBus.MusicVolume, 0, .6f);
                 GUI.Label(new Rect(420, 565, 150, 28), "SOUND EFFECTS", smallStyle);
                 audioBus.EffectsVolume = GUI.HorizontalSlider(new Rect(560, 574, 270, 20), audioBus.EffectsVolume, 0, 1);
                 GUI.Label(new Rect(420, 608, 430, 28), audioBus.Muted ? "M: SOUND MUTED" : "M: MUTE ALL SOUND", smallStyle);
+                if (GUI.changed) SaveMenuSettings();
             }
             GUI.matrix = previous;
         }
