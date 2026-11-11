@@ -110,7 +110,7 @@ namespace OfficeRampage
             view.backgroundColor = Navy;
             view.clearFlags = CameraClearFlags.SolidColor;
             current = BuildRoom(1, 0);
-            Notify("DESTROY 60% OF THE OFFICE TO OPEN THE EXIT", 5);
+            Notify("DESTROY 60% PROPS + DEFEAT 60% ENEMIES TO OPEN EXIT", 5);
             LockCursor(true);
             UpdateCamera();
         }
@@ -238,7 +238,7 @@ namespace OfficeRampage
                     warning.text = "OIL"; warning.anchor = TextAnchor.MiddleCenter;
                     warning.fontSize = 32; warning.characterSize = .11f; warning.color = new Color(1, .75f, .2f);
                 }
-                room.required = Mathf.CeilToInt(room.total * .6f);
+                room.required = OfficeProgressRules.Required(room.total);
             }
             foreach (Transform part in root)
                 if (part.name == "Side wall" || part.name == "Exit wall" || part.name == "Entry wall" || part.name == "Entrance" || part.name == "Window")
@@ -246,6 +246,7 @@ namespace OfficeRampage
             for (int side = -1; side <= 1; side += 2)
                 Shape(root, "Floor edge", new Vector3(side * room.width / 2, .025f, middle), new Vector3(.12f, .05f, length), Cyan, false);
             SetupDefenders(room, layout, root);
+            SpawnHealingPotions(room, layout);
             return room;
         }
 
@@ -367,8 +368,11 @@ namespace OfficeRampage
             if (ended || paused) return;
             float dt = Time.deltaTime;
             if (CombatLocked) { UpdateCamera(); return; }
-            remaining = Mathf.Max(0, remaining - dt);
-            if (remaining <= 0) { End(false); return; }
+            if (OfficeProgressRules.TimerRuns(current.number))
+            {
+                remaining = Mathf.Max(0, remaining - dt);
+                if (remaining <= 0) { End(false); return; }
+            }
             cooldown -= dt; comboLeft -= dt; noticeLeft -= dt; invulnerability -= dt;
             if (comboLeft <= 0) combo = 0;
             if (mouse != null && Cursor.lockState == CursorLockMode.Locked)
@@ -483,16 +487,7 @@ namespace OfficeRampage
             comboLeft = 4;
             score += 100 + Mathf.Min(combo, 20) * 15;
             if (combo % 3 == 0) { remaining += 5; Notify("COMBO " + combo + "   +5 SECONDS", 2); audioBus.Play("combo", .45f); }
-            if (room.number < 5 && !room.unlocked && room.destroyed >= room.required)
-            {
-                room.unlocked = true;
-                room.gate.GetComponent<Collider>().enabled = false;
-                room.gateRenderer.sharedMaterial = Mat(Cyan);
-                room.gate.transform.localScale = new Vector3(3.3f, .12f, .3f);
-                room.gate.transform.position = new Vector3(0, .06f, room.end);
-                Notify("EXIT OPEN - FIND THE CYAN DOOR", 3);
-                audioBus.Play("door", .45f);
-            }
+            RefreshExit(room);
             float previousHealth = hp;
             hp = OfficeRules.HealthAfterBreak(hp, kind);
             if (OfficeRules.IsElectronic(kind))
@@ -588,11 +583,11 @@ namespace OfficeRampage
             string objective = current.number == 5 ? (bossFight ? "FURIOUS CEO / HP " + (bossUnit != null ? Mathf.CeilToInt(bossUnit.Health) : 0) : "GUARD DOGS LEFT: " + LivingDefenders(5, true) + " / 5") : "DESTROY " + current.destroyed + " / " + current.required + (current.unlocked ? "  |  EXIT OPEN" : "  |  EXIT LOCKED");
             GUI.Label(new Rect(38, 108, 300, 24), objective, smallStyle);
             GUI.Label(new Rect(38, 144, 340, 24), current.layoutName + " / " + current.width + " x " + (current.end - current.start) + " m", smallStyle);
-            if (current.number < 5) GUI.Label(new Rect(38, 177, 300, 24), "DEFENDERS LEFT: " + LivingDefenders(current.number), smallStyle);
-            Box(new Rect(545, 20, 190, 86), remaining < 20 ? new Color(.65f, .1f, .07f, .95f) : Navy);
-            GUI.Label(new Rect(555, 22, 170, 28), "TIME REMAINING", centeredStyle);
+            if (current.number < 5) GUI.Label(new Rect(38, 177, 320, 24), "ENEMIES " + (OfficeDefenseRules.Count(current.number) - LivingDefenders(current.number)) + " / " + OfficeProgressRules.Required(OfficeDefenseRules.Count(current.number)) + " REQUIRED", smallStyle);
+            Box(new Rect(545, 20, 190, 86), OfficeProgressRules.TimerRuns(current.number) && remaining < 20 ? new Color(.65f, .1f, .07f, .95f) : Navy);
+            GUI.Label(new Rect(555, 22, 170, 28), OfficeProgressRules.TimerRuns(current.number) ? "TIME REMAINING" : "BOSS BATTLE", centeredStyle);
             int seconds = Mathf.CeilToInt(remaining);
-            GUI.Label(new Rect(590, 54, 160, 42), (seconds / 60).ToString("00") + ":" + (seconds % 60).ToString("00"), titleStyle);
+            GUI.Label(new Rect(555, 54, 190, 42), OfficeProgressRules.TimerRuns(current.number) ? (seconds / 60).ToString("00") + ":" + (seconds % 60).ToString("00") : "NO LIMIT", titleStyle);
             Box(new Rect(1018, 20, 240, 86), Navy);
             GUI.Label(new Rect(1034, 29, 215, 30), "SCORE  " + score.ToString("N0"), labelStyle);
             GUI.Label(new Rect(1034, 65, 215, 26), "COMBO " + combo + "  /  3 = +5s", smallStyle);

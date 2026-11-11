@@ -105,7 +105,7 @@ namespace OfficeRampage
             Box(new Rect(535, 215, 665, 410), new Color(.055f, .1f, .15f));
             Box(new Rect(535, 215, 665, 5), Cyan);
             GUI.Label(new Rect(567, 240, 600, 45), "처음 오셨나요?", menuHeading);
-            GUI.Label(new Rect(567, 302, 590, 105), "사무실 물건을 60% 파괴하면 다음 방으로 갈 수 있습니다.\n마지막 방의 경비견과 CEO를 쓰러뜨리세요!", menuText);
+            GUI.Label(new Rect(567, 302, 590, 105), "가구 60% 파괴 + 적 60% 처치 시 출구가 열립니다.\n초록 포션은 체력 +30! 대표방은 시간 무제한입니다.", menuText);
             GUI.Label(new Rect(567, 422, 590, 150), "WASD 이동  ·  마우스 조준  ·  왼쪽 클릭 공격\nSpace 점프  ·  Shift 달리기  ·  1~7 무기 · 8 BFG 18\nEsc 일시정지  ·  R 다시 시작  ·  M 음소거", menuText);
             GUI.Label(new Rect(567, 572, 590, 36), "음량과 제한시간은 ‘설정’에서 바꿀 수 있어요.", menuSmall);
         }

@@ -169,6 +169,7 @@ namespace OfficeRampage
         {
             score += unit.boss ? 5000 : unit.dog ? 300 : 200;
             if (unit.boss) { End(true); return; }
+            RefreshExit(rooms.Find(r => r.number == unit.room));
             if (OfficeDefenseRules.CanWakeBoss(unit.room, LivingDefenders(5, true), bossFight))
             {
                 bossFight = true;

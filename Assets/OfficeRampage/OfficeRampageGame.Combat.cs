@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -250,6 +250,7 @@ namespace OfficeRampage
             controller.enabled = false; player.position = new Vector3(0, .1f, current.start + 5); controller.enabled = true; vertical = 0;
             bossUnit.Teleport(new Vector3(0, .1f, current.start + length * .6f));
             yaw = 0; pitch = 13; flash = .3f;
+            SpawnHealingPotions(current, new OfficeLayout { width = current.width, length = length });
             cinematicText = "대표: 돈이면 다 돼! 돈 갑옷, 내려와라!";
             for (int i = 0; i < 70; i++)
             {
