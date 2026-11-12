@@ -14,7 +14,7 @@ namespace OfficeRampage
         private void ResetExpansion()
         {
             giftRequested = bfgReady = bfgUsed = combatLocked = desert = false;
-            cinematicText = ""; flash = 0; combatEffects.Clear();
+            cinematicText = ""; flash = 0; mushroomCamera = false; combatEffects.Clear();
         }
         public bool IsPlayerCollider(Collider col) { return col.transform == player || col.transform.IsChildOf(player); }
         private GameObject Fx(string name, Vector3 at, Vector3 size, Color color, float seconds, Vector3 velocity, float growth = 0, PrimitiveType type = PrimitiveType.Cube)
@@ -116,7 +116,8 @@ namespace OfficeRampage
         public void ResolvePlayerBlast(Vector3 center, float range, float damage)
         {
             if (!RunActive || CombatLocked) return;
-            Fx("Rocket blast", center, Vector3.one, Orange, .25f, Vector3.zero, 15, PrimitiveType.Sphere);
+            CreateBlast(center, false);
+            shake = Mathf.Max(shake, 1.6f);
             audioBus.Play("explosion", .6f, 1, center);
             var seen = new HashSet<OfficeProp>();
             foreach (var col in Physics.OverlapSphere(center, range))
@@ -220,10 +221,14 @@ namespace OfficeRampage
             var core = Fx("BFG energy", player.position + Vector3.up * 1.4f, Vector3.one * .7f, Color.green, 2, Vector3.zero, 2, PrimitiveType.Sphere);
             Vector3 origin = core.transform.position, target = bossUnit.AimPoint; float t = 0;
             while (t < .8f) { if (RunActive) { t += Time.deltaTime; core.transform.position = Vector3.Lerp(origin, target, t / .8f); } yield return null; }
-            flash = .85f; audioBus.Play("explosion", 1f); shake = 8;
-            Fx("Mushroom stem", target, new Vector3(2, 1, 2), Orange, 2.5f, Vector3.up * 3, 5, PrimitiveType.Sphere);
-            Fx("Mushroom crown", target + Vector3.up * 5, new Vector3(6, 3, 6), Color.yellow, 2.5f, Vector3.up, 12, PrimitiveType.Sphere);
-            yield return SceneWait(1.2f);
+            flash = .45f; audioBus.Play("explosion", 1f); shake = 8;
+            mushroomCenter = new Vector3(target.x, .08f, target.z);
+            mushroomCamera = true;
+            cinematicText = "BFG 18 — 사무실 철거 중!";
+            CreateBlast(mushroomCenter, true);
+            // Hold a wide shot until the rising column and broad cap have fully formed.
+            yield return SceneWait(6);
+            mushroomCamera = false;
             Transform bossTransform = bossUnit.transform; bossTransform.SetParent(world, true);
             for (int i = world.childCount - 1; i >= 0; i--)
             {
@@ -282,8 +287,8 @@ namespace OfficeRampage
             }
             if (combatLocked)
             {
-                EnsureMenuStyles(); Box(new Rect(150, 250, 980, 95), Navy);
-                GUI.Label(new Rect(180, 270, 920, 65), cinematicText, menuText);
+                EnsureMenuStyles(); Box(new Rect(150, mushroomCamera ? 445 : 250, 980, 75), Navy);
+                GUI.Label(new Rect(180, mushroomCamera ? 458 : 270, 920, 60), cinematicText, menuText);
             }
         }
     }

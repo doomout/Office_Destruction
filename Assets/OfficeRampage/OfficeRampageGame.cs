@@ -13,6 +13,7 @@ namespace OfficeRampage
             public float start, end, width;
             public GameObject gate;
             public Renderer gateRenderer;
+            public OfficeSlidingDoor door;
             public bool unlocked;
             public string layoutName;
         }
@@ -195,8 +196,12 @@ namespace OfficeRampage
             if (number == 1)
                 Shape(root, "Entrance", new Vector3(0, 2, start), new Vector3(room.width, 4, .3f), Navy);
             Shape(root, "Exit lintel", new Vector3(0, 3.65f, room.end), new Vector3(3.4f, .7f, .4f), Cyan);
-            room.gate = Shape(root, arena ? "Boardroom wall" : "Locked exit", new Vector3(0, 1.55f, room.end), new Vector3(3.3f, 3.1f, .3f), Orange);
-            room.gateRenderer = room.gate.GetComponent<Renderer>();
+            if (!arena) CreateSlidingDoor(room, root);
+            else
+            {
+                room.gate = Shape(root, "Boardroom wall", new Vector3(0, 1.55f, room.end), new Vector3(3.3f, 3.1f, .3f), Orange);
+                room.gateRenderer = room.gate.GetComponent<Renderer>();
+            }
             var sign = new GameObject("Office sign").AddComponent<TextMesh>();
             sign.transform.SetParent(root);
             sign.transform.position = new Vector3(0, 3.57f, room.end - .26f);
@@ -413,7 +418,7 @@ namespace OfficeRampage
             if (mouse != null && mouse.leftButton.isPressed && Cursor.lockState == CursorLockMode.Locked && cooldown <= 0) Attack();
             if (ended || CombatLocked) return;
             SealFinalRoom();
-            if (current.number < 5 && current.unlocked && player.position.z > current.end - 2 && Mathf.Abs(player.position.x) < 1.8f)
+            if (current.number < 5 && current.unlocked && current.door.IsOpen && player.position.z > current.end - 2 && Mathf.Abs(player.position.x) < 1.8f)
             {
                 current = BuildRoom(current.number + 1, current.end);
                 audioBus.ChangeRoom(current.number);
@@ -430,6 +435,14 @@ namespace OfficeRampage
 
         private void UpdateCamera()
         {
+            if (mushroomCamera)
+            {
+                view.fieldOfView = 56;
+                view.transform.position = mushroomCenter + new Vector3(-18, 11, -25);
+                view.transform.LookAt(mushroomCenter + Vector3.up * 9.5f);
+                return;
+            }
+            view.fieldOfView = 72;
             Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
             Vector3 pivot = player.position + Vector3.up * 1.55f;
             Vector3 offset = rotation * new Vector3(.65f, .25f, -3.5f);

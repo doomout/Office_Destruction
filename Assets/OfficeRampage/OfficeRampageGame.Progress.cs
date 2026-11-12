@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
@@ -10,11 +10,8 @@ namespace OfficeRampage
             int defeated = totalEnemies - LivingDefenders(room.number);
             if (!OfficeProgressRules.ExitReady(room.destroyed, room.total, defeated, totalEnemies)) return;
             room.unlocked = true;
-            room.gate.GetComponent<Collider>().enabled = false;
-            room.gateRenderer.sharedMaterial = Mat(Cyan);
-            room.gate.transform.localScale = new Vector3(3.3f, .12f, .3f);
-            room.gate.transform.position = new Vector3(0, .06f, room.end);
-            Notify("EXIT OPEN - PROPS AND ENEMIES 60% CLEARED", 3);
+            room.door.Open();
+            Notify("EXIT OPENING - PROPS AND ENEMIES 60% CLEARED", 3);
             audioBus.Play("door", .45f);
         }
         private void SpawnHealingPotions(Room room, OfficeLayout layout)
