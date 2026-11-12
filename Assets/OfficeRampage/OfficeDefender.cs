@@ -1,8 +1,8 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 namespace OfficeRampage
 {
-    public sealed class OfficeDefender : MonoBehaviour
+    public sealed partial class OfficeDefender : MonoBehaviour
     {
         public OfficeRampageGame game;
         [System.NonSerialized] public OfficeNavigation navigation;
@@ -82,6 +82,7 @@ namespace OfficeRampage
                     var flame = flames.GetChild(i);
                     if (flame.GetComponent<Renderer>() != null) flame.localScale = new Vector3(.17f, .48f + Mathf.Sin(Time.time * 16 + i) * .2f, .17f);
                 }
+            if (TickDistraction(dt)) return;
             Vector3 toward = game.PlayerPosition - transform.position; toward.y = 0;
             if (recovery > 0) { recovery -= dt; game.AnimateDefenderAttack(this, 1 - recovery / .35f); return; }
             if (pendingAttack >= 0)

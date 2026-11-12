@@ -13,6 +13,7 @@ namespace OfficeRampage
         public bool CombatLocked { get { return combatLocked; } }
         private void ResetExpansion()
         {
+            ResetDecoy();
             giftRequested = bfgReady = bfgUsed = combatLocked = desert = false;
             cinematicText = ""; flash = 0; mushroomCamera = false; combatEffects.Clear();
             whirlwindReady = whirlwindLeft = whirlwindTick = whirlwindAngle = 0; batStrike = false;
@@ -40,8 +41,7 @@ namespace OfficeRampage
             }
             else if (weaponIndex == 4)
             {
-                Shape(weapon, "Whip handle", new Vector3(0, .05f, .25f), new Vector3(.12f, .12f, .5f), Orange, false);
-                for (int i = 0; i < 7; i++) Shape(weapon, "Whip coil", new Vector3(Mathf.Sin(i) * .13f, -.05f * i, .5f + i * .08f), new Vector3(.04f, .04f, .2f), new Color(.4f, .22f, .1f), false);
+                BuildDecoyModel(weapon, .35f);
             }
             else
             {
@@ -58,6 +58,7 @@ namespace OfficeRampage
         private void AttackExpanded()
         {
             if (combatLocked || whirlwindLeft > 0) return;
+            if (weaponIndex == 4) { ThrowDecoy(); return; }
             if (weaponIndex == 7)
             {
                 if (!bfgReady || bfgUsed || current.number != 5 || bossUnit == null || bossUnit.PhaseTwo) return;
@@ -93,38 +94,24 @@ namespace OfficeRampage
                 SpawnProjectile(origin + direction * .5f, direction, player, true, true, 25, range, 120, 1);
                 return;
             }
-            if (weaponIndex == 4 || weaponIndex == 5)
+            float power = weaponIndex == 3 ? 12 : 32;
+            Vector3 end = origin + direction * range;
+            if (AimHit(origin, direction, range, out var hit))
             {
-                bool fire = weaponIndex == 5;
-                Vector3 forward = Quaternion.Euler(0, yaw, 0) * Vector3.forward;
-                SweepWeapon(origin, forward, range, 100, fire ? 65 : 55, fire);
-                ShowWeaponFan(origin, forward, range, fire);
-                return;
-            }
-            int pellets = 1;
-            float power = weaponIndex == 2 ? 32 : weaponIndex == 3 ? 12 : weaponIndex == 4 ? 55 : 16;
-            for (int i = 0; i < pellets; i++)
-            {
-                Vector3 shot = (direction + (pellets > 1 ? Random.insideUnitSphere * .085f : Vector3.zero)).normalized;
-                Vector3 end = origin + shot * range;
-                if (AimHit(origin, shot, range, out var hit))
+                end = hit.point;
+                var prop = hit.collider.GetComponentInParent<OfficeProp>();
+                var enemy = hit.collider.GetComponentInParent<OfficeDefender>();
+                if (prop != null) prop.Hit(power, direction);
+                if (enemy != null) enemy.Hit(power);
+                if (weaponIndex == 5)
                 {
-                    end = hit.point;
-                    var prop = hit.collider.GetComponentInParent<OfficeProp>(); if (prop != null) prop.Hit(power, shot);
-                    var enemy = hit.collider.GetComponentInParent<OfficeDefender>(); if (enemy != null) enemy.Hit(power);
+                    if (prop != null && prop.health > 0 && prop.gameObject.activeInHierarchy) Ignite(prop.gameObject);
+                    if (enemy != null && enemy.Alive && !enemy.Dormant) Ignite(enemy.gameObject);
                 }
-                if (weaponIndex == 4)
-                {
-                    Vector3 previous = origin;
-                    for (int n = 1; n <= 8; n++)
-                    {
-                        Vector3 point = Vector3.Lerp(origin, end, n / 8f) + Vector3.up * Mathf.Sin(n * Mathf.PI / 8) * .7f;
-                        Trail(previous, point, Orange); previous = point;
-                    }
-                }
-                else Trail(origin, end, weaponIndex == 3 ? Color.yellow : Cyan);
             }
+            Trail(origin, end, weaponIndex == 5 ? Orange : weaponIndex == 3 ? Color.yellow : Cyan);
         }
+
         public void ResolvePlayerBlast(Vector3 center, float range, float damage)
         {
             if (!RunActive || CombatLocked) return;
@@ -230,6 +217,7 @@ namespace OfficeRampage
         }
         private IEnumerator NuclearTransition()
         {
+            ClearDecoy();
             combatLocked = true; cinematicText = "BFG 18 — 사무실 철거 승인!";
             audioBus.Play("rocket", .8f); shake = 3;
             var core = Fx("BFG energy", player.position + Vector3.up * 1.4f, Vector3.one * .7f, Color.green, 2, Vector3.zero, 2, PrimitiveType.Sphere);
@@ -292,7 +280,7 @@ namespace OfficeRampage
         { var wall = Shape(root, "Invisible arena boundary", position, size, Navy); wall.GetComponent<Renderer>().enabled = false; }
         private void DrawExpansionOverlay()
         {
-            DrawWeaponSkills();
+            DrawWeaponSkills(); DrawDecoyHUD();
             if (desert && !combatLocked)
                 GUI.Label(new Rect(440, 145, 520, 35), "PHASE 2 / MONEY ARMOR", labelStyle);
             if (flash > 0)
