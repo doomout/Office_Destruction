@@ -37,6 +37,7 @@ namespace OfficeRampage
 
         private void ReturnToMainMenu()
         {
+            if (nameEditor != null) nameEditor.Close();
             SaveMenuSettings();
             menuPage = MenuPage.Main;
             paused = true;

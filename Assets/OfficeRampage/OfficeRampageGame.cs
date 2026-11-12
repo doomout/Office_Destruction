@@ -52,7 +52,8 @@ namespace OfficeRampage
 
         private void ResetRun()
         {
-            StopAllCoroutines(); ResetExpansion();
+            StopAllCoroutines(); ResetExpansion(); ResetSprint();
+            if (nameEditor != null) nameEditor.Close();
             runCompany = (companySettings ?? OfficeCompanySettings.CreateDefault()).Copy();
             System.Array.Clear(spawnedEnemies, 0, spawnedEnemies.Length);
             menuPage = MenuPage.Game;
@@ -363,6 +364,7 @@ namespace OfficeRampage
             var keys = Keyboard.current;
             if (menuPage != MenuPage.Game)
             {
+                if (nameEditor != null && nameEditor.Active) { if (keys != null && keys.escapeKey.wasPressedThisFrame) nameEditor.Close(); return; }
                 if (keys != null && keys.escapeKey.wasPressedThisFrame) menuPage = MenuPage.Main;
                 return;
             }
@@ -408,13 +410,15 @@ namespace OfficeRampage
             if (controller.isGrounded && vertical < 0) vertical = -2;
             if (keys != null && keys.spaceKey.wasPressedThisFrame && controller.isGrounded) vertical = 7;
             vertical -= 21 * dt;
-            float speed = keys != null && keys.leftShiftKey.isPressed ? 8 : 5.6f;
+            float speed = SprintSpeed(keys != null && keys.leftShiftKey.isPressed, input.sqrMagnitude > .01f, dt);
             slowedByOil = IsStandingOnOil();
             speed = OfficeRules.MovementSpeed(speed, slowedByOil);
             Vector3 move = Quaternion.Euler(0, yaw, 0) * new Vector3(input.x, 0, input.y) * speed;
+            Vector3 beforeMove = player.position;
             var collision = controller.Move((move + Vector3.up * vertical) * dt);
             slowedByOil = IsStandingOnOil();
             if ((collision & CollisionFlags.Above) != 0 && vertical > 0) vertical = 0;
+            AnimatePlayerRun(dt, player.position - beforeMove);
             TickWeaponSkills(dt);
             avatar.rotation = Quaternion.Euler(0, yaw + (whirlwindLeft > 0 ? whirlwindAngle : 0), 0);
             swing = Mathf.MoveTowards(swing, 0, dt * 5);
@@ -627,7 +631,7 @@ namespace OfficeRampage
             if (slowedByOil && !ended) GUI.Label(new Rect(38, 578, 300, 32), "기름! 이동속도 50%", labelStyle);
             Box(new Rect(38, 667, 285, 10), new Color(.2f, .25f, .3f));
             Box(new Rect(38, 667, 285 * hp / 100, 10), invulnerability > 0 ? Orange : Cyan);
-            DrawWeaponSlots();
+            DrawWeaponSlots(); DrawSprintHUD();
             GUI.Label(new Rect(354, 644, 480, 28), "WASD 이동 / 마우스 조준 / 왼쪽 클릭 공격 / 스페이스 점프", smallStyle);
             GUI.Label(new Rect(375, 674, 800, 24), "1~8 무기 / 시프트 달리기 / Esc 일시정지 / R 재시작 / M 음소거", smallStyle);
             DrawExpansionOverlay();

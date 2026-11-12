@@ -28,6 +28,7 @@ namespace OfficeRampage
         private void DrawCompanySettings()
         {
             if(companyDraft==null) OpenCompanySettings();
+            bool oldEnabled=GUI.enabled; GUI.enabled=oldEnabled && (nameEditor==null || !nameEditor.Active);
             if(companyInput==null)
             {
                 companyInput=new GUIStyle(GUI.skin.textField) { font=menuFont,fontSize=21,alignment=TextAnchor.MiddleLeft,richText=false };
@@ -50,7 +51,7 @@ namespace OfficeRampage
                 float y=i*62; var person=people[i];
                 Box(new Rect(0,y,840,57),i%2==0?new Color(.05f,.09f,.13f):Navy);
                 GUI.Label(new Rect(10,y+12,100,32),(i+1)+"번",menuText);
-                person.name=GUI.TextField(new Rect(100,y+8,490,42),person.name,24,companyInput);
+                if(GUI.Button(new Rect(100,y+8,490,42),person.name+"  ✎",companyInput)) OpenNameEditor(selectedCompanyRank,i);
                 if(MenuButton(new Rect(620,y+8,90,42),"남",!person.female)) person.female=false;
                 if(MenuButton(new Rect(720,y+8,90,42),"여",person.female)) person.female=true;
             }
@@ -58,6 +59,7 @@ namespace OfficeRampage
             if(companyError!="") GUI.Label(new Rect(330,580,870,30),companyError,menuSmall);
             if(MenuButton(new Rect(650,615,230,46),"취소")) { companyDraft=null; menuPage=MenuPage.Settings; }
             if(MenuButton(new Rect(900,615,300,46),"저장",true) && CommitCompanySettings()) menuPage=MenuPage.Settings;
+            GUI.enabled=oldEnabled; DrawNameEditor();
         }
         private int EnemyTotal(int room) { return spawnedEnemies[room]; }
         private void ApplyCompanyIdentity(OfficeDefender unit,int rank,int index)
@@ -65,6 +67,26 @@ namespace OfficeRampage
             unit.companyRank=rank; unit.female=runCompany.ranks[rank].people[index].female;
             unit.displayName=runCompany.UnitName(rank,index);
             unit.label.richText=false;
+            unit.label.color=unit.female?new Color(1,.6f,.85f):new Color(.5f,.85f,1);
+            foreach(Transform part in unit.visual)
+            {
+                if(part.name=="Jacket") part.localScale=unit.female?new Vector3(.56f,.72f,.36f):new Vector3(.76f,.72f,.4f);
+                if(part.name=="Tie" && unit.female) part.gameObject.SetActive(false);
+            }
+            if(unit.female)
+            {
+                var jacket=unit.visual.Find("Jacket").GetComponent<Renderer>().sharedMaterial.color;
+                Shape(unit.visual,"Office skirt",new Vector3(0,.57f,0),new Vector3(.79f,.48f,.49f),jacket,false);
+                Shape(unit.visual,"Scarf left",new Vector3(-.1f,1.34f,.22f),new Vector3(.16f,.09f,.08f),new Color(1,.65f,.7f),false).transform.localRotation=Quaternion.Euler(0,0,-25);
+                Shape(unit.visual,"Scarf right",new Vector3(.1f,1.34f,.22f),new Vector3(.16f,.09f,.08f),new Color(1,.65f,.7f),false).transform.localRotation=Quaternion.Euler(0,0,25);
+                Shape(unit.visual,"Ponytail",new Vector3(0,1.55f,-.4f),new Vector3(.3f,.75f,.3f),Navy,false,PrimitiveType.Capsule);
+            }
+            else
+            {
+                Shape(unit.visual,"Short hair crown",new Vector3(0,1.96f,-.02f),new Vector3(.47f,.14f,.43f),Navy,false);
+                Shape(unit.visual,"Suit lapel left",new Vector3(-.17f,1.26f,.22f),new Vector3(.13f,.3f,.05f),new Color(.75f,.8f,.85f),false).transform.localRotation=Quaternion.Euler(0,0,-24);
+                Shape(unit.visual,"Suit lapel right",new Vector3(.17f,1.26f,.22f),new Vector3(.13f,.3f,.05f),new Color(.75f,.8f,.85f),false).transform.localRotation=Quaternion.Euler(0,0,24);
+            }
             if(unit.female)
             {
                 Shape(unit.visual,"Long hair",new Vector3(0,1.63f,-.22f),new Vector3(.49f,.64f,.15f),Navy,false);
