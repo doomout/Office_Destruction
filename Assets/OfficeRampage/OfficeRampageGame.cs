@@ -345,6 +345,7 @@ namespace OfficeRampage
 
         private void SetWeapon(int index)
         {
+            if (whirlwindLeft > 0) return;
             if (index < 0 || index > 7 || (index == 7 && (!bfgReady || bfgUsed))) return;
             weaponIndex = index;
             for (int i = weapon.childCount - 1; i >= 0; i--)
@@ -411,7 +412,8 @@ namespace OfficeRampage
             var collision = controller.Move((move + Vector3.up * vertical) * dt);
             slowedByOil = IsStandingOnOil();
             if ((collision & CollisionFlags.Above) != 0 && vertical > 0) vertical = 0;
-            avatar.rotation = Quaternion.Euler(0, yaw, 0);
+            TickWeaponSkills(dt);
+            avatar.rotation = Quaternion.Euler(0, yaw + (whirlwindLeft > 0 ? whirlwindAngle : 0), 0);
             swing = Mathf.MoveTowards(swing, 0, dt * 5);
             weapon.localRotation = Quaternion.Euler(-swing * 60, -swing * 25, 0);
             UpdateCamera();
@@ -498,6 +500,7 @@ namespace OfficeRampage
             room.destroyed++;
             combo = comboLeft > 0 ? combo + 1 : 1;
             comboLeft = 4;
+            ChargeWhirlwind();
             score += 100 + Mathf.Min(combo, 20) * 15;
             if (combo % 3 == 0) { remaining += 5; Notify("COMBO " + combo + "   +5 SECONDS", 2); audioBus.Play("combo", .45f); }
             RefreshExit(room);

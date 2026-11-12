@@ -15,6 +15,7 @@ namespace OfficeRampage
         {
             giftRequested = bfgReady = bfgUsed = combatLocked = desert = false;
             cinematicText = ""; flash = 0; mushroomCamera = false; combatEffects.Clear();
+            whirlwindReady = whirlwindLeft = whirlwindTick = whirlwindAngle = 0; batStrike = false;
         }
         public bool IsPlayerCollider(Collider col) { return col.transform == player || col.transform.IsChildOf(player); }
         private GameObject Fx(string name, Vector3 at, Vector3 size, Color color, float seconds, Vector3 velocity, float growth = 0, PrimitiveType type = PrimitiveType.Cube)
@@ -56,7 +57,7 @@ namespace OfficeRampage
         }
         private void AttackExpanded()
         {
-            if (combatLocked) return;
+            if (combatLocked || whirlwindLeft > 0) return;
             if (weaponIndex == 7)
             {
                 if (!bfgReady || bfgUsed || current.number != 5 || bossUnit == null || bossUnit.PhaseTwo) return;
@@ -71,6 +72,8 @@ namespace OfficeRampage
             Vector3 direction = (aimPoint - origin).normalized;
             if (weaponIndex <= 1)
             {
+                batStrike = weaponIndex == 0;
+                try {
                 float damage = weaponIndex == 0 ? 40 : 90;
                 var seen = new HashSet<OfficeProp>();
                 foreach (var col in Physics.OverlapSphere(origin, range))
@@ -82,6 +85,7 @@ namespace OfficeRampage
                 }
                 foreach (var enemy in defenders)
                     if (enemy != null && enemy.Alive && Vector3.Distance(origin, enemy.AimPoint) <= range && Vector3.Dot(avatar.forward, (enemy.AimPoint - origin).normalized) > .25f && ClearDefenseSight(origin, enemy.AimPoint, player, enemy.transform)) enemy.Hit(damage);
+                } finally { batStrike = false; }
                 return;
             }
             if (weaponIndex == 6)
@@ -89,7 +93,15 @@ namespace OfficeRampage
                 SpawnProjectile(origin + direction * .5f, direction, player, true, true, 25, range, 120, 1);
                 return;
             }
-            int pellets = weaponIndex == 5 ? 9 : 1;
+            if (weaponIndex == 4 || weaponIndex == 5)
+            {
+                bool fire = weaponIndex == 5;
+                Vector3 forward = Quaternion.Euler(0, yaw, 0) * Vector3.forward;
+                SweepWeapon(origin, forward, range, 100, fire ? 65 : 55, fire);
+                ShowWeaponFan(origin, forward, range, fire);
+                return;
+            }
+            int pellets = 1;
             float power = weaponIndex == 2 ? 32 : weaponIndex == 3 ? 12 : weaponIndex == 4 ? 55 : 16;
             for (int i = 0; i < pellets; i++)
             {
@@ -132,6 +144,7 @@ namespace OfficeRampage
         {
             var obj = Shape(world, rocket ? "Rocket" : "Flying A4", origin, rocket ? new Vector3(.2f, .2f, .7f) : new Vector3(.42f, .035f, .59f) * scale, rocket ? Orange : Color.white, false);
             obj.transform.rotation = Quaternion.LookRotation(direction);
+            if (rocket) obj.AddComponent<OfficeRocketTrail>().game = this;
             var projectile = obj.AddComponent<OfficeProjectile>(); projectile.game = this; projectile.owner = owner;
             projectile.direction = direction; projectile.friendly = friendly; projectile.explosive = rocket;
             projectile.speed = speed; projectile.range = range; projectile.damage = damage; projectile.radius = .12f * scale;
@@ -195,6 +208,7 @@ namespace OfficeRampage
         }
         private IEnumerator SecretaryGift()
         {
+            whirlwindLeft = whirlwindReady = 0;
             combatLocked = true; cinematicText = "비서: 이걸 쓰세요! BFG 18, 딱 한 발이에요!";
             var secretary = new GameObject("Hidden secretary").transform; secretary.SetParent(world);
             Vector3 destination = player.position + avatar.forward * 2;
@@ -278,6 +292,7 @@ namespace OfficeRampage
         { var wall = Shape(root, "Invisible arena boundary", position, size, Navy); wall.GetComponent<Renderer>().enabled = false; }
         private void DrawExpansionOverlay()
         {
+            DrawWeaponSkills();
             if (desert && !combatLocked)
                 GUI.Label(new Rect(440, 145, 520, 35), "PHASE 2 / MONEY ARMOR", labelStyle);
             if (flash > 0)
