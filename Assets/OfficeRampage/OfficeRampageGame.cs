@@ -53,6 +53,8 @@ namespace OfficeRampage
         private void ResetRun()
         {
             StopAllCoroutines(); ResetExpansion();
+            runCompany = (companySettings ?? OfficeCompanySettings.CreateDefault()).Copy();
+            System.Array.Clear(spawnedEnemies, 0, spawnedEnemies.Length);
             menuPage = MenuPage.Game;
             Time.timeScale = 1;
             if (audioBus == null) audioBus = gameObject.AddComponent<OfficeAudio>();
@@ -426,7 +428,7 @@ namespace OfficeRampage
             {
                 current = BuildRoom(current.number + 1, current.end);
                 audioBus.ChangeRoom(current.number);
-                Notify(current.number == 5 ? "경비견 5마리를 모두 처치하면 대표가 깨어납니다." : "사무실 " + current.number + " / 5 · 적의 공격을 조심하세요!", 4);
+                Notify(current.number == 5 ? "경비견 5마리를 모두 처치하세요." : "사무실 " + current.number + " / 5 · 적의 공격을 조심하세요!", 4);
             }
             if (player.position.y < -8)
             {
@@ -601,10 +603,10 @@ namespace OfficeRampage
             Box(new Rect(22, 20, 350, 182), new Color(.02f, .04f, .07f, .92f));
             GUI.Label(new Rect(38, 28, 300, 40), "사무실 파괴", titleStyle);
             GUI.Label(new Rect(38, 74, 300, 28), bossFight ? "대표 사무실" : "사무실 " + current.number + " / 5", labelStyle);
-            string objective = current.number == 5 ? (bossFight ? "대표 체력 " + (bossUnit != null ? Mathf.CeilToInt(bossUnit.Health) : 0) : "남은 경비견: " + LivingDefenders(5, true) + " / 5") : "파괴 " + current.destroyed + " / " + current.required + (current.unlocked ? " · 출구 열림" : " · 출구 잠김");
+            string objective = current.number == 5 ? (bossFight ? "대표 체력 " + (bossUnit != null ? Mathf.CeilToInt(bossUnit.Health) : 0) : "남은 호위: " + LivingDefenders(5) + " / " + EnemyTotal(5)) : "파괴 " + current.destroyed + " / " + current.required + (current.unlocked ? " · 출구 열림" : " · 출구 잠김");
             GUI.Label(new Rect(38, 108, 300, 24), objective, smallStyle);
             GUI.Label(new Rect(38, 144, 340, 24), current.layoutName + " / " + current.width + " x " + (current.end - current.start) + " 미터", smallStyle);
-            if (current.number < 5) GUI.Label(new Rect(38, 177, 320, 24), "처치 " + (OfficeDefenseRules.Count(current.number) - LivingDefenders(current.number)) + " / " + OfficeProgressRules.Required(OfficeDefenseRules.Count(current.number)) + " 필요", smallStyle);
+            if (current.number < 5) GUI.Label(new Rect(38, 177, 320, 24), "처치 " + (EnemyTotal(current.number) - LivingDefenders(current.number)) + " / " + OfficeProgressRules.Required(EnemyTotal(current.number)) + " 필요", smallStyle);
             Box(new Rect(545, 20, 190, 86), OfficeProgressRules.TimerRuns(current.number) && remaining < 20 ? new Color(.65f, .1f, .07f, .95f) : Navy);
             GUI.Label(new Rect(555, 22, 170, 28), OfficeProgressRules.TimerRuns(current.number) ? "남은 시간" : "대표전", centeredStyle);
             int seconds = Mathf.CeilToInt(remaining);

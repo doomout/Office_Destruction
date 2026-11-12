@@ -30,13 +30,27 @@ namespace OfficeRampage
         {
             var navigation = new OfficeNavigation(layout);
             var random = new System.Random(Random.Range(0, int.MaxValue));
-            var spawnPositions = navigation.SpawnPoints(OfficeDefenseRules.Count(room.number), random, room.number == 5);
-            for (int i = 0; i < OfficeDefenseRules.Count(room.number); i++)
+            int count=runCompany.RoomCount(room.number);
+            spawnedEnemies[room.number]=count;
+            var spawnPositions=navigation.SpawnPoints(count,random,room.number==5,count>22?1.1f:2f);
+            int cursor=0;
+            int fixedCount=room.number==1?OfficeCompanySettings.GuardCount:room.number==5?OfficeCompanySettings.DogCount:0;
+            for(int i=0;i<fixedCount;i++)
             {
-                var p = spawnPositions[i];
-                var spawn = new Vector3(p.x, .08f, room.start + p.z);
-                CreateDefender(root, room, navigation, spawn, OfficeDefenseRules.Name(room.number, i),
-                    OfficeDefenseRules.Health(room.number, i, random), room.number == 5, false);
+                var p=spawnPositions[cursor++];
+                CreateDefender(root,room,navigation,new Vector3(p.x,.08f,room.start+p.z),
+                    OfficeDefenseRules.Name(room.number,i),OfficeDefenseRules.Health(room.number,i,random),room.number==5,false);
+            }
+            for(int rank=0;rank<OfficeCompanySettings.Ranks.Length;rank++)
+            {
+                if(OfficeCompanySettings.Rooms[rank]!=room.number) continue;
+                int amount=OfficeCompanySettings.Counts[rank]-(rank==OfficeCompanySettings.RepresentativeRank?1:0);
+                for(int i=0;i<amount;i++)
+                {
+                    var p=spawnPositions[cursor++];
+                    var unit=CreateDefender(root,room,navigation,new Vector3(p.x,.08f,room.start+p.z),runCompany.UnitName(rank,i),OfficeCompanySettings.Health[rank],false,false);
+                    ApplyCompanyIdentity(unit,rank,i);
+                }
             }
             if (room.number != 5) return;
             bossChair = new GameObject("CEO chair");
@@ -46,7 +60,8 @@ namespace OfficeRampage
             Shape(bossChair.transform, "Backrest", new Vector3(0, 1.2f, .48f), new Vector3(1.3f, 1.4f, .2f), Navy, false);
             Shape(bossChair.transform, "Chair base", new Vector3(0, .25f, 0), new Vector3(.2f, .5f, .2f), Color.gray, false);
             bossUnit = CreateDefender(root, room, navigation, bossChair.transform.position + Vector3.up * .08f,
-                "대표", OfficeDefenseRules.BossHealth, false, true);
+                runCompany.UnitName(OfficeCompanySettings.RepresentativeRank,0), OfficeDefenseRules.BossHealth, false, true);
+            ApplyCompanyIdentity(bossUnit,OfficeCompanySettings.RepresentativeRank,0);
             bossUnit.transform.rotation = Quaternion.Euler(0, 180, 0);
         }
 
@@ -57,7 +72,7 @@ namespace OfficeRampage
             unit.transform.SetParent(root); unit.transform.position = position;
             unit.game = this; unit.navigation = navigation; unit.room = room.number;
             unit.roomStart = room.start; unit.roomEnd = room.end; unit.roomWidth = room.width;
-            unit.dog = dog; unit.boss = isBoss; unit.guard = room.number == 1;
+            unit.dog = dog; unit.boss = isBoss; unit.guard = room.number == 1 && name == "경비";
             unit.displayName = name;
             unit.visual = new GameObject("Body").transform;
             unit.visual.SetParent(unit.transform, false);
@@ -106,7 +121,7 @@ namespace OfficeRampage
                 glow.type = LightType.Point; glow.color = Orange; glow.range = 3; glow.intensity = 2;
                 unit.flames.gameObject.SetActive(false);
             }
-            if (!dog && (room.number >= 3 || isBoss)) Shape(unit.visual, "A4 hand", new Vector3(.48f, 1.1f, .22f), new Vector3(.21f, .02f, .297f), Color.white, false);
+            if (!dog && (room.number >= 2 || isBoss)) Shape(unit.visual, "A4 hand", new Vector3(.48f, 1.1f, .22f), new Vector3(.21f, .02f, .297f), Color.white, false);
             unit.Initialize(health, isBoss);
             defenders.Add(unit);
             return unit;
@@ -170,13 +185,7 @@ namespace OfficeRampage
             score += unit.boss ? 5000 : unit.dog ? 300 : 200;
             if (unit.boss) { BeginBossEnding(unit); return; }
             RefreshExit(rooms.Find(r => r.number == unit.room));
-            if (OfficeDefenseRules.CanWakeBoss(unit.room, LivingDefenders(5, true), bossFight))
-            {
-                bossFight = true;
-                if (bossChair != null) bossChair.SetActive(false);
-                bossUnit.Wake(); audioBus.ChangeRoom(6);
-                Notify("경비견을 모두 처치했습니다! 대표전 시작!", 4);
-            }
+            if (unit.room == 5) CheckFinalRoster();
         }
 
         private void SealFinalRoom()

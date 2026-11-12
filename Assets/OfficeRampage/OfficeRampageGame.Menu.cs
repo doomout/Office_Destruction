@@ -4,7 +4,7 @@ namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
     {
-        private enum MenuPage { Main, Settings, Story, Endless, Quit, Game }
+        private enum MenuPage { Main, Settings, Units, Story, Endless, Quit, Game }
         private MenuPage menuPage = MenuPage.Main;
         private int difficulty = 1;
         private Font menuFont;
@@ -14,6 +14,7 @@ namespace OfficeRampage
 
         private void InitializeMenu()
         {
+            companySettings = OfficeCompanySettings.Load(); companySettings.Save();
             difficulty = OfficeMenuRules.Normalize(PlayerPrefs.GetInt(SettingsPrefix + "Difficulty", 1));
             audioBus = GetComponent<OfficeAudio>();
             if (audioBus == null) audioBus = gameObject.AddComponent<OfficeAudio>();
@@ -89,6 +90,7 @@ namespace OfficeRampage
                 Box(new Rect(80, 183, 1120, 2), new Color(.22f, .32f, .4f));
                 if (menuPage == MenuPage.Main) DrawMainPage();
                 else if (menuPage == MenuPage.Settings) DrawSettingsPage();
+                else if (menuPage == MenuPage.Units) DrawCompanySettings();
                 else DrawInformationPage();
                 GUI.Label(new Rect(80, 673, 1100, 30), "사무실 파괴  /  " + OfficeMenuRules.Label(difficulty) + "  /  시작 " + OfficeMenuRules.Duration(difficulty) / 60 + "분  /  3콤보마다 +5초", menuSmall);
             }
@@ -151,6 +153,7 @@ namespace OfficeRampage
             }
             if (changed) SaveMenuSettings();
             GUI.Label(new Rect(650, 560, 550, 65), "3콤보마다 +5초!\n자동 저장 · 다음 게임부터 적용됩니다.", menuSmall);
+            if (MenuButton(new Rect(80, 535, 485, 45), "유닛 설정")) OpenCompanySettings();
             if (MenuButton(new Rect(80, 590, 300, 55), "뒤로")) { SaveMenuSettings(); menuPage = MenuPage.Main; }
         }
 

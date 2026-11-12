@@ -58,8 +58,8 @@ namespace OfficeRampage
         {
             EnsureMenuStyles();
             Box(new Rect(180,380,920,270),new Color(.015f,.025f,.045f,.94f));
-            GUI.Label(new Rect(220,398,840,45),paused?"일시정지 · Esc를 누르면 계속합니다.":endingPlaying?"대표의 마지막 한마디…":"대표를 쓰러뜨렸습니다!",menuHeading);
-            GUI.Label(new Rect(220,458,840,55),"대표: “"+endingLine+"”",menuHeading);
+            GUI.Label(new Rect(220,398,840,45),paused?"일시정지 · Esc를 누르면 계속합니다.":endingPlaying?"대표의 마지막 한마디…":(bossUnit==null?"사무실 정리 완료!":"대표를 쓰러뜨렸습니다!"),menuHeading);
+            GUI.Label(new Rect(220,458,840,55),(bossUnit==null?endingLine:bossUnit.displayName+": “"+endingLine+"”"),menuText);
             GUI.Label(new Rect(220,521,840,32),"최종 점수  "+score.ToString("N0"),menuText);
             if(!endingPlaying)
             {

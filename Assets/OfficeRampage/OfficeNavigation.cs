@@ -63,7 +63,7 @@ namespace OfficeRampage
         private OfficeLayout.Point Point(int cell)
         { return new OfficeLayout.Point(left + cell % nx * Step, .6f + cell / nx * Step); }
         public OfficeLayout.Point RandomPoint(Random random) { return Point(cells[random.Next(cells.Count)]); }
-        public List<OfficeLayout.Point> SpawnPoints(int count, Random random, bool reserveBoss = false)
+        public List<OfficeLayout.Point> SpawnPoints(int count, Random random, bool reserveBoss = false, float separation = 2f)
         {
             var result = new List<OfficeLayout.Point>();
             for (int i = 0; i < count; i++)
@@ -76,7 +76,7 @@ namespace OfficeRampage
                     if (reserveBoss && p.x * p.x + (p.z - (length - 5)) * (p.z - (length - 5)) < 9) continue;
                     bool overlaps = false;
                     foreach (var previous in result)
-                        if ((previous.x - p.x) * (previous.x - p.x) + (previous.z - p.z) * (previous.z - p.z) < 4)
+                        if ((previous.x - p.x) * (previous.x - p.x) + (previous.z - p.z) * (previous.z - p.z) < separation * separation)
                         { overlaps = true; break; }
                     if (overlaps) continue;
                     result.Add(p); found = true; break;

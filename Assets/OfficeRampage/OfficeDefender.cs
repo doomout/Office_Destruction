@@ -8,7 +8,8 @@ namespace OfficeRampage
         [System.NonSerialized] public OfficeNavigation navigation;
         public int room;
         public float roomStart, roomEnd, roomWidth;
-        public bool dog, boss, guard;
+        public bool dog, boss, guard, female;
+        public int companyRank = -1;
         public float Health { get; private set; }
         public float MaxHealth { get; private set; }
         public bool Dormant { get; private set; }
@@ -63,7 +64,7 @@ namespace OfficeRampage
             navigation = newNavigation; roomWidth = width; roomEnd = end;
             path = null; pendingAttack = -1; recovery = 0; attackClock = 2;
             if (warning != null) warning.gameObject.SetActive(false);
-            displayName = "대표 / 돈 갑옷 · 2페이즈"; UpdateLabel();
+            displayName += " / 돈 갑옷 · 2페이즈"; UpdateLabel();
         }
         public void Teleport(Vector3 position)
         { body.enabled = false; transform.position = position; body.enabled = true; path = null; }
@@ -98,7 +99,7 @@ namespace OfficeRampage
                 return;
             }
             game.AnimateDefenderAttack(this, 0); attackClock -= dt;
-            int kind = dog || guard ? 0 : boss ? attackNumber % 3 : room == 2 ? 1 : room == 3 ? 2 : 1 + attackNumber % 2;
+            int kind = dog || guard ? 0 : (boss || companyRank == OfficeCompanySettings.RepresentativeRank) ? attackNumber % 3 : companyRank <= 2 ? 1 : companyRank <= 5 ? 2 : 1 + attackNumber % 2;
             float range = (kind == 0 ? 2.4f : kind == 1 ? 6f : 16f) * RangeScale;
             if (attackClock <= 0 && toward.magnitude <= range && game.ClearDefenseSight(AimPoint, game.PlayerPosition + Vector3.up, transform, null))
             {

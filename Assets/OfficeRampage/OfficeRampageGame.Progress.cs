@@ -6,7 +6,7 @@ namespace OfficeRampage
         private void RefreshExit(Room room)
         {
             if (room == null || room.number >= 5 || room.unlocked) return;
-            int totalEnemies = OfficeDefenseRules.Count(room.number);
+            int totalEnemies = EnemyTotal(room.number);
             int defeated = totalEnemies - LivingDefenders(room.number);
             if (!OfficeProgressRules.ExitReady(room.destroyed, room.total, defeated, totalEnemies)) return;
             room.unlocked = true;
