@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,7 +13,7 @@ namespace OfficeRampage
         {
             if (!batStrike || combo < 3 || whirlwindLeft > 0 || whirlwindReady > 0) return;
             whirlwindReady = 10;
-            Notify("[F] WHIRLWIND READY - 10 SECONDS", 3);
+            Notify("[F] 휠윈드 준비 완료 · 10초 안에 발동하세요!", 3);
         }
 
         private void StartWhirlwind()

@@ -53,12 +53,13 @@ namespace OfficeRampage
             if (!Alive)
             {
                 body.enabled = false; if (warning != null) warning.gameObject.SetActive(false);
+                if (boss) { game.DefenderDefeated(this); return; }
                 gameObject.SetActive(false); game.DefenderDefeated(this); Destroy(gameObject);
             }
         }
         public void EnterPhaseTwo(OfficeNavigation newNavigation, float width, float end)
         {
-            PhaseTwo = true; Health = OfficeCombatRules.PhaseTwoHealth(Health, MaxHealth);
+            PhaseTwo = true; Health = OfficeCombatRules.PhaseTwoHealth(Health, MaxHealth); MaxHealth = Health;
             navigation = newNavigation; roomWidth = width; roomEnd = end;
             path = null; pendingAttack = -1; recovery = 0; attackClock = 2;
             if (warning != null) warning.gameObject.SetActive(false);

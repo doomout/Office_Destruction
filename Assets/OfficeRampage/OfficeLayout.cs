@@ -35,7 +35,7 @@ namespace OfficeRampage
 
         public static OfficeLayout CreateExecutive()
         {
-            var layout = new OfficeLayout { width = 26, length = 30, name = "EXECUTIVE SUITE" };
+            var layout = new OfficeLayout { width = 26, length = 30, name = "대표 사무실" };
             for (int i = 0; i < 6; i++)
             {
                 layout.furniture.Add(new Point(-9, 5 + i * 3.7f, i));
@@ -49,13 +49,13 @@ namespace OfficeRampage
             var rng = new Random(seed);
             int[] widths = { 16, 32, 18, 34, 24 };
             int[] lengths = { 21, 25, 40, 37, 30 };
-            string[] names = { "COMPACT", "WIDE FLOOR", "LONG WING", "GRAND OFFICE", "PARTITIONS" };
+            string[] names = { "소형 사무실", "넓은 사무실", "긴 사무실", "대형 사무실", "칸막이 사무실" };
             var plan = new OfficeLayout {
                 width = widths[style] + rng.Next(-1, 2),
                 length = lengths[style] + rng.Next(-1, 2), name = names[style]
             };
             plan.width = Math.Max(32, plan.width); plan.length = Math.Max(34, plan.length);
-            plan.name = "OPEN OFFICE";
+            plan.name = "개방형 사무실";
             plan.AddRoute(0, 0, 0, plan.length);
             plan.AddRoute(-plan.width / 2, plan.length / 2, plan.width / 2, plan.length / 2);
             for (float z = 4.8f; z < plan.length - 3; z += 6f)

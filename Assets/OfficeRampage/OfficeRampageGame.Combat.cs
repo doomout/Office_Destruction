@@ -13,7 +13,7 @@ namespace OfficeRampage
         public bool CombatLocked { get { return combatLocked; } }
         private void ResetExpansion()
         {
-            ResetDecoy();
+            ResetEnding(); ResetDecoy();
             giftRequested = bfgReady = bfgUsed = combatLocked = desert = false;
             cinematicText = ""; flash = 0; mushroomCamera = false; combatEffects.Clear();
             whirlwindReady = whirlwindLeft = whirlwindTick = whirlwindAngle = 0; batStrike = false;
@@ -183,7 +183,7 @@ namespace OfficeRampage
                 Fx(kind == 0 ? "Baton arc" : "Sonic wave", unit.AimPoint + ray * .5f, Vector3.one * .14f, kind == 0 ? Orange : Cyan, .4f, ray * range / .4f, .3f, PrimitiveType.Sphere);
             }
         }
-        public void BossRaged() { Notify("CEO RAGE! SPEED +50% / RANGE +50%", 4); audioBus.Play("explosion", .5f); }
+        public void BossRaged() { Notify("대표 분노! 이동속도와 공격 범위 50% 증가", 4); audioBus.Play("explosion", .5f); }
         public void RequestSecretWeapon()
         {
             if (giftRequested || bfgUsed) return;
@@ -196,7 +196,7 @@ namespace OfficeRampage
         private IEnumerator SecretaryGift()
         {
             whirlwindLeft = whirlwindReady = 0;
-            combatLocked = true; cinematicText = "비서: 이걸 쓰세요! BFG 18, 딱 한 발이에요!";
+            combatLocked = true; cinematicText = "비서: 이걸 쓰세요! 비에프지 18, 딱 한 발이에요!";
             var secretary = new GameObject("Hidden secretary").transform; secretary.SetParent(world);
             Vector3 destination = player.position + avatar.forward * 2;
             Vector3 start = new Vector3(current.width / 2 - 1, .08f, Mathf.Clamp(player.position.z + 4, current.start + 2, current.end - 2));
@@ -208,17 +208,17 @@ namespace OfficeRampage
             while (t < 1.5f)
             { if (RunActive) { t += Time.deltaTime; secretary.position = Vector3.Lerp(start, destination, t / 1.5f); secretary.LookAt(new Vector3(player.position.x, secretary.position.y, player.position.z)); } yield return null; }
             gift.SetActive(false); bfgReady = true; SetWeapon(7); audioBus.Play("combo", .7f);
-            cinematicText = "BFG 18 획득! 왼쪽 클릭으로 발사 · 1회 사용";
+            cinematicText = "비에프지 18 획득! 왼쪽 클릭으로 발사 · 1회 사용";
             t = 0;
             while (t < 1.3f)
             { if (RunActive) { t += Time.deltaTime; secretary.position = Vector3.Lerp(destination, start, t / 1.3f); secretary.LookAt(start + Vector3.forward); } yield return null; }
             Destroy(secretary.gameObject); combatLocked = false; cinematicText = "";
-            cooldown = .5f; Notify("BFG 18 READY - LEFT CLICK / ONE SHOT", 6);
+            cooldown = .5f; Notify("비에프지 18 준비 완료 · 왼쪽 클릭 발사 · 한 발만 사용 가능", 6);
         }
         private IEnumerator NuclearTransition()
         {
             ClearDecoy();
-            combatLocked = true; cinematicText = "BFG 18 — 사무실 철거 승인!";
+            combatLocked = true; cinematicText = "비에프지 18 — 사무실 철거 승인!";
             audioBus.Play("rocket", .8f); shake = 3;
             var core = Fx("BFG energy", player.position + Vector3.up * 1.4f, Vector3.one * .7f, Color.green, 2, Vector3.zero, 2, PrimitiveType.Sphere);
             Vector3 origin = core.transform.position, target = bossUnit.AimPoint; float t = 0;
@@ -226,7 +226,7 @@ namespace OfficeRampage
             flash = .45f; audioBus.Play("explosion", 1f); shake = 8;
             mushroomCenter = new Vector3(target.x, .08f, target.z);
             mushroomCamera = true;
-            cinematicText = "BFG 18 — 사무실 철거 중!";
+            cinematicText = "비에프지 18 — 사무실 철거 중!";
             CreateBlast(mushroomCenter, true);
             // Hold a wide shot until the rising column and broad cap have fully formed.
             yield return SceneWait(6);
@@ -240,7 +240,7 @@ namespace OfficeRampage
             }
             oilPuddles.Clear(); desert = true;
             current.width *= 1.25f; float length = (current.end - current.start) * 1.25f; current.end = current.start + length;
-            current.layoutName = "DESERT / PHASE 2";
+            current.layoutName = "사막 / 2페이즈";
             var arena = new GameObject("Desert arena").transform; arena.SetParent(world);
             Shape(arena, "Sand floor", new Vector3(0, -.3f, current.start + length / 2), new Vector3(current.width + 50, .6f, length + 50), new Color(.78f, .61f, .35f));
             for (int side = -1; side <= 1; side += 2)
@@ -272,7 +272,7 @@ namespace OfficeRampage
             t = 0;
             while (t < 2) { if (RunActive) { t += Time.deltaTime; armor.localPosition = Vector3.up * Mathf.Lerp(12, 0, t / 2); } yield return null; }
             bossUnit.EnterPhaseTwo(new OfficeNavigation(new OfficeLayout { width = current.width, length = length }), current.width, current.end);
-            cinematicText = "2페이즈! 대표 최대 체력의 50% 회복"; audioBus.Play("thud", .8f);
+            cinematicText = "2페이즈! 대표 체력 700 · 돈 갑옷 장착!"; audioBus.Play("thud", .8f);
             yield return SceneWait(1);
             combatLocked = false; cinematicText = ""; flash = 0; invulnerability = 2; SetWeapon(0);
         }
@@ -282,7 +282,7 @@ namespace OfficeRampage
         {
             DrawWeaponSkills(); DrawDecoyHUD();
             if (desert && !combatLocked)
-                GUI.Label(new Rect(440, 145, 520, 35), "PHASE 2 / MONEY ARMOR", labelStyle);
+                GUI.Label(new Rect(440, 145, 520, 35), "2페이즈 / 돈 갑옷", labelStyle);
             if (flash > 0)
             {
                 Box(new Rect(0, 0, 1280, 720), new Color(1, 1, .85f, flash));

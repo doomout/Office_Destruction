@@ -168,14 +168,14 @@ namespace OfficeRampage
         public void DefenderDefeated(OfficeDefender unit)
         {
             score += unit.boss ? 5000 : unit.dog ? 300 : 200;
-            if (unit.boss) { End(true); return; }
+            if (unit.boss) { BeginBossEnding(unit); return; }
             RefreshExit(rooms.Find(r => r.number == unit.room));
             if (OfficeDefenseRules.CanWakeBoss(unit.room, LivingDefenders(5, true), bossFight))
             {
                 bossFight = true;
                 if (bossChair != null) bossChair.SetActive(false);
                 bossUnit.Wake(); audioBus.ChangeRoom(6);
-                Notify("ALL GUARD DOGS DEFEATED - CEO BATTLE!", 4);
+                Notify("경비견을 모두 처치했습니다! 대표전 시작!", 4);
             }
         }
 

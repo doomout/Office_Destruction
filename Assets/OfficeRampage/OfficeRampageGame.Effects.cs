@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
@@ -29,7 +29,7 @@ namespace OfficeRampage
             door.openMaterial = Mat(Cyan);
             var sign = new GameObject("Door status").AddComponent<TextMesh>(); sign.transform.SetParent(room.gate.transform, false);
             sign.transform.localPosition = new Vector3(0, 2.6f, -.25f); sign.anchor = TextAnchor.MiddleCenter;
-            sign.characterSize = .12f; sign.fontSize = 44; sign.color = Color.white; sign.text = "LOCKED"; door.sign = sign;
+            sign.characterSize = .12f; sign.fontSize = 44; sign.color = Color.white; sign.text = "잠김"; door.sign = sign;
             room.gateRenderer = top.GetComponent<Renderer>();
         }
     }

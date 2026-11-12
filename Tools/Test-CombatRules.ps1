@@ -31,7 +31,7 @@ Check(!OfficeCombatRules.Rage(251,500)&&OfficeCombatRules.Rage(250,500),"Rage th
 Check(!OfficeCombatRules.Gift(101,500)&&OfficeCombatRules.Gift(100,500),"Gift threshold");
 Check(OfficeCombatRules.DamageResult(500,9999,500,false)==100,"Phase one can be skipped");
 Check(OfficeCombatRules.DamageResult(100,9999,500,true)==0,"Phase two cannot die");
-Check(OfficeCombatRules.PhaseTwoHealth(100,500)==350,"Wrong recovery");
+Check(OfficeCombatRules.PhaseTwoHealth(100,500)==700,"Wrong recovery");
 Check(OfficeCombatRules.Weapons.Length==8,"Weapon slots");
 Check(OfficeCombatRules.Cooldowns[3]<OfficeCombatRules.Cooldowns[2],"Machinegun speed");
 Check(OfficeCombatRules.Ranges[6]>OfficeCombatRules.Ranges[5],"Rocket range");

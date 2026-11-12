@@ -11,14 +11,14 @@ namespace OfficeRampage
             if (!OfficeProgressRules.ExitReady(room.destroyed, room.total, defeated, totalEnemies)) return;
             room.unlocked = true;
             room.door.Open();
-            Notify("EXIT OPENING - PROPS AND ENEMIES 60% CLEARED", 3);
+            Notify("물건 파괴와 적 처치 60% 달성! 문이 열립니다.", 3);
             audioBus.Play("door", .45f);
         }
         private void SpawnHealingPotions(Room room, OfficeLayout layout)
         {
             var random = new System.Random(Random.Range(0, int.MaxValue));
             var navigation = new OfficeNavigation(layout);
-            foreach (var point in navigation.SpawnPoints(random.Next(2, 5), random, room.number == 5))
+            foreach (var point in navigation.SpawnPoints(2, random, room.number == 5))
             {
                 var pickup = new GameObject("Healing potion +30 HP").AddComponent<OfficeHealingPotion>();
                 pickup.transform.SetParent(world);
@@ -38,7 +38,7 @@ namespace OfficeRampage
             if (!RunActive || CombatLocked || hp >= 100 || !IsCurrentRoom(room)) return false;
             float before = hp;
             hp = OfficeProgressRules.Heal(hp);
-            Notify("HEALING POTION  +" + (hp - before).ToString("0") + " HP", 2);
+            Notify("회복 포션 · 체력 +" + (hp - before).ToString("0") + " 체력", 2);
             audioBus.Play("combo", .45f, 1.3f);
             return true;
         }

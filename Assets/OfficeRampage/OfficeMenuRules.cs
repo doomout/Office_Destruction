@@ -1,4 +1,4 @@
-namespace OfficeRampage
+﻿namespace OfficeRampage
 {
     public static class OfficeMenuRules
     {

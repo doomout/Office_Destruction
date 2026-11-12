@@ -111,7 +111,7 @@ namespace OfficeRampage
             view.backgroundColor = Navy;
             view.clearFlags = CameraClearFlags.SolidColor;
             current = BuildRoom(1, 0);
-            Notify("DESTROY 60% PROPS + DEFEAT 60% ENEMIES TO OPEN EXIT", 5);
+            Notify("물건 60% 파괴와 적 60% 처치를 달성하면 출구가 열립니다.", 5);
             LockCursor(true);
             UpdateCamera();
         }
@@ -206,7 +206,7 @@ namespace OfficeRampage
             sign.transform.SetParent(root);
             sign.transform.position = new Vector3(0, 3.57f, room.end - .26f);
             sign.transform.rotation = Quaternion.identity;
-            sign.text = arena ? "THE CEO" : "OFFICE 0" + number + " / 05";
+            sign.text = arena ? "대표실" : "사무실 " + number + " / 5";
             sign.anchor = TextAnchor.MiddleCenter;
             sign.characterSize = .16f;
             sign.fontSize = 48;
@@ -240,7 +240,7 @@ namespace OfficeRampage
                     warning.transform.SetParent(root);
                     warning.transform.position = center + new Vector3(0, .04f, 0);
                     warning.transform.rotation = Quaternion.Euler(90, 0, 0);
-                    warning.text = "OIL"; warning.anchor = TextAnchor.MiddleCenter;
+                    warning.text = "기름"; warning.anchor = TextAnchor.MiddleCenter;
                     warning.fontSize = 32; warning.characterSize = .11f; warning.color = new Color(1, .75f, .2f);
                 }
                 room.required = OfficeProgressRules.Required(room.total);
@@ -252,6 +252,7 @@ namespace OfficeRampage
                 Shape(root, "Floor edge", new Vector3(side * room.width / 2, .025f, middle), new Vector3(.12f, .05f, length), Cyan, false);
             SetupDefenders(room, layout, root);
             SpawnHealingPotions(room, layout);
+            ApplyKoreanWorldFont(root);
             return room;
         }
 
@@ -329,7 +330,7 @@ namespace OfficeRampage
                 var label = new GameObject("Break effect label").AddComponent<TextMesh>();
                 label.transform.SetParent(t, false);
                 label.transform.localPosition = new Vector3(0, kind == OfficeRules.WaterCooler ? 2.1f : 1.95f, 0);
-                label.text = kind == OfficeRules.WaterCooler ? "+5 HP" : "-5 HP";
+                label.text = kind == OfficeRules.WaterCooler ? "체력 +5" : "체력 -5";
                 label.anchor = TextAnchor.MiddleCenter; label.fontSize = 36; label.characterSize = .09f;
                 label.color = kind == OfficeRules.WaterCooler ? new Color(.2f, 1, .5f) : Orange;
             }
@@ -425,7 +426,7 @@ namespace OfficeRampage
             {
                 current = BuildRoom(current.number + 1, current.end);
                 audioBus.ChangeRoom(current.number);
-                Notify(current.number == 5 ? "DEFEAT ALL 5 GUARD DOGS TO FACE THE CEO" : "OFFICE " + current.number + " / 5  -  WATCH THE DEFENDERS!", 4);
+                Notify(current.number == 5 ? "경비견 5마리를 모두 처치하면 대표가 깨어납니다." : "사무실 " + current.number + " / 5 · 적의 공격을 조심하세요!", 4);
             }
             if (player.position.y < -8)
             {
@@ -438,6 +439,7 @@ namespace OfficeRampage
 
         private void UpdateCamera()
         {
+            if (endingPlaying) { UpdateEndingCamera(); return; }
             if (mushroomCamera)
             {
                 view.fieldOfView = 56;
@@ -503,7 +505,7 @@ namespace OfficeRampage
             comboLeft = 4;
             ChargeWhirlwind();
             score += 100 + Mathf.Min(combo, 20) * 15;
-            if (combo % 3 == 0) { remaining += 5; Notify("COMBO " + combo + "   +5 SECONDS", 2); audioBus.Play("combo", .45f); }
+            if (combo % 3 == 0) { remaining += 5; Notify("콤보 " + combo + " · 제한시간 +5초", 2); audioBus.Play("combo", .45f); }
             RefreshExit(room);
             float previousHealth = hp;
             hp = OfficeRules.HealthAfterBreak(hp, kind);
@@ -516,14 +518,14 @@ namespace OfficeRampage
                 var flash = Shape(world, "Electronic explosion", position, Vector3.one * 1.6f, Orange, false, PrimitiveType.Sphere);
                 Destroy(flash, .12f);
                 shake = 1.5f;
-                Notify("ELECTRONICS EXPLODED  -5 HP", 1.8f);
+                Notify("전자기기 폭발! 체력 -5", 1.8f);
                 if (hp <= 0) End(false);
             }
             else if (kind == OfficeRules.WaterCooler)
             {
                 Impact(position, new Color(.2f, .9f, .6f), Vector3.up, 7);
                 audioBus.Play("combo", .4f, 1.25f);
-                Notify(hp > previousHealth ? "WATER COOLER  +" + (hp - previousHealth).ToString("0") + " HP" : "WATER COOLER  HP FULL", 1.8f);
+                Notify(hp > previousHealth ? "정수기 · 체력 +" + (hp - previousHealth).ToString("0") + " 체력" : "정수기 · 체력이 가득 찼습니다.", 1.8f);
             }
         }
 
@@ -569,7 +571,7 @@ namespace OfficeRampage
         private void DrawWeaponSlots()
         {
             EnsureMenuStyles();
-            GUI.Label(new Rect(345, 540, 900, 38), weaponNames[weaponIndex] + (weaponIndex == 7 ? " / 1발" : " / 무제한"), menuText);
+            GUI.Label(new Rect(345, 540, 900, 38), weaponNames[weaponIndex] + (weaponIndex == 7 ? " / 1발" : weaponIndex == 4 ? " / 남은 횟수 " + (2-decoysUsed[current.number]) : " / 무제한"), menuText);
             for (int i = 0; i < 8; i++)
             {
                 float x = 345 + i * 114;
@@ -583,66 +585,68 @@ namespace OfficeRampage
         {
             if (menuPage != MenuPage.Game) { DrawFrontEnd(); return; }
             if (world == null) return;
+            EnsureMenuStyles();
             if (titleStyle == null)
             {
-                titleStyle = new GUIStyle(GUI.skin.label) { fontSize = 30, fontStyle = FontStyle.Bold };
-                labelStyle = new GUIStyle(GUI.skin.label) { fontSize = 19, fontStyle = FontStyle.Bold };
-                smallStyle = new GUIStyle(GUI.skin.label) { fontSize = 14 };
+                titleStyle = new GUIStyle(GUI.skin.label) { font = menuFont, fontSize = 30, fontStyle = FontStyle.Bold };
+                labelStyle = new GUIStyle(GUI.skin.label) { font = menuFont, fontSize = 19, fontStyle = FontStyle.Bold };
+                smallStyle = new GUIStyle(GUI.skin.label) { font = menuFont, fontSize = 14 };
                 centeredStyle = new GUIStyle(labelStyle) { alignment = TextAnchor.MiddleCenter };
                 titleStyle.normal.textColor = labelStyle.normal.textColor = smallStyle.normal.textColor = centeredStyle.normal.textColor = Color.white;
             }
             Matrix4x4 previous = GUI.matrix;
             float scale = Mathf.Min(Screen.width / 1280f, Screen.height / 720f);
             GUI.matrix = Matrix4x4.TRS(new Vector3((Screen.width - 1280 * scale) / 2, (Screen.height - 720 * scale) / 2), Quaternion.identity, Vector3.one * scale);
+            if (endingPlaying || (ended && won)) { DrawEndingScreen(); GUI.matrix = previous; return; }
             Box(new Rect(22, 20, 350, 182), new Color(.02f, .04f, .07f, .92f));
-            GUI.Label(new Rect(38, 28, 300, 40), "OFFICE / RAMPAGE", titleStyle);
-            GUI.Label(new Rect(38, 74, 300, 28), bossFight ? "FINAL FLOOR / THE CEO" : "OFFICE 0" + current.number + " / 05", labelStyle);
-            string objective = current.number == 5 ? (bossFight ? "FURIOUS CEO / HP " + (bossUnit != null ? Mathf.CeilToInt(bossUnit.Health) : 0) : "GUARD DOGS LEFT: " + LivingDefenders(5, true) + " / 5") : "DESTROY " + current.destroyed + " / " + current.required + (current.unlocked ? "  |  EXIT OPEN" : "  |  EXIT LOCKED");
+            GUI.Label(new Rect(38, 28, 300, 40), "사무실 파괴", titleStyle);
+            GUI.Label(new Rect(38, 74, 300, 28), bossFight ? "대표 사무실" : "사무실 " + current.number + " / 5", labelStyle);
+            string objective = current.number == 5 ? (bossFight ? "대표 체력 " + (bossUnit != null ? Mathf.CeilToInt(bossUnit.Health) : 0) : "남은 경비견: " + LivingDefenders(5, true) + " / 5") : "파괴 " + current.destroyed + " / " + current.required + (current.unlocked ? " · 출구 열림" : " · 출구 잠김");
             GUI.Label(new Rect(38, 108, 300, 24), objective, smallStyle);
-            GUI.Label(new Rect(38, 144, 340, 24), current.layoutName + " / " + current.width + " x " + (current.end - current.start) + " m", smallStyle);
-            if (current.number < 5) GUI.Label(new Rect(38, 177, 320, 24), "ENEMIES " + (OfficeDefenseRules.Count(current.number) - LivingDefenders(current.number)) + " / " + OfficeProgressRules.Required(OfficeDefenseRules.Count(current.number)) + " REQUIRED", smallStyle);
+            GUI.Label(new Rect(38, 144, 340, 24), current.layoutName + " / " + current.width + " x " + (current.end - current.start) + " 미터", smallStyle);
+            if (current.number < 5) GUI.Label(new Rect(38, 177, 320, 24), "처치 " + (OfficeDefenseRules.Count(current.number) - LivingDefenders(current.number)) + " / " + OfficeProgressRules.Required(OfficeDefenseRules.Count(current.number)) + " 필요", smallStyle);
             Box(new Rect(545, 20, 190, 86), OfficeProgressRules.TimerRuns(current.number) && remaining < 20 ? new Color(.65f, .1f, .07f, .95f) : Navy);
-            GUI.Label(new Rect(555, 22, 170, 28), OfficeProgressRules.TimerRuns(current.number) ? "TIME REMAINING" : "BOSS BATTLE", centeredStyle);
+            GUI.Label(new Rect(555, 22, 170, 28), OfficeProgressRules.TimerRuns(current.number) ? "남은 시간" : "대표전", centeredStyle);
             int seconds = Mathf.CeilToInt(remaining);
-            GUI.Label(new Rect(555, 54, 190, 42), OfficeProgressRules.TimerRuns(current.number) ? (seconds / 60).ToString("00") + ":" + (seconds % 60).ToString("00") : "NO LIMIT", titleStyle);
+            GUI.Label(new Rect(555, 54, 190, 42), OfficeProgressRules.TimerRuns(current.number) ? (seconds / 60).ToString("00") + ":" + (seconds % 60).ToString("00") : "시간 무제한", titleStyle);
             Box(new Rect(1018, 20, 240, 86), Navy);
-            GUI.Label(new Rect(1034, 29, 215, 30), "SCORE  " + score.ToString("N0"), labelStyle);
-            GUI.Label(new Rect(1034, 65, 215, 26), "COMBO " + combo + "  /  3 = +5s", smallStyle);
+            GUI.Label(new Rect(1034, 29, 215, 30), "점수  " + score.ToString("N0"), labelStyle);
+            GUI.Label(new Rect(1034, 65, 215, 26), "콤보 " + combo + " / 3회마다 +5초", smallStyle);
             Box(new Rect(1034, 94, 208 * Mathf.Clamp01(comboLeft / 4), 4), Orange);
             if (noticeLeft > 0 && !ended) GUI.Label(new Rect(260, 205, 760, 40), notice, centeredStyle);
             if (bossFight && !ended)
             {
                 Box(new Rect(390, 119, 500, 18), Navy);
-                Box(new Rect(390, 119, 500 * Mathf.Clamp01(bossUnit != null ? bossUnit.Health / OfficeDefenseRules.BossHealth : 0), 18), Orange);
+                Box(new Rect(390, 119, 500 * Mathf.Clamp01(bossUnit != null ? bossUnit.Health / bossUnit.MaxHealth : 0), 18), Orange);
             }
             GUI.Label(new Rect(627, 342, 30, 32), "+", titleStyle);
             Box(new Rect(22, 617, 320, 80), Navy);
-            GUI.Label(new Rect(38, 627, 290, 28), "HEALTH  " + Mathf.CeilToInt(hp), labelStyle);
-            if (slowedByOil && !ended) GUI.Label(new Rect(38, 578, 300, 32), "OIL!  MOVE SPEED 50%", labelStyle);
+            GUI.Label(new Rect(38, 627, 290, 28), "체력  " + Mathf.CeilToInt(hp), labelStyle);
+            if (slowedByOil && !ended) GUI.Label(new Rect(38, 578, 300, 32), "기름! 이동속도 50%", labelStyle);
             Box(new Rect(38, 667, 285, 10), new Color(.2f, .25f, .3f));
             Box(new Rect(38, 667, 285 * hp / 100, 10), invulnerability > 0 ? Orange : Cyan);
             DrawWeaponSlots();
-            GUI.Label(new Rect(354, 644, 480, 28), "WASD Move / Mouse Aim / LMB Attack / Space Jump", smallStyle);
-            GUI.Label(new Rect(375, 674, 800, 24), "1-7 Weapons / 8 BFG / Shift Sprint / Esc Pause / R Restart / M Mute", smallStyle);
+            GUI.Label(new Rect(354, 644, 480, 28), "WASD 이동 / 마우스 조준 / 왼쪽 클릭 공격 / 스페이스 점프", smallStyle);
+            GUI.Label(new Rect(375, 674, 800, 24), "1~8 무기 / 시프트 달리기 / Esc 일시정지 / R 재시작 / M 음소거", smallStyle);
             DrawExpansionOverlay();
             if (ended || paused)
             {
                 Box(new Rect(0, 0, 1280, 720), new Color(.01f, .025f, .045f, .88f));
-                GUI.Label(new Rect(430, 245, 550, 55), paused ? "TAKE A BREATHER" : won ? "YOU'RE THE BOSS NOW." : "BAD DAY AT THE OFFICE.", titleStyle);
-                GUI.Label(new Rect(340, 325, 600, 40), paused ? "ESC TO RESUME" : "SCORE " + score.ToString("N0") + "  |  " + (won ? "CEO DEFEATED" : hp <= 0 ? "YOU WERE DEFEATED" : "TIME'S UP"), centeredStyle);
-                GUI.Label(new Rect(340, 380, 600, 40), "PRESS R FOR A NEW RANDOM RUN", centeredStyle);
-                if (GUI.Button(new Rect(510, 450, 260, 48), paused ? "RESUME" : "PLAY AGAIN"))
+                GUI.Label(new Rect(430, 245, 550, 55), paused ? "잠깐 쉬어가세요" : won ? "대표를 쓰러뜨렸습니다!" : "오늘은 여기까지…", titleStyle);
+                GUI.Label(new Rect(340, 325, 600, 40), paused ? "Esc를 누르면 계속합니다." : "점수 " + score.ToString("N0") + "  |  " + (won ? "대표 처치" : hp <= 0 ? "체력 소진" : "시간 초과"), centeredStyle);
+                GUI.Label(new Rect(340, 380, 600, 40), "R을 누르면 첫 사무실부터 다시 시작합니다.", centeredStyle);
+                if (MenuButton(new Rect(510, 450, 260, 48), paused ? "계속하기" : "재게임"))
                 {
                     if (paused) { paused = false; Time.timeScale = 1; LockCursor(true); audioBus.SetPaused(false); }
                     else ResetRun();
                 }
                 DrawReturnToMenu();
                 GUI.changed = false;
-                GUI.Label(new Rect(420, 525, 150, 28), "MUSIC", smallStyle);
+                GUI.Label(new Rect(420, 525, 150, 28), "음악", smallStyle);
                 audioBus.MusicVolume = GUI.HorizontalSlider(new Rect(560, 534, 270, 20), audioBus.MusicVolume, 0, .6f);
-                GUI.Label(new Rect(420, 565, 150, 28), "SOUND EFFECTS", smallStyle);
+                GUI.Label(new Rect(420, 565, 150, 28), "효과음", smallStyle);
                 audioBus.EffectsVolume = GUI.HorizontalSlider(new Rect(560, 574, 270, 20), audioBus.EffectsVolume, 0, 1);
-                GUI.Label(new Rect(420, 608, 430, 28), audioBus.Muted ? "M: SOUND MUTED" : "M: MUTE ALL SOUND", smallStyle);
+                GUI.Label(new Rect(420, 608, 430, 28), audioBus.Muted ? "M: 소리 꺼짐" : "M: 전체 소리 끄기", smallStyle);
                 if (GUI.changed) SaveMenuSettings();
             }
             GUI.matrix = previous;

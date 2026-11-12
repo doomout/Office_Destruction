@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 namespace OfficeRampage
 {
     public static class OfficeDefenseRules
