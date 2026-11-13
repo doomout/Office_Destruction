@@ -4,7 +4,7 @@ namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
     {
-        private enum MenuPage { Main, Settings, Units, Story, Endless, Quit, Game }
+        private enum MenuPage { Main, Settings, Units, Story, Endless, Quit, Intro, Game }
         private MenuPage menuPage = MenuPage.Main;
         private int difficulty = 1;
         private Font menuFont;
@@ -92,6 +92,7 @@ namespace OfficeRampage
                 if (menuPage == MenuPage.Main) DrawMainPage();
                 else if (menuPage == MenuPage.Settings) DrawSettingsPage();
                 else if (menuPage == MenuPage.Units) DrawCompanySettings();
+                else if (menuPage == MenuPage.Intro) DrawIntro();
                 else DrawInformationPage();
                 GUI.Label(new Rect(80, 673, 1100, 30), "사무실 파괴  /  " + OfficeMenuRules.Label(difficulty) + "  /  시작 " + OfficeMenuRules.Duration(difficulty) / 60 + "분  /  3콤보마다 +5초", menuSmall);
             }
@@ -100,7 +101,7 @@ namespace OfficeRampage
 
         private void DrawMainPage()
         {
-            if (MenuButton(new Rect(80, 215, 400, 65), "사무실 파괴", true)) { SaveMenuSettings(); ResetRun(); return; }
+            if (MenuButton(new Rect(80, 215, 400, 65), "사무실 파괴", true)) { SaveMenuSettings(); BeginIntro(); return; }
             if (MenuButton(new Rect(80, 295, 400, 65), "무한파괴")) menuPage = MenuPage.Endless;
             if (MenuButton(new Rect(80, 375, 400, 65), "설정")) menuPage = MenuPage.Settings;
             if (MenuButton(new Rect(80, 455, 400, 65), "스토리")) menuPage = MenuPage.Story;

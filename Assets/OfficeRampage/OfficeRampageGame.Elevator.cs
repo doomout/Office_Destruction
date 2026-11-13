@@ -48,7 +48,7 @@ namespace OfficeRampage
                 { child.gameObject.SetActive(false); Destroy(child.gameObject); }
             rooms.Clear(); defenders.Clear(); oilPuddles.Clear(); debris.Clear(); combatEffects.Clear();
             bossUnit=null; bossChair=null; finalRoomSealed=false;
-            combo=0; comboLeft=0; whirlwindLeft=whirlwindReady=0;
+            combo=0; comboLeft=0; whirlwindLeft=whirlwindReady=0; ResetElements();
             yield return null; // Destruction completes before creating the next floor.
             current=BuildRoom(next,0);
             player.position=new Vector3(0,.08f,3); yaw=0; pitch=13; avatar.rotation=Quaternion.identity;

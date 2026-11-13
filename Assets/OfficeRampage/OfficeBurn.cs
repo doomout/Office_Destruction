@@ -27,8 +27,7 @@ namespace OfficeRampage
             while (tick <= .00001f)
             {
                 tick += 1;
-                if (enemy != null) enemy.Hit(1);
-                else if (prop != null) prop.Hit(1, Vector3.up);
+                game.SkillDamage(() => { if (enemy != null) enemy.Hit(1); else if (prop != null) prop.Hit(1, Vector3.up); });
                 if (!game.RunActive || game.CombatLocked || !gameObject.activeInHierarchy) break;
             }
             visualAge += dt;

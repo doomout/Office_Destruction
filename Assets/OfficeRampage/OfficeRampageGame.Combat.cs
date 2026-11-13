@@ -13,7 +13,7 @@ namespace OfficeRampage
         public bool CombatLocked { get { return combatLocked; } }
         private void ResetExpansion()
         {
-            ResetEnding(); ResetDecoy();
+            ResetEnding(); ResetDecoy(); ResetElements();
             giftRequested = bfgReady = bfgUsed = combatLocked = desert = false;
             cinematicText = ""; flash = 0; mushroomCamera = false; combatEffects.Clear();
             whirlwindReady = whirlwindLeft = whirlwindTick = whirlwindAngle = 0; batStrike = false;
@@ -57,7 +57,7 @@ namespace OfficeRampage
         }
         private void AttackExpanded()
         {
-            if (combatLocked || whirlwindLeft > 0) return;
+            if (combatLocked || whirlwindLeft > 0 || thunderLeft>0) return;
             if (weaponIndex == 4) { ThrowDecoy(); return; }
             if (weaponIndex == 7)
             {
@@ -73,7 +73,7 @@ namespace OfficeRampage
             Vector3 direction = (aimPoint - origin).normalized;
             if (weaponIndex <= 1)
             {
-                batStrike = weaponIndex == 0;
+                normalStrikeWeapon=weaponIndex; batStrike = weaponIndex == 0;
                 try {
                 float damage = weaponIndex == 0 ? 40 : 90;
                 var seen = new HashSet<OfficeProp>();
@@ -86,7 +86,7 @@ namespace OfficeRampage
                 }
                 foreach (var enemy in defenders)
                     if (enemy != null && enemy.Alive && Vector3.Distance(origin, enemy.AimPoint) <= range && Vector3.Dot(avatar.forward, (enemy.AimPoint - origin).normalized) > .25f && ClearDefenseSight(origin, enemy.AimPoint, player, enemy.transform)) enemy.Hit(damage);
-                } finally { batStrike = false; }
+                } finally { batStrike = false; normalStrikeWeapon=-1; }
                 return;
             }
             if (weaponIndex == 6)
@@ -101,8 +101,16 @@ namespace OfficeRampage
                 end = hit.point;
                 var prop = hit.collider.GetComponentInParent<OfficeProp>();
                 var enemy = hit.collider.GetComponentInParent<OfficeDefender>();
-                if (prop != null) prop.Hit(power, direction);
-                if (enemy != null) enemy.Hit(power);
+                bool frozenShot=weaponIndex==2 && iceLeft>0;
+                normalStrikeWeapon=weaponIndex;
+                try
+                {
+                    System.Action damage=()=> { if(prop!=null) prop.Hit(power,direction); if(enemy!=null) enemy.Hit(power); };
+                    if(frozenShot) { SkillDamage(damage); if(enemy!=null && enemy.Alive) enemy.Freeze(3); }
+                    else damage();
+                }
+                finally { normalStrikeWeapon=-1; }
+                if(frozenShot) for(int i=0;i<6;i++) Fx("Ice impact",end,Vector3.one*.18f,Cyan,.4f,Random.onUnitSphere*2);
                 if (weaponIndex == 5)
                 {
                     if (prop != null && prop.health > 0 && prop.gameObject.activeInHierarchy) Ignite(prop.gameObject);

@@ -52,7 +52,7 @@ namespace OfficeRampage
 
         private void ResetRun()
         {
-            StopAllCoroutines(); ResetExpansion(); ResetSprint();
+            StopAllCoroutines(); submissionPlaying=submissionEnded=false; ResetExpansion(); ResetSprint();
             if (nameEditor != null) nameEditor.Close();
             runCompany = (companySettings ?? OfficeCompanySettings.CreateDefault()).Copy();
             System.Array.Clear(spawnedEnemies, 0, spawnedEnemies.Length);
@@ -348,8 +348,9 @@ namespace OfficeRampage
 
         private void SetWeapon(int index)
         {
-            if (whirlwindLeft > 0) return;
+            if (whirlwindLeft > 0 || thunderLeft>0) return;
             if (index < 0 || index > 7 || (index == 7 && (!bfgReady || bfgUsed))) return;
+            weapon.localScale=Vector3.one;
             weaponIndex = index;
             for (int i = weapon.childCount - 1; i >= 0; i--)
             { weapon.GetChild(i).gameObject.SetActive(false); Destroy(weapon.GetChild(i).gameObject); }
@@ -440,6 +441,7 @@ namespace OfficeRampage
 
         private void UpdateCamera()
         {
+            if (submissionPlaying || submissionEnded) { UpdateSubmissionCamera(); return; }
             if (endingPlaying) { UpdateEndingCamera(); return; }
             if (mushroomCamera)
             {
@@ -502,11 +504,13 @@ namespace OfficeRampage
             if (ended) return;
             var room = rooms.Find(r => r.number == roomNumber);
             room.destroyed++;
-            combo = comboLeft > 0 ? combo + 1 : 1;
-            comboLeft = 4;
-            ChargeWhirlwind();
-            score += 100 + Mathf.Min(combo, 20) * 15;
-            if (combo % 3 == 0) { remaining += 5; Notify("콤보 " + combo + " · 제한시간 +5초", 2); audioBus.Play("combo", .45f); }
+            score += 100;
+            if (skillDamageDepth==0)
+            {
+                combo = comboLeft > 0 ? combo + 1 : 1; comboLeft=4;
+                ChargeWhirlwind(); ChargeElements(); score+=Mathf.Min(combo,20)*15;
+                if(combo%3==0) { remaining+=5; Notify("콤보 "+combo+" · 제한시간 +5초",2); audioBus.Play("combo",.45f); }
+            }
             RefreshExit(room);
             float previousHealth = hp;
             hp = OfficeRules.HealthAfterBreak(hp, kind);
@@ -598,6 +602,7 @@ namespace OfficeRampage
             Matrix4x4 previous = GUI.matrix;
             float scale = Mathf.Min(Screen.width / 1280f, Screen.height / 720f);
             GUI.matrix = Matrix4x4.TRS(new Vector3((Screen.width - 1280 * scale) / 2, (Screen.height - 720 * scale) / 2), Quaternion.identity, Vector3.one * scale);
+            if (submissionPlaying || submissionEnded) { DrawSubmission(); GUI.matrix=previous; return; }
             if (endingPlaying || (ended && won)) { DrawEndingScreen(); GUI.matrix = previous; return; }
             Box(new Rect(22, 20, 350, 182), new Color(.02f, .04f, .07f, .92f));
             GUI.Label(new Rect(38, 28, 300, 40), "사무실 파괴", titleStyle);

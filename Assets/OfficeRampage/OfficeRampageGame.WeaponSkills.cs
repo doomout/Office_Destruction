@@ -11,7 +11,7 @@ namespace OfficeRampage
 
         private void ChargeWhirlwind()
         {
-            if (!batStrike || combo < 3 || whirlwindLeft > 0 || whirlwindReady > 0) return;
+            if (!batStrike || combo % 3 != 0 || whirlwindLeft > 0 || whirlwindReady > 0) return;
             whirlwindReady = 10;
             Notify("[F] 휠윈드 준비 완료 · 10초 안에 발동하세요!", 3);
         }
@@ -19,7 +19,7 @@ namespace OfficeRampage
         private void StartWhirlwind()
         {
             if (!RunActive || CombatLocked || weaponIndex != 0 || whirlwindReady <= 0 || whirlwindLeft > 0) return;
-            whirlwindReady = 0; whirlwindLeft = 10; whirlwindTick = .25f; whirlwindAngle = 0;
+            combo=0; comboLeft=0; whirlwindReady = 0; whirlwindLeft = 10; whirlwindTick = .25f; whirlwindAngle = 0;
             audioBus.Play("combo", .6f);
         }
 
@@ -27,7 +27,8 @@ namespace OfficeRampage
         {
             if (!RunActive || CombatLocked) return;
             whirlwindReady = Mathf.Max(0, whirlwindReady - dt);
-            if (Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame) StartWhirlwind();
+            TickElements(dt);
+            if (Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame) ActivateWeaponSkill();
             if (whirlwindLeft <= 0) return;
             // Fixed attack cadence: never apply damage once per rendered frame.
             float activeTime = Mathf.Min(dt, whirlwindLeft);
@@ -37,7 +38,7 @@ namespace OfficeRampage
             while (whirlwindTick <= 0 && RunActive && !CombatLocked)
             {
                 whirlwindTick += .25f;
-                SweepWeapon(player.position + Vector3.up * 1.35f, Vector3.forward, 3.4f, 360, 18, false);
+                SkillDamage(() => SweepWeapon(player.position + Vector3.up * 1.35f, Vector3.forward, 3.4f, 360, 18, false));
                 for (int i = 0; i < 16; i++)
                 {
                     Vector3 ray = Quaternion.Euler(0, i * 22.5f + whirlwindAngle, 0) * Vector3.forward;
@@ -107,6 +108,7 @@ namespace OfficeRampage
 
         private void DrawWeaponSkills()
         {
+            DrawElementSkills();
             if (whirlwindLeft <= 0 && whirlwindReady <= 0) return;
             EnsureMenuStyles();
             Box(new Rect(340, 535, 600, 42), Navy);
