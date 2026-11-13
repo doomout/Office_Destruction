@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 namespace OfficeRampage
 {
@@ -29,30 +29,45 @@ namespace OfficeRampage
         }
         private IEnumerator SubmissionScene()
         {
-            var crowd=new Transform[6];
-            for(int i=0;i<crowd.Length;i++)
+            int total=0;
+            foreach(var rank in runCompany.ranks) total+=rank.people.Length;
+            var crowd=new Transform[total]; var ranks=new int[total];
+            int index=0;
+            for(int rank=0;rank<runCompany.ranks.Length;rank++)
+            for(int person=0;person<runCompany.ranks[rank].people.Length;person++,index++)
             {
-                var actor=new GameObject("Overtime supervisor").transform; actor.SetParent(world);
-                float angle=i*Mathf.PI/3; actor.position=player.position+new Vector3(Mathf.Cos(angle),0,Mathf.Sin(angle))*3.5f;
-                actor.LookAt(player.position); BuildPerson(actor,i>=4); crowd[i]=actor;
-                Shape(actor,i%3==0?"Baton":"A4 hand",new Vector3(.48f,1,.5f),i%3==0?new Vector3(.1f,.1f,1):new Vector3(.4f,.03f,.55f),i%3==0?Orange:Color.white,false);
+                var actor=new GameObject("Overtime supervisor · "+runCompany.UnitName(rank,person)).transform; actor.SetParent(world);
+                int ring=index<12?0:index<28?1:2;
+                int slot=ring==0?index:ring==1?index-12:index-28;
+                int count=ring==0?Mathf.Min(12,total):ring==1?Mathf.Min(16,total-12):total-28;
+                float angle=slot*Mathf.PI*2/count+ring*.19f;
+                actor.position=player.position+new Vector3(Mathf.Cos(angle),0,Mathf.Sin(angle))*(3.4f+ring*1.8f);
+                actor.LookAt(player.position); crowd[index]=actor; ranks[index]=rank;
+                var model=new GameObject("Supervisor appearance").transform; model.SetParent(actor,false);
+                BuildPerson(model,rank==OfficeCompanySettings.RepresentativeRank);
+                // Reuse the saved per-person appearance without enabling combat AI during this scripted ending.
+                var unit=actor.gameObject.AddComponent<OfficeDefender>(); unit.enabled=false; unit.game=this; unit.visual=model;
+                unit.label=new GameObject("Supervisor identity").AddComponent<TextMesh>(); unit.label.transform.SetParent(actor,false);
+                ApplyCompanyIdentity(unit,rank,person); unit.label.gameObject.SetActive(false);
+                Shape(model,rank==OfficeCompanySettings.RepresentativeRank?"Baton":"A4 hand",new Vector3(.48f,1,.5f),rank==OfficeCompanySettings.RepresentativeRank?new Vector3(.1f,.1f,1):new Vector3(.4f,.03f,.55f),rank==OfficeCompanySettings.RepresentativeRank?Orange:Color.white,false);
             }
-            for(int wave=0;wave<6;wave++)
+            for(int wave=0;wave<15;wave++)
             {
                 for(int i=0;i<crowd.Length;i++)
                 {
                     var actor=crowd[i]; Vector3 origin=actor.position+Vector3.up*1.3f;
                     Vector3 direction=(player.position+Vector3.up-origin).normalized;
-                    foreach(Transform part in actor) if(part.name=="Sleeve") part.localRotation=Quaternion.Euler(-100,0,0);
-                    if(i%3==0) Trail(origin,player.position+Vector3.up,Orange);
-                    else if(i%3==1)
-                        for(int n=-2;n<=2;n++) Fx("Overtime sonic wave",origin,Vector3.one*.22f,Cyan,.5f,Quaternion.Euler(0,n*8,0)*direction*7,.4f,PrimitiveType.Sphere);
-                    else Fx("Overtime A4",origin,new Vector3(.4f,.03f,.55f),Color.white,.5f,direction*7);
+                    foreach(Transform part in actor.Find("Supervisor appearance")) if(part.name=="Sleeve") part.localRotation=Quaternion.Euler(-100,0,0);
+                    int attack=ranks[i]==OfficeCompanySettings.RepresentativeRank?wave%3:ranks[i]<=2?1:ranks[i]<=5?2:1+wave%2;
+                    if(attack==0) Trail(origin,player.position+Vector3.up,Orange);
+                    else if(attack==1)
+                        for(int n=-2;n<=2;n++) Fx("Overtime sonic wave",origin,Vector3.one*.22f,Cyan,.5f,Quaternion.Euler(0,n*8,0)*direction*Vector3.Distance(origin,player.position+Vector3.up)/.5f,.4f,PrimitiveType.Sphere);
+                    else Fx("Overtime A4",origin,new Vector3(.4f,.03f,.55f),Color.white,.5f,direction*Vector3.Distance(origin,player.position+Vector3.up)/.5f);
                 }
-                hp=Mathf.Max(0,100-(wave+1)*16); audioBus.Play("thud",.5f);
+                hp=Mathf.Max(0,100-(wave+1)*6); audioBus.Play("thud",.5f);
                 avatar.localRotation=Quaternion.Euler(0,0,wave%2==0?12:-12);
                 yield return SceneWait(.8f);
-                foreach(var actor in crowd) foreach(Transform part in actor) if(part.name=="Sleeve") part.localRotation=Quaternion.identity;
+                foreach(var actor in crowd) foreach(Transform part in actor.Find("Supervisor appearance")) if(part.name=="Sleeve") part.localRotation=Quaternion.identity;
             }
             hp=0;
             for(float t=0;t<1;)
@@ -63,12 +78,12 @@ namespace OfficeRampage
         private void UpdateSubmissionCamera()
         {
             Vector3 target=player.position+Vector3.up*.8f; view.fieldOfView=60;
-            view.transform.position=target+new Vector3(-6,5,-8); view.transform.LookAt(target);
+            view.transform.position=target+new Vector3(-11,11,-14); view.transform.LookAt(target);
         }
         private void DrawSubmission()
         {
             Box(new Rect(190,500,900,170),Navy);
-            GUI.Label(new Rect(220,515,840,45),submissionEnded?"게임 끝 · 오늘도 고분고분하게 출근했다.":paused?"일시정지 · Esc로 계속":"상사들의 주말 업무 지시가 쏟아진다…",menuHeading);
+            GUI.Label(new Rect(220,505,840,75),submissionEnded?"업무 스트레스로 사망":paused?"일시정지 · Esc로 계속":"상사들의 주말 업무 지시가 쏟아진다…",submissionEnded?menuTitle:menuHeading);
             if(submissionEnded)
             {
                 if(MenuButton(new Rect(250,590,340,55),"첫 메뉴로")) ReturnToMainMenu();
