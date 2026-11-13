@@ -9,7 +9,7 @@ namespace OfficeRampage
         private Vector3 roamTarget;
         private bool TickDistraction(float dt)
         {
-            bool attracted=!dog && game.TryGetLure(room,out _);
+            bool attracted=!dog && !female && !boss && companyRank!=OfficeCompanySettings.RepresentativeRank && game.TryGetLure(room,out _);
             var burn=GetComponent<OfficeBurn>(); bool panic=!dog && burn!=null && burn.Burning;
             if(!attracted && !panic)
             {

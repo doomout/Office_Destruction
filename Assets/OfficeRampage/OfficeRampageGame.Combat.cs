@@ -218,7 +218,7 @@ namespace OfficeRampage
         private IEnumerator NuclearTransition()
         {
             ClearDecoy();
-            combatLocked = true; cinematicText = "비에프지 18 — 사무실 철거 승인!";
+            combatLocked = true; cinematicText = "";
             audioBus.Play("rocket", .8f); shake = 3;
             var core = Fx("BFG energy", player.position + Vector3.up * 1.4f, Vector3.one * .7f, Color.green, 2, Vector3.zero, 2, PrimitiveType.Sphere);
             Vector3 origin = core.transform.position, target = bossUnit.AimPoint; float t = 0;
@@ -226,7 +226,7 @@ namespace OfficeRampage
             flash = .45f; audioBus.Play("explosion", 1f); shake = 8;
             mushroomCenter = new Vector3(target.x, .08f, target.z);
             mushroomCamera = true;
-            cinematicText = "비에프지 18 — 사무실 철거 중!";
+            cinematicText = "";
             CreateBlast(mushroomCenter, true);
             // Hold a wide shot until the rising column and broad cap have fully formed.
             yield return SceneWait(6);
@@ -258,7 +258,7 @@ namespace OfficeRampage
             bossUnit.Teleport(new Vector3(0, .1f, current.start + length * .6f));
             yaw = 0; pitch = 13; flash = .3f;
             SpawnHealingPotions(current, new OfficeLayout { width = current.width, length = length });
-            cinematicText = "대표: 돈이면 다 돼! 돈 갑옷, 내려와라!";
+            cinematicText = "";
             for (int i = 0; i < 70; i++)
             {
                 Vector3 v = Random.onUnitSphere * 4 + Vector3.up * 4;
@@ -272,7 +272,7 @@ namespace OfficeRampage
             t = 0;
             while (t < 2) { if (RunActive) { t += Time.deltaTime; armor.localPosition = Vector3.up * Mathf.Lerp(12, 0, t / 2); } yield return null; }
             bossUnit.EnterPhaseTwo(new OfficeNavigation(new OfficeLayout { width = current.width, length = length }), current.width, current.end);
-            cinematicText = "2페이즈! 대표 체력 700 · 돈 갑옷 장착!"; audioBus.Play("thud", .8f);
+            cinematicText = ""; audioBus.Play("thud", .8f);
             yield return SceneWait(1);
             combatLocked = false; cinematicText = ""; flash = 0; invulnerability = 2; SetWeapon(0);
         }
@@ -288,7 +288,7 @@ namespace OfficeRampage
                 Box(new Rect(0, 0, 1280, 720), new Color(1, 1, .85f, flash));
                 if (Event.current.type == EventType.Repaint && RunActive) flash = Mathf.Max(0, flash - Time.unscaledDeltaTime * .6f);
             }
-            if (combatLocked)
+            if (combatLocked && !string.IsNullOrEmpty(cinematicText))
             {
                 EnsureMenuStyles(); Box(new Rect(150, mushroomCamera ? 445 : 250, 980, 75), Navy);
                 GUI.Label(new Rect(180, mushroomCamera ? 458 : 270, 920, 60), cinematicText, menuText);

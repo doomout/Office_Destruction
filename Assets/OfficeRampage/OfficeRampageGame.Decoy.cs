@@ -123,7 +123,7 @@ namespace OfficeRampage
                 yield return null;
             }
             decoy.rotation=Quaternion.identity; lureCenter=target; lureLeft=10; decoyFlying=false; decoyFlight=null;
-            audioBus.Play("combo",.4f); Notify("미인계 성공! 인간들을 10초 동안 유인합니다.",3);
+            audioBus.Play("combo",.4f); Notify("미인계 성공! 남성 직원을 10초 동안 유인합니다. 대표는 면역입니다.",3);
         }
         private void DrawDecoyHUD()
         {

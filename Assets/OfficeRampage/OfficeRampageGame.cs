@@ -196,10 +196,9 @@ namespace OfficeRampage
                 if (number > 1)
                     Shape(root, "Entry wall", new Vector3(s * (1.7f + segment / 2), 2, start), new Vector3(segment, 4, .3f), Navy);
             }
-            if (number == 1)
-                Shape(root, "Entrance", new Vector3(0, 2, start), new Vector3(room.width, 4, .3f), Navy);
+            Shape(root, "Entrance", new Vector3(0, 2, start), new Vector3(room.width, 4, .3f), Navy);
             Shape(root, "Exit lintel", new Vector3(0, 3.65f, room.end), new Vector3(3.4f, .7f, .4f), Cyan);
-            if (!arena) CreateSlidingDoor(room, root);
+            if (!arena) { CreateSlidingDoor(room, root); BuildElevatorCab(root, room); }
             else
             {
                 room.gate = Shape(root, "Boardroom wall", new Vector3(0, 1.55f, room.end), new Vector3(3.3f, 3.1f, .3f), Orange);
@@ -209,9 +208,9 @@ namespace OfficeRampage
             sign.transform.SetParent(root);
             sign.transform.position = new Vector3(0, 3.57f, room.end - .26f);
             sign.transform.rotation = Quaternion.identity;
-            sign.text = arena ? "대표실" : "사무실 " + number + " / 5";
+            sign.text = arena ? "대표실" : number + "층 · 엘리베이터";
             sign.anchor = TextAnchor.MiddleCenter;
-            sign.characterSize = .16f;
+            sign.characterSize = arena ? .16f : .10f;
             sign.fontSize = 48;
             sign.color = Color.white;
 
@@ -267,7 +266,7 @@ namespace OfficeRampage
             var prop = new GameObject(names[kind]).AddComponent<OfficeProp>();
             prop.transform.SetParent(root);
             prop.transform.position = position;
-            prop.transform.rotation = Quaternion.Euler(0, Random.Range(-12f, 12f), 0);
+            prop.transform.rotation = Quaternion.Euler(0, Random.Range(-12f, 12f) + (Random.value < .5f ? 0 : 180), 0);
             prop.game = this; prop.room = room.number;
             prop.kind = kind;
             prop.soundMaterial = kind == OfficeRules.Plant ? 0 : kind;
@@ -428,12 +427,8 @@ namespace OfficeRampage
             if (mouse != null && (weaponIndex == 4 ? mouse.leftButton.wasPressedThisFrame : mouse.leftButton.isPressed) && Cursor.lockState == CursorLockMode.Locked && cooldown <= 0) Attack();
             if (ended || CombatLocked) return;
             SealFinalRoom();
-            if (current.number < 5 && current.unlocked && current.door.IsOpen && player.position.z > current.end - 2 && Mathf.Abs(player.position.x) < 1.8f)
-            {
-                current = BuildRoom(current.number + 1, current.end);
-                audioBus.ChangeRoom(current.number);
-                Notify(current.number == 5 ? "경비견 5마리를 모두 처치하세요." : "사무실 " + current.number + " / 5 · 적의 공격을 조심하세요!", 4);
-            }
+            if (current.number < 5 && current.unlocked && current.door.IsOpen && player.position.z > current.end + .7f && Mathf.Abs(player.position.x) < 1.45f)
+                StartCoroutine(RideElevator());
             if (player.position.y < -8)
             {
                 controller.enabled = false;

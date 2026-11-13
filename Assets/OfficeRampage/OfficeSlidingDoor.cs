@@ -17,7 +17,7 @@ namespace OfficeRampage
             if (opening) return;
             opening = true;
             foreach (var indicator in indicators) indicator.sharedMaterial = openMaterial;
-            sign.text = "문 여는 중";
+            sign.text = "엘리베이터 열리는 중";
         }
         private void Update()
         {
@@ -26,7 +26,7 @@ namespace OfficeRampage
             float slide = Mathf.SmoothStep(0, 1.8f, progress);
             left.localPosition = new Vector3(-.825f - slide, 1.55f, 0);
             right.localPosition = new Vector3(.825f + slide, 1.55f, 0);
-            if (IsOpen) { barrier.enabled = false; sign.text = "출구 열림"; }
+            if (IsOpen) { barrier.enabled = false; sign.text = ""; }
         }
     }
 }

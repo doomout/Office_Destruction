@@ -47,66 +47,26 @@ namespace OfficeRampage
         public static OfficeLayout Create(int style, int seed)
         {
             var rng = new Random(seed);
-            int[] widths = { 16, 32, 18, 34, 24 };
-            int[] lengths = { 21, 25, 40, 37, 30 };
-            string[] names = { "소형 사무실", "넓은 사무실", "긴 사무실", "대형 사무실", "칸막이 사무실" };
-            var plan = new OfficeLayout {
-                width = widths[style] + rng.Next(-1, 2),
-                length = lengths[style] + rng.Next(-1, 2), name = names[style]
-            };
-            plan.width = Math.Max(32, plan.width); plan.length = Math.Max(34, plan.length);
-            plan.name = "개방형 사무실";
+            string[] names = { "넓은 사무실", "긴 사무실", "분산형 사무실", "대형 사무실", "개방형 사무실" };
+            var plan = new OfficeLayout { width = 32 + rng.Next(9), length = 34 + rng.Next(11), name = names[style % names.Length] };
             plan.AddRoute(0, 0, 0, plan.length);
-            plan.AddRoute(-plan.width / 2, plan.length / 2, plan.width / 2, plan.length / 2);
-            for (float z = 4.8f; z < plan.length - 3; z += 6f)
-                for (float x = -plan.width / 2 + 2; x < plan.width / 2 - 1.7f; x += 6f)
-                {
-                    var footprint = new Area(x, z, 2.9f, 1.9f);
-                    bool blocked = false;
-                    foreach (var wall in plan.walls) if (wall.Overlaps(footprint, .5f)) { blocked = true; break; }
-                    if (blocked) continue;
-                    foreach (var aisle in plan.route) if (aisle.Overlaps(footprint)) { blocked = true; break; }
-                    if (!blocked) plan.furniture.Add(new Point(x, z, plan.furniture.Count % 2));
-                }
-            // Fill spaces that cannot fit a desk with compact office fixtures.
-            // All footprints include the maximum rotation of the generated models.
-            int[] smallKinds = { 4, 2, 3, 5 };
-            for (int i = smallKinds.Length - 1; i > 0; i--)
+            float cross = plan.length * (.35f + (float)rng.NextDouble() * .3f);
+            plan.AddRoute(-plan.width/2,cross,plan.width/2,cross);
+            int target = rng.Next(36,51);
+            // Random positions, not a fixed grid. Reserve connected aisles and reject overlaps.
+            for(int attempt=0; attempt<6000 && plan.furniture.Count<target; attempt++)
             {
-                int j = rng.Next(i + 1);
-                int swap = smallKinds[i]; smallKinds[i] = smallKinds[j]; smallKinds[j] = swap;
+                int kind=plan.furniture.Count<6 ? plan.furniture.Count : rng.Next(6);
+                float x=(float)(rng.NextDouble()*(plan.width-4)-plan.width/2+2);
+                float z=3+(float)rng.NextDouble()*(plan.length-6);
+                var point=new Point(x,z,kind); bool blocked=false;
+                foreach(var aisle in plan.route) if(aisle.Overlaps(point.Footprint,.25f)) { blocked=true; break; }
+                if(blocked) continue;
+                foreach(var other in plan.furniture) if(other.Footprint.Overlaps(point.Footprint,1.4f)) { blocked=true; break; }
+                if(!blocked) plan.furniture.Add(point);
             }
-            int smallCount = 0;
-            for (float z = 1.4f; z < plan.length - 1.2f; z += 3.5f)
-                for (float x = -plan.width / 2 + 1.2f; x < plan.width / 2 - 1; x += 3.5f)
-                {
-                    var point = new Point(x, z, smallKinds[smallCount % smallKinds.Length]);
-                    var footprint = point.Footprint;
-                    bool blocked = false;
-                    foreach (var wall in plan.walls) if (wall.Overlaps(footprint, .35f)) { blocked = true; break; }
-                    if (blocked) continue;
-                    foreach (var aisle in plan.route) if (aisle.Overlaps(footprint)) { blocked = true; break; }
-                    if (blocked) continue;
-                    foreach (var existing in plan.furniture) if (existing.Footprint.Overlaps(footprint, 1.4f)) { blocked = true; break; }
-                    if (!blocked) { plan.furniture.Add(point); smallCount++; }
-                }
-            // Every office includes all six types, even if desks left few small slots.
-            // Replace redundant fixtures with equal-size or smaller missing types.
-            int[] counts = new int[6];
-            foreach (var item in plan.furniture) counts[item.kind]++;
-            for (int kind = 2; kind < 6; kind++)
-                if (counts[kind] == 0)
-                    for (int i = plan.furniture.Count - 1; i >= 0; i--)
-                    {
-                        var item = plan.furniture[i];
-                        if (counts[item.kind] <= 1) continue;
-                        counts[item.kind]--; item.kind = kind; counts[kind]++;
-                        plan.furniture[i] = item;
-                        break;
-                    }
-            // Keep oil hazards on the central reserved aisle after removing the partitions.
-            for (float z = 7; z < plan.length - 4; z += 8)
-                plan.oil.Add(new Point(0, z));
+            for(float z=7+(float)rng.NextDouble()*3; z<plan.length-4; z+=7+(float)rng.NextDouble()*4)
+                plan.oil.Add(new Point(0,z));
             return plan;
         }
 
