@@ -62,7 +62,7 @@ namespace OfficeRampage
             audioBus.ResetRun();
             if (world != null) { world.gameObject.SetActive(false); Destroy(world.gameObject); }
             rooms.Clear();
-            defenders.Clear(); bossUnit = null; bossChair = null; finalRoomSealed = false;
+            defenders.Clear(); bossUnit = null; bossChair = null; finalRoomSealed = false; securityWaveStarted=false; securityWavePending=false;
             oilPuddles.Clear(); slowedByOil = false;
             debris.Clear();
             world = new GameObject("Generated Office Rampage").transform;
@@ -591,7 +591,7 @@ namespace OfficeRampage
             Box(new Rect(22, 20, 350, 182), new Color(.02f, .04f, .07f, .92f));
             GUI.Label(new Rect(38, 28, 300, 40), "사무실 파괴", titleStyle);
             GUI.Label(new Rect(38, 74, 300, 28), bossFight ? "대표 사무실" : "사무실 " + current.number + " / 5", labelStyle);
-            string objective = current.number == 5 ? (bossFight ? "대표 체력 " + (bossUnit != null ? Mathf.CeilToInt(bossUnit.Health) : 0) : "남은 호위: " + LivingDefenders(5) + " / " + EnemyTotal(5)) : "파괴 " + current.destroyed + " / " + current.required + (current.unlocked ? " · 출구 열림" : " · 출구 잠김");
+            string objective = current.number == 5 ? (bossFight ? "대표 체력 " + (bossUnit != null ? Mathf.CeilToInt(bossUnit.Health) : 0) : (securityWaveStarted ? "남은 경비: " : "남은 경비견: ") + LivingDefenders(5)) : "파괴 " + current.destroyed + " / " + current.required + (current.unlocked ? " · 출구 열림" : " · 출구 잠김");
             GUI.Label(new Rect(38, 108, 300, 24), objective, smallStyle);
             GUI.Label(new Rect(38, 144, 340, 24), current.layoutName + " / " + current.width + " x " + (current.end - current.start) + " 미터", smallStyle);
             if (current.number < 5) GUI.Label(new Rect(38, 177, 320, 24), "처치 " + (EnemyTotal(current.number) - LivingDefenders(current.number)) + " / " + OfficeProgressRules.Required(EnemyTotal(current.number)) + " 필요", smallStyle);

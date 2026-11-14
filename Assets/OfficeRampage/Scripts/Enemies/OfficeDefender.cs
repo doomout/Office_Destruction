@@ -10,6 +10,7 @@ namespace OfficeRampage
         public float roomStart, roomEnd, roomWidth;
         public bool dog, boss, guard, female;
         public int companyRank = -1;
+        public int securityWeapon; // 0 baton, 3 pistol, 4 long-range shotgun
         public float Health { get; private set; }
         public float MaxHealth { get; private set; }
         public bool Dormant { get; private set; }
@@ -70,7 +71,7 @@ namespace OfficeRampage
         { body.enabled = false; transform.position = position; body.enabled = true; path = null; }
         private void UpdateLabel()
         {
-            if (label != null) label.text = displayName + "  " + Mathf.CeilToInt(Health) + " / " + MaxHealth + (Dormant ? "\n경비견 보호 중" : Enraged ? "\n분노 +50%" : "");
+            if (label != null) label.text = displayName + "  " + Mathf.CeilToInt(Health) + " / " + MaxHealth + (Dormant ? "\n호위 보호 중" : Enraged ? "\n분노 +50%" : "");
         }
         private void Update()
         {
@@ -80,12 +81,6 @@ namespace OfficeRampage
             bool frozen=TickFrozen(dt), stunned=TickStun(dt);
             if(frozen || stunned) return;
             if (rising > 0) { rising = Mathf.Max(0, rising - dt); game.SetBossPose(this, 1 - rising); return; }
-            if (Enraged && flames != null)
-                for (int i = 0; i < flames.childCount; i++)
-                {
-                    var flame = flames.GetChild(i);
-                    if (flame.GetComponent<Renderer>() != null) flame.localScale = new Vector3(.17f, .48f + Mathf.Sin(Time.time * 16 + i) * .2f, .17f);
-                }
             if (TickDistraction(dt)) return;
             Vector3 toward = game.PlayerPosition - transform.position; toward.y = 0;
             if (recovery > 0) { recovery -= dt; game.AnimateDefenderAttack(this, 1 - recovery / .35f); return; }
@@ -101,8 +96,8 @@ namespace OfficeRampage
                 return;
             }
             game.AnimateDefenderAttack(this, 0); attackClock -= dt;
-            int kind = dog || guard ? 0 : (boss || companyRank == OfficeCompanySettings.RepresentativeRank) ? attackNumber % 3 : companyRank <= 2 ? 1 : companyRank <= 5 ? 2 : 1 + attackNumber % 2;
-            float range = (kind == 0 ? 2.4f : kind == 1 ? 6f : 16f) * RangeScale;
+            int kind = guard ? securityWeapon : dog ? 0 : (boss || companyRank == OfficeCompanySettings.RepresentativeRank) ? attackNumber % 3 : companyRank <= 2 ? 1 : companyRank <= 5 ? 2 : 1 + attackNumber % 2;
+            float range = (kind == 3 ? 12f : kind == 4 ? 22f : kind == 0 ? 2.4f : kind == 1 ? 6f : 16f) * RangeScale;
             if (attackClock <= 0 && toward.magnitude <= range && game.ClearDefenseSight(AimPoint, game.PlayerPosition + Vector3.up, transform, null))
             {
                 pendingAttack = kind; attackNumber++; windup = kind == 2 ? .9f : .8f;
@@ -115,6 +110,7 @@ namespace OfficeRampage
         private void Patrol(float dt, Vector3 toward)
         {
             float speed = (dog ? 6f : boss ? 3.6f : guard ? 2.8f : 2.4f) * (Enraged ? 1.5f : 1);
+            if(guard && securityWeapon>=3 && toward.magnitude<(securityWeapon==3?9:17) && game.ClearDefenseSight(AimPoint,game.PlayerPosition+Vector3.up,transform,null)) return;
             if (toward.magnitude > 1.3f && game.ClearDefenseSight(AimPoint, game.PlayerPosition + Vector3.up, transform, null))
             { Move(toward.normalized * speed, dt); return; }
             chooseTime -= dt;

@@ -153,7 +153,7 @@ namespace OfficeRampage
             unit.warning.position = unit.transform.position + Vector3.up * .045f;
             unit.warning.rotation = Quaternion.LookRotation(forward);
             Color color = kind == 1 ? Cyan : kind == 2 ? new Color(1, .85f, .25f) : Orange;
-            if (kind == 2) Shape(unit.warning, "Paper trajectory", new Vector3(0, 0, range / 2), new Vector3(.12f, .025f, range), color, false);
+            if (kind == 2 || kind==3) Shape(unit.warning, "Paper trajectory", new Vector3(0, 0, range / 2), new Vector3(.12f, .025f, range), color, false);
             else
                 for (int i = 0; i <= 12; i++)
                 {
@@ -175,7 +175,8 @@ namespace OfficeRampage
         }
         public void ReleaseDefenderAttack(OfficeDefender unit, int kind, Vector3 direction)
         {
-            unit.visual.GetComponent<OfficeCharacterVisual>()?.PlayAction(kind==2?"holding-right-shoot":"attack-melee-right");
+            unit.visual.GetComponent<OfficeCharacterVisual>()?.PlayAction(kind>=2?"holding-right-shoot":"attack-melee-right");
+            if(kind==3 || kind==4) { FireSecurityGun(unit,kind,direction); return; }
             float range = (kind == 0 ? 2.4f : kind == 1 ? 6 : 16) * unit.RangeScale;
             if (kind == 2)
             {
@@ -238,6 +239,12 @@ namespace OfficeRampage
             mushroomCenter = new Vector3(target.x, .08f, target.z);
             mushroomCamera = true;
             cinematicText = "";
+            var building=bossUnit.transform.parent.Find("Office architecture");
+            if(building!=null)
+            {
+                var debris=new GameObject("Nuclear building collapse");debris.transform.SetParent(world,false);
+                debris.AddComponent<OfficeBuildingCollapse>().Initialize(this,building,current.width,current.start,current.end,mushroomCenter);
+            }
             CreateBlast(mushroomCenter, true);
             // Hold a wide shot until the rising column and broad cap have fully formed.
             yield return SceneWait(6);

@@ -32,7 +32,7 @@ namespace OfficeRampage
         {
             foreach(Transform child in transform)
             {
-                if(child==model?.transform || child.name=="Baton" || child.name=="A4 hand") continue;
+                if(child==model?.transform || child.name=="Baton" || child.name=="A4 hand" || child.name=="Security weapon" || child.name=="Security cap" || child.name=="Security badge") continue;
                 var renderer=child.GetComponent<Renderer>(); if(renderer!=null) renderer.enabled=false;
             }
         }

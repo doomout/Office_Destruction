@@ -155,3 +155,11 @@ Unity에서 함께 확인할 항목:
 - Player/OfficeCharacterVisual.cs와 Core/OfficeRampageGame.cs: 망치 치켜들기 자세. Combat/OfficeRampageGame.Combat.cs: 망치 머리 90도 회전.
 - UI/OfficeRampageGame.WeaponHUD.cs → Resources/OfficeIcons PNG. Audio/OfficeAudio.cs → Resources/OfficeAudio/CombatRefresh 효과음.
 - Story/OfficeRampageGame.Intro.cs: 출근 연출 상단 자막. 결과 버튼은 사망 후에만 표시.
+
+
+## 경비견 다음 경비 전투
+- `Enemies/OfficeRampageGame.Security.cs`: 마지막 경비견 처치 다음 프레임에 경비 5명 생성. 공격 중 defenders 목록을 변경하지 않도록 지연합니다. 재시작 시 coroutine과 securityWaveStarted/Pending 초기화.
+- `UI/OfficeRampageGame.Company.cs`의 CheckFinalRoster: 경비견 → 경비 → 대표 순서와 대표 무적 해제.
+- `Enemies/OfficeDefender.cs`의 securityWeapon: 0 근접/3 권총/4 장거리 샷건. 기존 직원 공격 종류는 유지.
+- `Effects/OfficeRageAura.cs`, `Effects/OfficeBuildingCollapse.cs`: 분노/핵폭발 외형. Play 일시정지 중 효과 시간 정지.
+- `Audio/OfficeAudio.cs`: shot/machinegun/shotgun 키는 기존 OfficeAudio/Sfx/shot 파일을 사용. 다른 새 효과음은 유지.

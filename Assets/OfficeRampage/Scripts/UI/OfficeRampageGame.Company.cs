@@ -100,6 +100,8 @@ namespace OfficeRampage
         private void CheckFinalRoster()
         {
             if(current==null || current.number!=5 || bossFight || ended || LivingDefenders(5)>0) return;
+            if(securityWavePending) return;
+            if(!securityWaveStarted) { securityWavePending=true; StartCoroutine(RevealSecurity()); return; }
             bossFight=true;
             if(bossUnit==null)
             {
@@ -107,7 +109,7 @@ namespace OfficeRampage
             }
             if(bossChair!=null) bossChair.SetActive(false);
             bossUnit.Wake(); audioBus.ChangeRoom(6);
-            Notify("경비견을 모두 처치했습니다! 대표전 시작!",4);
+            Notify("경비까지 모두 처치했습니다! 대표전 시작!",4);
         }
     }
 }

@@ -181,7 +181,12 @@ Assets/OfficeRampage/Art/
 
 ## 새 전투 효과음
 `Resources/OfficeAudio/CombatRefresh/`에 새 총성·타격음이 있습니다. `Scripts/Audio/OfficeAudio.cs`의 Load switch가 기존 이벤트 키를 이 파일들에 연결합니다. 이 연결이 있는 키는 기존 Sfx 폴더 파일보다 새 파일을 사용합니다. 음악 폴더는 그대로입니다.
-- pistol/machinegun/shotgun.wav: 실녹음 총성에서 한 발만 추출, 모노 48 kHz, 음량과 끝 페이드 조정.
+- pistol/machinegun/shotgun.wav: 보존 중인 대체 총성. 현재는 사용하지 않고 세 총기 모두 이전 `Sfx/shot.ogg`로 복구했습니다.
 - impact1~6.ogg: 물건 타격 변형, impact7.ogg: 사람 타격.
 - rocket/explosion/thunder.ogg: 로켓 발사/폭발/낙뢰.
 출처와 라이선스는 CombatRefresh-LICENSES.md를 참고하세요. 체감 음량은 사운드 설정과 OfficeAudio.Weapon의 개별 배율에서 조정합니다.
+
+
+## 대표 붉은 오라 / 핵폭발 붕괴
+- `Scripts/Effects/OfficeRageAura.cs`: 붉은 에너지 띠 12개+고리4개. 오렌지 화염과 독립적인 LineRenderer 효과입니다.
+- `Scripts/Effects/OfficeBuildingCollapse.cs`: 천장48개·옆벽48개·앞뒤벽36개, 총132개 파편. 고정 개수로 생성하고 원래 외형을 숨깁니다. 충돌 없는 파편을 폭심 반대 방향으로 날린 뒤 중력으로 떨어뜨립니다. 6초 후 및 사막 전환 때 정리됩니다.

@@ -1,0 +1,56 @@
+using System.Collections;
+using UnityEngine;
+namespace OfficeRampage
+{
+    public sealed partial class OfficeRampageGame
+    {
+        private bool securityWaveStarted, securityWavePending;
+        private IEnumerator RevealSecurity()
+        {
+            // Leave the hit/area-damage iteration before adding members to defenders.
+            yield return null;
+            while(!RunActive) yield return null;
+            if(current==null || current.number!=5 || ended || bossUnit==null) { securityWavePending=false; yield break; }
+            securityWaveStarted=true;
+            var layout=OfficeFixedFloor.Load(5).CreateLayout();
+            var navigation=new OfficeNavigation(layout);
+            var points=OfficeFixedFloor.Load(5).EnemyPoints();
+            for(int i=0;i<5;i++)
+            {
+                int kind=i<2?0:i<4?3:4;
+                string label=kind==0?"몽둥이":kind==3?"권총":"장거리 샷건";
+                var at=points[i];
+                var unit=CreateDefender(bossUnit.transform.parent,current,navigation,new Vector3(at.x,.08f,current.start+at.z),"경비 · "+label,kind==4?160:kind==3?120:140,false,false);
+                unit.guard=true;unit.securityWeapon=kind;
+                unit.visual.GetComponent<OfficeCharacterVisual>()?.SetIdentity(false,i,0);
+                foreach(Transform child in unit.visual)
+                    if(child.name=="A4 hand" || (kind!=0 && child.name=="Baton")) child.gameObject.SetActive(false);
+                if(kind!=0)
+                {
+                    var gun=new GameObject("Security weapon").transform;gun.SetParent(unit.visual,false);gun.localPosition=new Vector3(.42f,1.15f,.4f);
+                    Shape(gun,"Receiver",Vector3.zero,new Vector3(.18f,.2f,kind==4?.65f:.3f),Navy,false);
+                    Shape(gun,"Barrel",new Vector3(0,.02f,.4f),new Vector3(.08f,.08f,kind==4?.7f:.35f),Color.gray,false);
+                    Shape(gun,"Grip",new Vector3(0,-.16f,0),new Vector3(.1f,.25f,.15f),Navy,false);
+                    if(kind==4) Shape(gun,"Second barrel",new Vector3(.1f,.02f,.4f),new Vector3(.08f,.08f,.7f),Color.gray,false);
+                }
+                Impact(unit.AimPoint,Cyan,Vector3.up,8);
+            }
+            spawnedEnemies[5]+=5;securityWavePending=false;
+            Notify("숨겨진 경비 5명 등장! 경비까지 처치해야 대표를 공격할 수 있습니다.",5);
+        }
+        private void FireSecurityGun(OfficeDefender unit,int kind,Vector3 direction)
+        {
+            bool shotgun=kind==4;float range=shotgun?22:12;
+            int count=shotgun?5:1;
+            for(int i=0;i<count;i++)
+            {
+                Vector3 ray=Quaternion.Euler(0,shotgun?(i-2)*4:0,0)*direction;
+                var obj=Shape(world,"Security bullet",unit.AimPoint+ray*.55f,new Vector3(.06f,.06f,.45f),Color.yellow,false);
+                obj.transform.rotation=Quaternion.LookRotation(ray);
+                var bullet=obj.AddComponent<OfficeProjectile>();bullet.game=this;bullet.owner=unit.transform;
+                bullet.direction=ray;bullet.speed=shotgun?23:20;bullet.range=range;bullet.damage=shotgun?5:10;bullet.radius=.045f;
+            }
+            audioBus.Play(shotgun?"shotgun":"shot",.45f,1,unit.AimPoint);
+        }
+    }
+}

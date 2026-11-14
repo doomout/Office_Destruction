@@ -53,9 +53,9 @@ namespace OfficeRampage
             string replacement=null;
             switch(key)
             {
-                case "Sfx/shot": replacement="pistol"; break;
-                case "Sfx/machinegun": replacement="machinegun"; break;
-                case "Sfx/shotgun": replacement="shotgun"; break;
+                case "Sfx/shot": break;
+                case "Sfx/machinegun": key="Sfx/shot"; break;
+                case "Sfx/shotgun": key="Sfx/shot"; break;
                 case "Sfx/rocket": replacement="rocket"; break;
                 case "Sfx/explosion": replacement="explosion"; break;
                 case "Sfx/thunder": replacement="thunder"; break;
@@ -161,7 +161,7 @@ namespace OfficeRampage
         public void Weapon(int index)
         {
             string key=index<=1 || index==4 ? "swing" : index==3 ? "machinegun" : index==5 ? "shotgun" : index>=6 ? "rocket" : "shot";
-            Play(key,index==3?.42f:index<=1?.35f:.65f,Random.Range(.97f,1.03f));
+            Play(key,index<=1?.35f:.65f,Random.Range(.93f,1.04f));
             duckUntil = Time.unscaledTime + .18f;
         }
 

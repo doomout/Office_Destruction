@@ -72,7 +72,7 @@ namespace OfficeRampage
             unit.transform.SetParent(root); unit.transform.position = position;
             unit.game = this; unit.navigation = navigation; unit.room = room.number;
             unit.roomStart = room.start; unit.roomEnd = room.end; unit.roomWidth = room.width;
-            unit.dog = dog; unit.boss = isBoss; unit.guard = room.number == 1 && name == "경비";
+            unit.dog = dog; unit.boss = isBoss; unit.guard = name.StartsWith("경비 ·") || (room.number == 1 && name == "경비");
             unit.displayName = name;
             unit.visual = new GameObject("Body").transform;
             unit.visual.SetParent(unit.transform, false);
@@ -108,17 +108,9 @@ namespace OfficeRampage
             {
                 unit.warning = Shape(root, "CEO charge warning", Vector3.zero, new Vector3(1.8f, .025f, 9), Orange, false).transform;
                 unit.warning.gameObject.SetActive(false);
-                unit.flames = new GameObject("Raging flames").transform;
-                unit.flames.SetParent(unit.visual, false);
-                for (int i = 0; i < 24; i++)
-                {
-                    float angle = i * Mathf.PI / 5;
-                    Shape(unit.flames, "Flame", new Vector3(Mathf.Sin(angle) * .47f, .25f + (i % 6) * .33f, Mathf.Cos(angle) * .4f),
-                        new Vector3(.15f, .5f, .15f), i % 2 == 0 ? Orange : Color.yellow, false, PrimitiveType.Sphere);
-                }
-                var glow = new GameObject("Rage glow").AddComponent<Light>();
-                glow.transform.SetParent(unit.flames, false); glow.transform.localPosition = Vector3.up * 1.7f;
-                glow.type = LightType.Point; glow.color = Orange; glow.range = 3; glow.intensity = 2;
+                unit.flames = new GameObject("Red rage aura").transform;
+                unit.flames.SetParent(unit.visual,false);
+                unit.flames.gameObject.AddComponent<OfficeRageAura>().Initialize(this);
                 unit.flames.gameObject.SetActive(false);
             }
             if (!dog && (room.number >= 2 || isBoss)) Shape(unit.visual, "A4 hand", new Vector3(.48f, 1.1f, .22f), new Vector3(.21f, .02f, .297f), Color.white, false);
