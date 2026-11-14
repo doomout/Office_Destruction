@@ -13,7 +13,7 @@ namespace OfficeRampage
         public bool CombatLocked { get { return combatLocked; } }
         private void ResetExpansion()
         {
-            ResetEnding(); ResetDecoy(); ResetElements();
+            ResetEnding(); ResetDecoy(); ResetElements(); ResetAmmo();
             giftRequested = bfgReady = bfgUsed = combatLocked = desert = false;
             cinematicText = ""; flash = 0; mushroomCamera = false; combatEffects.Clear();
             whirlwindReady = whirlwindLeft = whirlwindTick = whirlwindAngle = 0; batStrike = false;
@@ -57,13 +57,14 @@ namespace OfficeRampage
         }
         private void AttackExpanded()
         {
-            if (combatLocked || whirlwindLeft > 0 || thunderLeft>0) return;
+            if (!RunActive || combatLocked || whirlwindLeft > 0 || thunderLeft>0) return;
             if (weaponIndex == 4) { ThrowDecoy(); return; }
             if (weaponIndex == 7)
             {
                 if (!bfgReady || bfgUsed || current.number != 5 || bossUnit == null || bossUnit.PhaseTwo) return;
                 bfgUsed = true; bfgReady = false; StartCoroutine(NuclearTransition()); return;
             }
+            if(!SpendAmmo(weaponIndex)) return;
             avatar.GetComponent<OfficeCharacterVisual>()?.PlayAction(weaponIndex<=1?"attack-melee-right":"holding-right-shoot");
             cooldown = cooldowns[weaponIndex]; swing = 1; shake = weaponIndex == 3 ? .25f : .8f;
             audioBus.Weapon(weaponIndex <= 1 || weaponIndex == 4 ? 0 : weaponIndex == 6 ? 2 : 1);

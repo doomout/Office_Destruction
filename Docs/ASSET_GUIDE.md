@@ -170,3 +170,10 @@ Assets/OfficeRampage/Art/
 가구 kind는 0 책상, 1 컴퓨터 책상, 2 정수기, 3 복사기, 4 캐비닛, 5 화분입니다. x=0은 가운데, z=0은 입구 쪽이며 출구는 z=length입니다. 가구는 `OfficeLayout.Point.Footprint` 크기를 고려해 서로와 통로를 침범하지 않게 옮깁니다. 인물과 포션은 가구 안에 배치하지 마세요. 적 시작 위치 배열의 순서는 해당 층의 직급 순서와 연결됩니다.
 
 파일 편집 후 Play를 재시작해야 캐시가 갱신됩니다. `OfficeLayout.Create`는 검사/최초 배치 작성용으로 남아 있지만 정상 게임의 `BuildRoom`은 `OfficeFixedFloor`를 읽습니다. 기존 Tools의 무작위 배치 검사만으로 수정한 JSON을 검증하지는 못하므로 수정한 층의 이동/충돌/출구/적 수를 실제로 확인하세요.
+
+
+## 무기 아이콘·천장·창문 배경 변경
+
+현재 무기 아이콘은 별도 PNG가 아니라 `Scripts/UI/OfficeRampageGame.WeaponHUD.cs`의 `DrawWeaponIcon`에서 선과 사각형으로 그립니다. 색·실루엣을 이 함수에서 바꿀 수 있습니다. 직접 만든 이미지로 교체하려면 Texture2D 필드/리소스를 연결하고 해당 함수에서 GUI.DrawTexture로 그리도록 수정하세요. 숫자는 아이콘과 별도로 표시됩니다.
+
+천장과 창틀, 창밖 도시 건물은 `Scripts/World/OfficeRampageGame.Architecture.cs`의 `BuildOfficeShell`에서 생성합니다. 천장은 높이 5.8m이며 위쪽 카메라에서는 OfficeRoofCutaway가 벽/천장 외형을 숨깁니다. 높이를 바꾸면 cutaway.height와 3인칭 카메라·점프 충돌도 함께 확인하세요. 창문은 외부가 보이는 창틀 구조이며 기존 보이지 않는 경계 충돌체는 그대로 남아 밖으로 나가지 못합니다.

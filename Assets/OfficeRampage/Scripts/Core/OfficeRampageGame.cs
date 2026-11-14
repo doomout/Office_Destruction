@@ -247,6 +247,7 @@ namespace OfficeRampage
                 { var renderer = part.GetComponent<Renderer>(); if (renderer != null) renderer.enabled = false; }
             for (int side = -1; side <= 1; side += 2)
                 Shape(root, "Floor edge", new Vector3(side * room.width / 2, .025f, middle), new Vector3(.12f, .05f, length), Cyan, false);
+            BuildOfficeShell(room,root);
             SetupDefenders(room, layout, root);
             SpawnHealingPotions(room, layout);
             ApplyKoreanWorldFont(root);
@@ -568,19 +569,6 @@ namespace OfficeRampage
             GUI.color = color; GUI.DrawTexture(rect, Texture2D.whiteTexture); GUI.color = Color.white;
         }
 
-        private void DrawWeaponSlots()
-        {
-            EnsureMenuStyles();
-            GUI.Label(new Rect(345, 540, 900, 38), weaponNames[weaponIndex] + (weaponIndex == 7 ? " / 1발" : weaponIndex == 4 ? " / 남은 횟수 " + (2-decoysUsed[current.number]) : " / 무제한"), menuText);
-            for (int i = 0; i < 8; i++)
-            {
-                float x = 345 + i * 114;
-                bool locked = i == 7 && (!bfgReady || bfgUsed);
-                Box(new Rect(x, 583, 108, 54), i == weaponIndex ? new Color(.08f, .42f, .43f) : Navy);
-                GUI.Label(new Rect(x + 4, 587, 104, 45), (i + 1) + " " + (locked ? (bfgUsed ? "사용완료" : "잠김") : weaponNames[i]), menuSmall);
-            }
-        }
-
         private void OnGUI()
         {
             if (menuPage != MenuPage.Game) { DrawFrontEnd(); return; }
@@ -627,8 +615,7 @@ namespace OfficeRampage
             Box(new Rect(38, 667, 285, 10), new Color(.2f, .25f, .3f));
             Box(new Rect(38, 667, 285 * hp / 100, 10), invulnerability > 0 ? Orange : Cyan);
             DrawWeaponSlots(); DrawSprintHUD();
-            GUI.Label(new Rect(354, 644, 480, 28), "WASD 이동 / 마우스 조준 / 왼쪽 클릭 공격 / 스페이스 점프", smallStyle);
-            GUI.Label(new Rect(375, 674, 800, 24), "1~8 무기 / 시프트 달리기 / Esc 일시정지 / R 재시작 / M 음소거", smallStyle);
+            GUI.Label(new Rect(375, 674, 800, 24), "WASD 이동 · 클릭 공격 · 1~8 무기 · F 스킬 · Shift 달리기 · Esc 일시정지", smallStyle);
             DrawExpansionOverlay();
             if (ended || paused)
             {

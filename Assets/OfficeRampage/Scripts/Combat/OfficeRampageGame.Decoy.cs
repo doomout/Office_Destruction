@@ -5,6 +5,7 @@ namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
     {
+        private const int DecoysPerOffice=3;
         private readonly int[] decoysUsed = new int[6];
         private Transform decoy, decoyPreview;
         private Vector3 decoyTarget, lureCenter;
@@ -95,14 +96,14 @@ namespace OfficeRampage
             if(lureRoom!=current.number && (decoy!=null || decoyFlying)) ClearDecoy();
             if(lureLeft>0) { lureLeft=Mathf.Max(0,lureLeft-dt); if(lureLeft<=0) ClearDecoy(); }
             var mouse=Mouse.current;
-            if(weaponIndex!=4 || decoyFlying || decoysUsed[current.number]>=2) decoyAiming=false;
+            if(weaponIndex!=4 || decoyFlying || decoysUsed[current.number]>=DecoysPerOffice) decoyAiming=false;
             else if(mouse!=null && Cursor.lockState==CursorLockMode.Locked && mouse.rightButton.wasPressedThisFrame) decoyAiming=!decoyAiming;
             if(decoyAiming) UpdateDecoyAim();
             else if(decoyPreview!=null) decoyPreview.gameObject.SetActive(false);
         }
         private void ThrowDecoy()
         {
-            if(!RunActive || CombatLocked || weaponIndex!=4 || !decoyAiming || !decoyValid || decoyFlying || decoysUsed[current.number]>=2) return;
+            if(!RunActive || CombatLocked || weaponIndex!=4 || !decoyAiming || !decoyValid || decoyFlying || decoysUsed[current.number]>=DecoysPerOffice) return;
             Vector3 start=player.position+Vector3.up*1.4f, target=decoyTarget;
             if(!ValidDecoyLanding(target) || !ClearThrowPath(start,target)) return;
             ClearDecoy(); decoysUsed[current.number]++; lureRoom=current.number; decoyFlying=true;
@@ -129,7 +130,7 @@ namespace OfficeRampage
         {
             if(weaponIndex!=4 && lureLeft<=0) return;
             EnsureMenuStyles(); Box(new Rect(225,485,830,44),Navy);
-            string text=weaponIndex==4?"미인계 더미 "+(2-decoysUsed[current.number])+"/2 · 우클릭: 조준/취소 · 좌클릭: 투척":"미인계 더미";
+            string text=weaponIndex==4?"미인계 더미 "+(DecoysPerOffice-decoysUsed[current.number])+"/3 · 우클릭: 조준/취소 · 좌클릭: 투척":"미인계 더미";
             if(lureLeft>0) text+=" · 유인 "+lureLeft.ToString("0.0")+"초";
             else if(decoyAiming && !decoyValid) text+=" · 투척 불가";
             GUI.Label(new Rect(240,491,810,35),text,menuText);

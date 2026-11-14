@@ -137,3 +137,13 @@ Unity에서 함께 확인할 항목:
 - `Editor/OfficeArtBuilder.cs`: 원본 FBX의 Legacy 애니메이션·URP 재질·키 정규화 프리팹 생성. 카탈로그/프리팹 수동 편집을 덮으므로 재생성 전 백업합니다.
 - `Art/KenneyMiniCharacters`: 원본 FBX, 텍스처, 재질, 프리팹 및 CC0 출처. .meta를 포함해 함께 보관합니다.
 - 그래픽 교체 시 기존 Body/CharacterController를 제거하지 않고 시각 모델만 교체합니다. 새 모델 연결과 고정 JSON 편집 절차는 ASSET_GUIDE.md의 마지막 두 절을 확인하세요.
+
+
+## 무기창·탄약·실내·출근 대사
+
+- `Scripts/UI/OfficeRampageGame.WeaponHUD.cs`: 아이콘 실루엣, 잔탄 표시, 새 게임 탄약 지급과 1회 소비. 권총/샷건/로켓 수량은 `ResetAmmo`에서 조절합니다.
+- `Scripts/Combat/OfficeRampageGame.Combat.cs`: 발사 전에 탄약을 검사합니다. 빈 탄창은 발사/투사체 생성을 막고 무기 교체나 층 이동으로 재충전되지 않습니다.
+- `Scripts/Combat/OfficeRampageGame.Decoy.cs`: `DecoysPerOffice=3`, 조준/투척 제한과 HUD.
+- `Scripts/World/OfficeRampageGame.Architecture.cs`: 천장·창틀·벽 외형·도시 배경 생성. 기존 경계 Collider를 보존합니다.
+- `Scripts/World/OfficeRoofCutaway.cs`: 카메라가 천장보다 높을 때 지붕/벽 Renderer만 숨기는 처리. 충돌체는 유지합니다.
+- `Scripts/Story/OfficeRampageGame.Intro.cs`: `OvertimeLines` 대사 배열, 3겹 반경, 높은 연출 카메라. 15회×0.8초 공격 중 2회마다 대사를 바꿉니다.
