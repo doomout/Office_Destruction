@@ -1,6 +1,6 @@
 ﻿$ErrorActionPreference = 'Stop'
 $source = "using System;`nusing System.Collections.Generic;`n"
-foreach ($file in @('OfficeLayout.cs', 'OfficeDefenseRules.cs', 'OfficeNavigation.cs')) {
+foreach ($file in @('Scripts/World/OfficeLayout.cs', 'Scripts/Enemies/OfficeDefenseRules.cs', 'Scripts/World/OfficeNavigation.cs')) {
     $text = Get-Content (Join-Path $PSScriptRoot "../Assets/OfficeRampage/$file") -Raw -Encoding UTF8
     $source += [Environment]::NewLine + ($text -replace '(?m)^using [^;]+;\s*', '')
 }

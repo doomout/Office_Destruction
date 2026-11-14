@@ -1,3 +1,5 @@
+﻿> 초기 검사 기록입니다. 현재 구조/검사 방법은 [유지보수 안내](Docs/MAINTENANCE.md), 최신 결과는 [업데이트 기록](OfficeRampage_Update.md)을 참고하세요. 현재 입력 설정은 Both입니다.
+
 # Office Rampage 검사 기록
 
 ## 실제 실행한 검사

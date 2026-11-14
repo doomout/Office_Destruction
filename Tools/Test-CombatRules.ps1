@@ -1,6 +1,6 @@
 ﻿$ErrorActionPreference = 'Stop'
 $source = "using System;`nusing System.Collections.Generic;`n"
-foreach ($name in @('OfficeLayout.cs','OfficeNavigation.cs','OfficeDefenseRules.cs','OfficeCombatRules.cs')) {
+foreach ($name in @('Scripts/World/OfficeLayout.cs','Scripts/World/OfficeNavigation.cs','Scripts/Enemies/OfficeDefenseRules.cs','Scripts/Combat/OfficeCombatRules.cs')) {
     $source += (Get-Content "$PSScriptRoot/../Assets/OfficeRampage/$name" -Raw -Encoding UTF8) -replace '(?m)^using [^;]+;\s*', ''
 }
 $source += @'

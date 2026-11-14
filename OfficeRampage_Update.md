@@ -144,3 +144,27 @@
 - 검증: 전체 런타임 C# 컴파일 통과. 별도 Unity Play 모드에서 43명 및 직급별 인원 일치, 연출용 AI 비활성, 12초 이상 경과 후 패배/쓰러짐, 재선택/새 게임 초기화 검사 통과. 기존 스킬·보스전 회귀 검사도 통과. 렌더 이미지로 3겹 군중과 쓰러진 주인공을 확인했습니다. 실제 키 조작 및 모든 해상도 UI는 미확인입니다.
 - 확인 순서: Play 종료 → 임포트 완료 → 실행 → 사무실 파괴 → 닥치고 출근하기 → 12초 집중 공격과 사망 문구 → 다시 선택하기 → 사무실 파괴하기로 정상 시작 확인.
 - 백업: Codex 작업 폴더 outputs/CrowdUpdateBackup. 검사 결과: outputs/CrowdUpdate-validation.txt. 기존 씬과 .meta GUID는 유지했습니다.
+
+
+## 2026-11-14 — 기능별 폴더 정리와 유지보수 문서
+- 36개 런타임 C# 파일을 Scripts/Core, Player, Combat, Enemies, World, UI, Story, Effects, Audio로 분류했습니다. 기존 namespace/partial 클래스/파일명과 .meta GUID는 유지했습니다.
+- 씬을 Scenes/OfficeRampage.unity로 이동하고 Editor 메뉴 및 EditorBuildSettings의 경로를 수정했습니다. 씬 본문과 GUID는 그대로입니다. Resources 오디오와 라이선스 자료는 원래 위치를 유지합니다.
+- Art/Models, Materials, Textures, Prefabs를 교체 자산 보관 공간으로 마련했습니다. 자동 그래픽 교체 기능은 아니며 코드 연결이 필요합니다.
+- Docs/ASSET_GUIDE.md에 실제 음악 파일명·확장자 교체·메타/중복 이름·음량 보정·그래픽 생성 위치·프리팹/애니메이션 연결 계약을 설명했습니다. Docs/MAINTENANCE.md에는 전체 파일 이동 지도와 검사/복구 방법을 작성했습니다.
+- README를 현재 기능 기준으로 통합하고 초기 사운드/검증 기록에는 최신 문서 링크를 추가했습니다. Tools의 기존 검사 스크립트 경로도 갱신했습니다.
+- 검증: 파일 이동 전후 원본 C#/씬/메타 해시 동일 확인. 별도 동일 구조 Unity 프로젝트 컴파일·Play 회귀 검사 PASS(설정/스킬/43명 출근 결말/엘리베이터/보스/BFG/엔딩/재시작). 기존 PowerShell 검사 3개 PASS: 배치 1000종, 적 경로 11500개 등. 수동 이동/점프/모든 UI 해상도는 이번 작업에서 직접 키 조작하지 않았습니다.
+- 실행: Play 종료 → 임포트 완료 → Tools/Office Rampage/Open Game Scene 또는 Assets/OfficeRampage/Scenes/OfficeRampage.unity → Play. IDE에 이전 경로가 보이면 Unity 프로젝트 파일을 재생성합니다.
+- 백업과 이동 명세: Codex 작업 폴더 outputs/StructureUpdateBackup, work/StructureUpdate/manifest.json. 기존 파일을 되돌릴 때는 .meta도 함께 복구합니다.
+
+
+## 2026-11-14 — 고정 사무실 배치와 무료 캐릭터 그래픽
+- 런타임 무작위 사무실 배치를 제거했습니다. Resources/OfficeLayouts/floor1~5.json에 크기·가구 위치/종류/방향·기름·적 시작 위치·포션 2개 위치를 고정 저장하고 그대로 읽습니다. 최초 데이터 작성 시만 배치 생성기를 사용했으며, 실행 시 난수 시드로 재생성하는 방식이 아닙니다.
+- 적 AI 이동/공격 타이밍, 파편, 최초 회사 이름 생성은 기존 기능을 유지합니다. 대표/경비견 구성과 출구 조건도 유지합니다.
+- Kenney 공식 Mini Characters 2.0(CC0)에서 인간 FBX/컬러맵을 가져와 URP 프리팹으로 구성했습니다. 남녀 각 6종 민간인 모델을 카탈로그에 사용하며 경찰 모델은 원본에만 보관합니다. 원문 라이선스와 공식 출처는 Art/KenneyMiniCharacters에 있습니다.
+- 주인공·직원·대표·비서·더미·출근 군중의 인간 외형에 적용합니다. 가구·무기·효과와 경비견 외형은 기존 도형입니다. 몸체 판정은 그대로 두고, 인간 기본 도형 Renderer를 숨긴 뒤 새 모델을 연결합니다.
+- Legacy Animation의 대기/걷기/달리기/공격을 연결하고 일시정지·얼음 동결에서 재생을 멈춥니다. 기존 시각 루트의 쓰러짐 동작·10배 무기·효과 부착은 유지합니다.
+- 카탈로그/프리팹 교체와 고정 JSON 편집 절차를 Docs/ASSET_GUIDE.md에 추가하고 README/유지보수 안내를 현 구조에 맞췄습니다.
+- 검증: 별도 Unity 프로젝트에서 최종 컴파일 및 Play 회귀 검사 PASS. 고정 5층의 적/포션 수, 통로, 서로 다른 전역 난수 상태에서도 재시작 배치 동일, 남녀 12개 프리팹/URP 텍스처/필수 애니메이션, 실제 모델 적용을 검사했습니다. 기존 스킬·동결·더미·출근 43명/12초·문·엘리베이터·보스/BFG·엔딩·재시작도 통과했습니다. 캐릭터와 출근 결말 렌더를 확인했습니다.
+- 배치 비교 검사는 순서가 보장되지 않는 Unity 오브젝트 열거 결과를 정렬해 비교하도록 보정했습니다. 최종 배치는 동일합니다. 새 그래픽의 실제 키 조작 손맛과 다양한 PC의 프레임률은 별도 확인이 필요합니다.
+- 적용 순서: Play 종료 → Unity 임포트 완료(처음에는 FBX 처리가 걸릴 수 있음) → Scenes/OfficeRampage.unity → Play. 바뀐 캐릭터·고정 배치와 설정의 성별/이름을 확인합니다.
+- 백업: Codex 작업 폴더 outputs/ArtUpdateBackup, 결과 outputs/ArtUpdate-validation.txt. 새 자산의 Unity 생성 .meta GUID를 함께 복사했고 프리팹/카탈로그 참조를 확인했습니다. 기존 씬/스크립트 메타와 음악은 유지했습니다.

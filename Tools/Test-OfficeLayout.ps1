@@ -1,6 +1,6 @@
-$ErrorActionPreference = 'Stop'
-$source = Get-Content (Join-Path $PSScriptRoot '../Assets/OfficeRampage/OfficeLayout.cs') -Raw
-$source += [Environment]::NewLine + ((Get-Content (Join-Path $PSScriptRoot '../Assets/OfficeRampage/OfficeRules.cs') -Raw) -replace '^using System;\s*', '')
+﻿$ErrorActionPreference = 'Stop'
+$source = Get-Content (Join-Path $PSScriptRoot '../Assets/OfficeRampage/Scripts/World/OfficeLayout.cs') -Raw -Encoding UTF8
+$source += [Environment]::NewLine + ((Get-Content (Join-Path $PSScriptRoot '../Assets/OfficeRampage/Scripts/World/OfficeRules.cs') -Raw -Encoding UTF8) -replace '^using System;\s*', '')
 $test = @'
 namespace OfficeRampage
 {

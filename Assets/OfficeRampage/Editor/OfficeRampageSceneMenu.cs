@@ -1,4 +1,4 @@
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
@@ -6,7 +6,7 @@ namespace OfficeRampage.Editor
 {
     public static class OfficeRampageSceneMenu
     {
-        public const string ScenePath = "Assets/OfficeRampage/OfficeRampage.unity";
+        public const string ScenePath = "Assets/OfficeRampage/Scenes/OfficeRampage.unity";
 
         [MenuItem("Tools/Office Rampage/Open Game Scene")]
         public static void Open()
