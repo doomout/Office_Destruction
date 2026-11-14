@@ -1,9 +1,24 @@
-using UnityEngine;
+﻿using UnityEngine;
 namespace OfficeRampage
 {
     public sealed partial class OfficeDefender
     {
         public float FrozenLeft { get; private set; }
+        public float StunLeft { get; private set; }
+        public void Stun(float seconds)
+        {
+            if(!Alive || Dormant || dog) return;
+            StunLeft=Mathf.Max(StunLeft,seconds); pendingAttack=-1; recovery=0;
+            if(warning!=null) warning.gameObject.SetActive(false);
+        }
+        private bool TickStun(float dt)
+        {
+            if(StunLeft<=0) return false;
+            StunLeft=Mathf.Max(0,StunLeft-dt);
+            if(label!=null) label.text=displayName+"  "+Mathf.CeilToInt(Health)+" / "+MaxHealth+"\n번개 기절 "+StunLeft.ToString("0.0")+"초";
+            if(StunLeft<=0) { UpdateLabel(); attackClock=Mathf.Max(attackClock,.6f); }
+            return true;
+        }
         private Transform iceShell;
         private Material iceMaterial;
         public void Freeze(float seconds)

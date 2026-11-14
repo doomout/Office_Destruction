@@ -115,7 +115,7 @@ Assets/OfficeRampage/Art/
 | `Jacket`, `Tie`, `Sleeve` 등 기본 부품 | 성별 외형 조정, 공격/패닉 동작 |
 | `Baton`, `A4 hand` | 적 공격 동작 |
 | `visual` 루트 | 보스 일어나기/쓰러짐, 패닉, 출근 군중 동작 |
-| `weapon` 루트 | 휘두르기, 10배 망치 확대 및 원래 크기 복귀 |
+| `weapon` 루트 | 휘두르기, 토르 스킬의 망치 치켜들기(확대 없음) |
 
 특히 `ApplyCompanyIdentity`는 `Jacket`을 직접 찾습니다. 새 모델에 이 부품이 없는데 해당 코드를 그대로 실행하면 오류가 날 수 있습니다. 외형 교체와 연결 코드를 함께 바꾸세요. 인물별 성별 모델을 사용한다면 기존 치마/머리 도형 추가도 중복되지 않게 조정합니다.
 
@@ -174,6 +174,14 @@ Assets/OfficeRampage/Art/
 
 ## 무기 아이콘·천장·창문 배경 변경
 
-현재 무기 아이콘은 별도 PNG가 아니라 `Scripts/UI/OfficeRampageGame.WeaponHUD.cs`의 `DrawWeaponIcon`에서 선과 사각형으로 그립니다. 색·실루엣을 이 함수에서 바꿀 수 있습니다. 직접 만든 이미지로 교체하려면 Texture2D 필드/리소스를 연결하고 해당 함수에서 GUI.DrawTexture로 그리도록 수정하세요. 숫자는 아이콘과 별도로 표시됩니다.
+현재 무기 아이콘은 `Resources/OfficeIcons/`의 bat, hammer, pistol, machinegun, decoy, shotgun, rocket, bfg PNG입니다. 같은 경로/이름으로 이미지를 교체하면 됩니다. 기존 .meta를 유지하세요. `Scripts/UI/OfficeRampageGame.WeaponHUD.cs`에서 비율을 유지하여 표시하며 잔량은 별도 숫자입니다. 원본 무료 아이콘의 제작자 표기와 라이선스는 `Art/CombatRefresh-LICENSES.md` 및 첫 메뉴에 있습니다.
 
-천장과 창틀, 창밖 도시 건물은 `Scripts/World/OfficeRampageGame.Architecture.cs`의 `BuildOfficeShell`에서 생성합니다. 천장은 높이 5.8m이며 위쪽 카메라에서는 OfficeRoofCutaway가 벽/천장 외형을 숨깁니다. 높이를 바꾸면 cutaway.height와 3인칭 카메라·점프 충돌도 함께 확인하세요. 창문은 외부가 보이는 창틀 구조이며 기존 보이지 않는 경계 충돌체는 그대로 남아 밖으로 나가지 못합니다.
+천장과 창틀, 창밖 도시 건물은 `Scripts/World/OfficeRampageGame.Architecture.cs`의 `BuildOfficeShell`에서 생성합니다. 천장은 높이 11.6m이며 위쪽 카메라에서는 OfficeRoofCutaway가 벽/천장 외형을 숨깁니다. 높이를 바꾸면 cutaway.height와 3인칭 카메라·점프 충돌도 함께 확인하세요. 창문은 외부가 보이는 창틀 구조이며 기존 보이지 않는 경계 충돌체는 그대로 남아 밖으로 나가지 못합니다.
+
+
+## 새 전투 효과음
+`Resources/OfficeAudio/CombatRefresh/`에 새 총성·타격음이 있습니다. `Scripts/Audio/OfficeAudio.cs`의 Load switch가 기존 이벤트 키를 이 파일들에 연결합니다. 이 연결이 있는 키는 기존 Sfx 폴더 파일보다 새 파일을 사용합니다. 음악 폴더는 그대로입니다.
+- pistol/machinegun/shotgun.wav: 실녹음 총성에서 한 발만 추출, 모노 48 kHz, 음량과 끝 페이드 조정.
+- impact1~6.ogg: 물건 타격 변형, impact7.ogg: 사람 타격.
+- rocket/explosion/thunder.ogg: 로켓 발사/폭발/낙뢰.
+출처와 라이선스는 CombatRefresh-LICENSES.md를 참고하세요. 체감 음량은 사운드 설정과 OfficeAudio.Weapon의 개별 배율에서 조정합니다.

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 namespace OfficeRampage
 {
     // Wide cinematic cameras look down through the roof; normal interior cameras see the ceiling and windows.

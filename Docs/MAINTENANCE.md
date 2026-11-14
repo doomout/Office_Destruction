@@ -147,3 +147,11 @@ Unity에서 함께 확인할 항목:
 - `Scripts/World/OfficeRampageGame.Architecture.cs`: 천장·창틀·벽 외형·도시 배경 생성. 기존 경계 Collider를 보존합니다.
 - `Scripts/World/OfficeRoofCutaway.cs`: 카메라가 천장보다 높을 때 지붕/벽 Renderer만 숨기는 처리. 충돌체는 유지합니다.
 - `Scripts/Story/OfficeRampageGame.Intro.cs`: `OvertimeLines` 대사 배열, 3겹 반경, 높은 연출 카메라. 15회×0.8초 공격 중 2회마다 대사를 바꿉니다.
+
+
+## 연속 낙뢰와 새 미디어 유지보수
+- Combat/OfficeRampageGame.Elements.cs: 3초·0.5초 간격 총 6웨이브, 웨이브당 낙뢰 3개. 탐색 반경 14m/타격 반경 1.7m, 사람 피해 12·기절 3초, 물건 피해 18. SkillDamage 범위에서 적용하여 콤보 보상 방지.
+- Enemies/OfficeDefender.Frozen.cs: Stun/TickStun. 기존 얼음과 기절을 독립적으로 감소시키고 두 상태 중 하나라도 남으면 이동/공격 중단. 일시정지·연출 중에는 시간 정지.
+- Player/OfficeCharacterVisual.cs와 Core/OfficeRampageGame.cs: 망치 치켜들기 자세. Combat/OfficeRampageGame.Combat.cs: 망치 머리 90도 회전.
+- UI/OfficeRampageGame.WeaponHUD.cs → Resources/OfficeIcons PNG. Audio/OfficeAudio.cs → Resources/OfficeAudio/CombatRefresh 효과음.
+- Story/OfficeRampageGame.Intro.cs: 출근 연출 상단 자막. 결과 버튼은 사망 후에만 표시.

@@ -77,7 +77,8 @@ namespace OfficeRampage
             if (label != null && Camera.main != null) label.transform.rotation = Camera.main.transform.rotation;
             if (!game.RunActive || game.CombatLocked || !game.IsCurrentRoom(room) || !Alive || Dormant) return;
             float dt = Time.deltaTime;
-            if(TickFrozen(dt)) return;
+            bool frozen=TickFrozen(dt), stunned=TickStun(dt);
+            if(frozen || stunned) return;
             if (rising > 0) { rising = Mathf.Max(0, rising - dt); game.SetBossPose(this, 1 - rising); return; }
             if (Enraged && flames != null)
                 for (int i = 0; i < flames.childCount; i++)

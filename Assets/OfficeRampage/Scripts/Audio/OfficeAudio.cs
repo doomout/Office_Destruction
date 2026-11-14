@@ -29,7 +29,7 @@ namespace OfficeRampage
             }
             for (int i = 0; i < effects.Length; i++) effects[i] = Source("Effect " + i);
             string[] keys = { "wood0", "wood1", "wood2", "metal0", "metal1", "metal2", "glass0", "glass1",
-                "thud", "wall", "combo", "door", "win", "lose", "swing", "shot", "rocket", "explosion" };
+                "thud", "wall", "combo", "door", "win", "lose", "swing", "shot", "rocket", "explosion", "machinegun", "shotgun", "thunder" };
             foreach (string key in keys) Load("Sfx/" + key);
             for (int i = 1; i <= 5; i++) Load("Music/office" + i);
             Load("Music/boss");
@@ -50,7 +50,24 @@ namespace OfficeRampage
         private AudioClip Load(string key)
         {
             if (clips.TryGetValue(key, out var cached)) return cached;
-            var clip = Resources.Load<AudioClip>("OfficeAudio/" + key);
+            string replacement=null;
+            switch(key)
+            {
+                case "Sfx/shot": replacement="pistol"; break;
+                case "Sfx/machinegun": replacement="machinegun"; break;
+                case "Sfx/shotgun": replacement="shotgun"; break;
+                case "Sfx/rocket": replacement="rocket"; break;
+                case "Sfx/explosion": replacement="explosion"; break;
+                case "Sfx/thunder": replacement="thunder"; break;
+                case "Sfx/thud": replacement="impact7"; break;
+                case "Sfx/wood0": replacement="impact1"; break;
+                case "Sfx/wood1": replacement="impact2"; break;
+                case "Sfx/wood2": replacement="impact3"; break;
+                case "Sfx/metal0": replacement="impact4"; break;
+                case "Sfx/metal1": replacement="impact5"; break;
+                case "Sfx/metal2": replacement="impact6"; break;
+            }
+            var clip = Resources.Load<AudioClip>(replacement==null ? "OfficeAudio/"+key : "OfficeAudio/CombatRefresh/"+replacement);
             if (clip == null) Debug.LogError("Office Rampage audio missing: " + key);
             clips[key] = clip;
             return clip;
@@ -143,8 +160,8 @@ namespace OfficeRampage
 
         public void Weapon(int index)
         {
-            Play(index == 0 ? "swing" : index == 1 ? "shot" : "rocket",
-                index == 0 ? .25f : .65f, Random.Range(.93f, 1.04f));
+            string key=index<=1 || index==4 ? "swing" : index==3 ? "machinegun" : index==5 ? "shotgun" : index>=6 ? "rocket" : "shot";
+            Play(key,index==3?.42f:index<=1?.35f:.65f,Random.Range(.97f,1.03f));
             duckUntil = Time.unscaledTime + .18f;
         }
 

@@ -52,11 +52,18 @@ namespace OfficeRampage
             HidePrimitives();
             if(game==null || animationPlayer==null) return;
             var unit=GetComponentInParent<OfficeDefender>();
-            bool frozen=unit!=null && unit.FrozenLeft>0;
+            bool frozen=unit!=null && (unit.FrozenLeft>0 || unit.StunLeft>0);
             bool stopped=!game.RunActive || frozen || (game.CombatLocked && !cinematicAction);
             foreach(AnimationState state in animationPlayer) state.speed=stopped?0:1;
             Vector3 delta=transform.position-previous; delta.y=0; previous=transform.position;
             if(stopped) return;
+            if(game.IsRaisingHammer(transform))
+            {
+                Play("attack-melee-right",true);
+                var pose=animationPlayer["attack-melee-right"];
+                if(pose!=null) { pose.normalizedTime=.35f; pose.speed=0; animationPlayer.Sample(); }
+                return;
+            }
             if(actionLeft>0) { actionLeft=Mathf.Max(0,actionLeft-Time.deltaTime); if(actionLeft>0) return; cinematicAction=false; }
             float speed=delta.magnitude/Mathf.Max(.001f,Time.deltaTime);
             Play(speed>6?"sprint":speed>.15f?"walk":"idle");

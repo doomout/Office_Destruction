@@ -37,7 +37,7 @@ namespace OfficeRampage
                     var bat = Shape(weapon, "Baseball bat", new Vector3(0, .05f, .85f), new Vector3(.18f, .55f, .18f), new Color(.72f, .48f, .22f), false, PrimitiveType.Capsule);
                     bat.transform.localRotation = Quaternion.Euler(90, 0, 0);
                 }
-                else Shape(weapon, "Hammer head", new Vector3(0, .05f, .8f), new Vector3(.7f, .36f, .36f), steel, false);
+                else Shape(weapon, "Hammer head", new Vector3(0, .05f, .8f), new Vector3(.7f, .36f, .36f), steel, false).transform.localRotation=Quaternion.Euler(0,0,90);
             }
             else if (weaponIndex == 4)
             {
@@ -67,7 +67,7 @@ namespace OfficeRampage
             if(!SpendAmmo(weaponIndex)) return;
             avatar.GetComponent<OfficeCharacterVisual>()?.PlayAction(weaponIndex<=1?"attack-melee-right":"holding-right-shoot");
             cooldown = cooldowns[weaponIndex]; swing = 1; shake = weaponIndex == 3 ? .25f : .8f;
-            audioBus.Weapon(weaponIndex <= 1 || weaponIndex == 4 ? 0 : weaponIndex == 6 ? 2 : 1);
+            audioBus.Weapon(weaponIndex);
             float range = OfficeCombatRules.Ranges[weaponIndex];
             Vector3 origin = player.position + Vector3.up * 1.35f;
             Vector3 aimPoint = view.transform.position + view.transform.forward * range;

@@ -88,9 +88,10 @@ namespace OfficeRampage
         {
             if(submissionPlaying && !paused)
             {
-                Box(new Rect(150,380,980,105),new Color(.12f,.025f,.025f,.94f));
-                GUI.Label(new Rect(180,395,920,70),"상사: “"+submissionDialogue+"”",menuHeading);
+                Box(new Rect(150,22,980,76),new Color(.12f,.025f,.025f,.94f));
+                GUI.Label(new Rect(180,33,920,56),"상사: “"+submissionDialogue+"”",menuHeading);
             }
+            if(!submissionEnded) return;
             Box(new Rect(190,500,900,170),Navy);
             GUI.Label(new Rect(220,505,840,75),submissionEnded?"업무 스트레스로 사망":paused?"일시정지 · Esc로 계속":"상사들의 주말 업무 지시가 쏟아진다…",submissionEnded?menuTitle:menuHeading);
             if(submissionEnded)

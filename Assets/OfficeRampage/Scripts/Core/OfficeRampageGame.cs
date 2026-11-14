@@ -418,7 +418,8 @@ namespace OfficeRampage
             TickWeaponSkills(dt);
             avatar.rotation = Quaternion.Euler(0, yaw + (whirlwindLeft > 0 ? whirlwindAngle : 0), 0);
             swing = Mathf.MoveTowards(swing, 0, dt * 5);
-            weapon.localRotation = Quaternion.Euler(weaponIndex == 4 ? swing * 100 - 20 : -swing * 60, -swing * 25, 0);
+            weapon.localPosition = thunderLeft>0 ? new Vector3(.48f,1.65f,.1f) : new Vector3(.48f,.95f,.25f);
+            weapon.localRotation = thunderLeft>0 ? Quaternion.Euler(-90,0,0) : Quaternion.Euler(weaponIndex == 4 ? swing * 100 - 20 : -swing * 60, -swing * 25, 0);
             UpdateCamera();
             TickDecoy(dt);
             if (mouse != null && (weaponIndex == 4 ? mouse.leftButton.wasPressedThisFrame : mouse.leftButton.isPressed) && Cursor.lockState == CursorLockMode.Locked && cooldown <= 0) Attack();
