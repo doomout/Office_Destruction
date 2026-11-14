@@ -345,7 +345,7 @@ namespace OfficeRampage
         private void SetWeapon(int index)
         {
             if (whirlwindLeft > 0 || thunderLeft>0) return;
-            if (index < 0 || index > 7 || (index == 7 && (!bfgReady || bfgUsed))) return;
+            if (index < 0 || index > 7 || (index == 7 && (!bfgReady || bfgUsed) && !orbitalReady)) return;
             weapon.localScale=Vector3.one;
             weaponIndex = index;
             for (int i = weapon.childCount - 1; i >= 0; i--)
@@ -366,7 +366,6 @@ namespace OfficeRampage
             }
             var mouse = Mouse.current;
             if (keys != null && keys.mKey.wasPressedThisFrame) { audioBus.Muted = !audioBus.Muted; SaveMenuSettings(); }
-            if (keys != null && keys.rKey.wasPressedThisFrame) { ResetRun(); return; }
             if (keys != null && keys.escapeKey.wasPressedThisFrame && !ended)
             {
                 paused = !paused; Time.timeScale = paused ? 0 : 1; LockCursor(!paused);
@@ -400,7 +399,7 @@ namespace OfficeRampage
                 if (keys.digit5Key.wasPressedThisFrame) SetWeapon(4);
                 if (keys.digit6Key.wasPressedThisFrame) SetWeapon(5);
                 if (keys.digit7Key.wasPressedThisFrame) SetWeapon(6);
-                if (keys.digit8Key.wasPressedThisFrame && bfgReady && !bfgUsed) SetWeapon(7);
+                if (keys.digit8Key.wasPressedThisFrame && ((bfgReady && !bfgUsed) || orbitalReady)) SetWeapon(7);
             }
             input = Vector2.ClampMagnitude(input, 1);
             if (controller.isGrounded && vertical < 0) vertical = -2;
@@ -422,7 +421,7 @@ namespace OfficeRampage
             weapon.localRotation = thunderLeft>0 ? Quaternion.Euler(-90,0,0) : Quaternion.Euler(weaponIndex == 4 ? swing * 100 - 20 : -swing * 60, -swing * 25, 0);
             UpdateCamera();
             TickDecoy(dt);
-            if (mouse != null && (weaponIndex == 4 ? mouse.leftButton.wasPressedThisFrame : mouse.leftButton.isPressed) && Cursor.lockState == CursorLockMode.Locked && cooldown <= 0) Attack();
+            if (mouse != null && (weaponIndex == 4 || (weaponIndex==7 && orbitalReady) ? mouse.leftButton.wasPressedThisFrame : mouse.leftButton.isPressed) && Cursor.lockState == CursorLockMode.Locked && cooldown <= 0) Attack();
             if (ended || CombatLocked) return;
             SealFinalRoom();
             if (current.number < 5 && current.unlocked && current.door.IsOpen && player.position.z > current.end + .7f && Mathf.Abs(player.position.x) < 1.45f)
@@ -438,6 +437,7 @@ namespace OfficeRampage
 
         private void UpdateCamera()
         {
+            if(finaleCamera) return;
             if (submissionPlaying || submissionEnded) { UpdateSubmissionCamera(); return; }
             if (endingPlaying) { UpdateEndingCamera(); return; }
             if (mushroomCamera)
@@ -574,6 +574,7 @@ namespace OfficeRampage
         {
             if (menuPage != MenuPage.Game) { DrawFrontEnd(); return; }
             if (world == null) return;
+            if(finaleCamera && orbitalUsed && !paused) return;
             EnsureMenuStyles();
             if (titleStyle == null)
             {
@@ -623,7 +624,7 @@ namespace OfficeRampage
                 Box(new Rect(0, 0, 1280, 720), new Color(.01f, .025f, .045f, .88f));
                 GUI.Label(new Rect(430, 245, 550, 55), paused ? "잠깐 쉬어가세요" : won ? "대표를 쓰러뜨렸습니다!" : "오늘은 여기까지…", titleStyle);
                 GUI.Label(new Rect(340, 325, 600, 40), paused ? "Esc를 누르면 계속합니다." : "점수 " + score.ToString("N0") + "  |  " + (won ? "대표 처치" : hp <= 0 ? "체력 소진" : "시간 초과"), centeredStyle);
-                GUI.Label(new Rect(340, 380, 600, 40), "R을 누르면 첫 사무실부터 다시 시작합니다.", centeredStyle);
+                GUI.Label(new Rect(340, 380, 600, 40), paused ? "계속하기 또는 시작 메뉴로 이동할 수 있습니다." : "재게임 버튼으로 첫 사무실부터 시작합니다.", centeredStyle);
                 if (MenuButton(new Rect(510, 450, 260, 48), paused ? "계속하기" : "재게임"))
                 {
                     if (paused) { paused = false; Time.timeScale = 1; LockCursor(true); audioBus.SetPaused(false); }

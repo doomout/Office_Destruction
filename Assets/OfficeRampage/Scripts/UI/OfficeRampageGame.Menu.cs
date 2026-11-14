@@ -112,7 +112,7 @@ namespace OfficeRampage
             Box(new Rect(535, 215, 665, 5), Cyan);
             GUI.Label(new Rect(567, 240, 600, 45), "처음 오셨나요?", menuHeading);
             GUI.Label(new Rect(567, 302, 590, 105), "가구 60% 파괴 + 적 60% 처치 시 출구가 열립니다.\n초록 포션은 체력 +30! 대표방은 시간 무제한입니다.", menuText);
-            GUI.Label(new Rect(567, 422, 590, 150), "WASD 이동  ·  마우스 조준  ·  왼쪽 클릭 공격\n스페이스 점프  ·  시프트 달리기  ·  1~7 무기 · 8 비에프지 18\nEsc 일시정지  ·  R 다시 시작  ·  M 음소거", menuText);
+            GUI.Label(new Rect(567, 422, 590, 150), "WASD 이동  ·  마우스 조준  ·  왼쪽 클릭 공격\n스페이스 점프  ·  시프트 달리기  ·  1~7 무기 · 8 비에프지 18\nEsc 일시정지  ·  M 음소거", menuText);
             GUI.Label(new Rect(567, 572, 590, 36), "음량과 제한시간은 ‘설정’에서 바꿀 수 있어요.", menuSmall);
         }
 

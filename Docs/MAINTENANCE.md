@@ -19,7 +19,7 @@
 | 60% 조건·제한시간·엘리베이터 | `World/OfficeRampageGame.Progress.cs`, `OfficeProgressRules.cs`, `OfficeRampageGame.Elevator.cs` |
 | 도입 선택·출근 결말 | `Story/OfficeRampageGame.Intro.cs` |
 | 대표 사망·마지막 대사·엔딩 버튼 | `Story/OfficeRampageGame.Ending.cs` |
-| 비서·BFG·사막·돈 갑옷 전환 | `Combat/OfficeRampageGame.Combat.cs` |
+| 비서·BFG·사막 전환 | `Combat/OfficeRampageGame.Combat.cs` |
 | 폭발·로켓 꼬리·효과 수명 | `Effects/` |
 | 배경음·효과음·볼륨·전환 | `Audio/OfficeAudio.cs` |
 
@@ -163,3 +163,14 @@ Unity에서 함께 확인할 항목:
 - `Enemies/OfficeDefender.cs`의 securityWeapon: 0 근접/3 권총/4 장거리 샷건. 기존 직원 공격 종류는 유지.
 - `Effects/OfficeRageAura.cs`, `Effects/OfficeBuildingCollapse.cs`: 분노/핵폭발 외형. Play 일시정지 중 효과 시간 정지.
 - `Audio/OfficeAudio.cs`: shot/machinegun/shotgun 키는 기존 OfficeAudio/Sfx/shot 파일을 사용. 다른 새 효과음은 유지.
+
+
+## 거대 로봇·위성 피니시 / R 재시작 삭제
+- Core/OfficeRampageGame.cs: R키 재시작 분기 제거. 비밀 버튼은 새 클릭만 처리. Finale 카메라 중 일반 카메라 덮어쓰기 방지.
+- Story/OfficeRampageGame.Finale.cs: DeployBossRobot → DropOrbitalButton → OrbitalStrike. 초기화는 ResetFinale. 카메라·우주 모형·버튼은 기존 world 아래 소유하며 새 게임에서 함께 제거.
+- Enemies/OfficeDefender.cs: 2페이즈 타격점 높이/6.6m 컨트롤러, 최초20% 임계점 클램프와 버튼 요청. 반복 지급 방지. 피니시 후 기존 엔딩 경로 사용.
+- Combat/OfficeRampageGame.Combat.cs: 사막 길이/폭2.5배(이전1.25배 대비 각각2배), 로봇 배치 coroutine 호출. 버튼은 BFG 소진 후8번 슬롯 재사용.
+- World/OfficeCraterFloor.cs: 반구형 하강 지형, MeshCollider, 생성 Mesh 정리. 기존 평평한 사막 바닥은 분화구 생성 시 비활성화.
+- Enemies/OfficeBossRobot.cs: 로봇 보행. UI/OfficeRampageGame.WeaponHUD.cs: 빨간 버튼 및 ??? 표시.
+
+- Effects/OfficeOrbitLand.cs: 간략화한 대륙 윤곽을 구면 Mesh로 나누어 생성하고 연출 종료 시 Mesh를 정리합니다.

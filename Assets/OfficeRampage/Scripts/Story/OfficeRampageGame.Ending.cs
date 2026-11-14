@@ -49,7 +49,7 @@ namespace OfficeRampage
         {
             if(bossUnit==null) return;
             Vector3 target=bossUnit.transform.position+Vector3.up*.7f;
-            view.fieldOfView=55; view.transform.position=target+new Vector3(-5,2.6f,-6);
+            view.fieldOfView=55; view.transform.position=target+(bossUnit.PhaseTwo?new Vector3(-10,32,-14):new Vector3(-5,2.6f,-6));
             view.transform.LookAt(target);
         }
         private void ConfirmEnding() { ReturnToMainMenu(); }

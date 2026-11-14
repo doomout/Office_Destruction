@@ -13,7 +13,7 @@ namespace OfficeRampage
         public bool CombatLocked { get { return combatLocked; } }
         private void ResetExpansion()
         {
-            ResetEnding(); ResetDecoy(); ResetElements(); ResetAmmo();
+            ResetEnding(); ResetDecoy(); ResetElements(); ResetAmmo(); ResetFinale();
             giftRequested = bfgReady = bfgUsed = combatLocked = desert = false;
             cinematicText = ""; flash = 0; mushroomCamera = false; combatEffects.Clear();
             whirlwindReady = whirlwindLeft = whirlwindTick = whirlwindAngle = 0; batStrike = false;
@@ -28,6 +28,7 @@ namespace OfficeRampage
         }
         private void BuildExpandedWeapon()
         {
+            if(weaponIndex==7 && orbitalReady) { BuildRedButton(weapon); return; }
             Color steel = new Color(.5f, .62f, .68f);
             if (weaponIndex == 0 || weaponIndex == 1)
             {
@@ -61,6 +62,7 @@ namespace OfficeRampage
             if (weaponIndex == 4) { ThrowDecoy(); return; }
             if (weaponIndex == 7)
             {
+                if(orbitalReady && !orbitalUsed) { ActivateOrbital(); return; }
                 if (!bfgReady || bfgUsed || current.number != 5 || bossUnit == null || bossUnit.PhaseTwo) return;
                 bfgUsed = true; bfgReady = false; StartCoroutine(NuclearTransition()); return;
             }
@@ -181,7 +183,7 @@ namespace OfficeRampage
             if (kind == 2)
             {
                 Vector3 origin = unit.AimPoint + direction * .5f;
-                SpawnProjectile(origin, direction, unit.transform, false, false, 10, range, unit.boss ? 18 : 10, unit.RangeScale);
+                SpawnProjectile(origin, unit.PhaseTwo ? (PlayerPosition+Vector3.up*1.1f-origin).normalized : direction, unit.transform, false, false, 10, range, unit.boss ? 18 : 10, unit.RangeScale);
                 audioBus.Play("swing", .25f, 1.5f, origin); return;
             }
             Vector3 delta = player.position - unit.transform.position;
@@ -257,7 +259,7 @@ namespace OfficeRampage
                 child.gameObject.SetActive(false); Destroy(child.gameObject);
             }
             oilPuddles.Clear(); desert = true;
-            current.width *= 1.25f; float length = (current.end - current.start) * 1.25f; current.end = current.start + length;
+            current.width *= 2.5f; float length = (current.end - current.start) * 2.5f; current.end = current.start + length;
             current.layoutName = "사막 / 2페이즈";
             var arena = new GameObject("Desert arena").transform; arena.SetParent(world);
             Shape(arena, "Sand floor", new Vector3(0, -.3f, current.start + length / 2), new Vector3(current.width + 50, .6f, length + 50), new Color(.78f, .61f, .35f));
@@ -283,12 +285,7 @@ namespace OfficeRampage
                 var bill = Fx("Flying money", bossUnit.AimPoint, new Vector3(.38f, .02f, .18f), new Color(.3f, .75f, .38f), 4, v);
                 bill.GetComponent<OfficeVisualEffect>().spin = Random.onUnitSphere * 240;
             }
-            var armor = new GameObject("Money armor").transform; armor.SetParent(bossUnit.visual, false); armor.localPosition = Vector3.up * 12;
-            Shape(armor, "Gold breastplate", new Vector3(0, 1.1f, 0), new Vector3(.8f, .8f, .5f), new Color(.85f, .66f, .13f), false);
-            for (int side = -1; side <= 1; side += 2)
-                Shape(armor, "Money shoulder", new Vector3(side * .5f, 1.42f, 0), new Vector3(.38f, .3f, .48f), new Color(.25f, .65f, .3f), false);
-            t = 0;
-            while (t < 2) { if (RunActive) { t += Time.deltaTime; armor.localPosition = Vector3.up * Mathf.Lerp(12, 0, t / 2); } yield return null; }
+            yield return DeployBossRobot();
             bossUnit.EnterPhaseTwo(new OfficeNavigation(new OfficeLayout { width = current.width, length = length }), current.width, current.end);
             cinematicText = ""; audioBus.Play("thud", .8f);
             yield return SceneWait(1);
@@ -300,7 +297,7 @@ namespace OfficeRampage
         {
             DrawWeaponSkills(); DrawDecoyHUD();
             if (desert && !combatLocked)
-                GUI.Label(new Rect(440, 145, 520, 35), "2페이즈 / 돈 갑옷", labelStyle);
+                GUI.Label(new Rect(440, 145, 520, 35), "2페이즈 / 대표 전용 거대 로봇", labelStyle);
             if (flash > 0)
             {
                 Box(new Rect(0, 0, 1280, 720), new Color(1, 1, .85f, flash));

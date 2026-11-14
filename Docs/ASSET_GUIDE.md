@@ -190,3 +190,9 @@ Assets/OfficeRampage/Art/
 ## 대표 붉은 오라 / 핵폭발 붕괴
 - `Scripts/Effects/OfficeRageAura.cs`: 붉은 에너지 띠 12개+고리4개. 오렌지 화염과 독립적인 LineRenderer 효과입니다.
 - `Scripts/Effects/OfficeBuildingCollapse.cs`: 천장48개·옆벽48개·앞뒤벽36개, 총132개 파편. 고정 개수로 생성하고 원래 외형을 숨깁니다. 충돌 없는 파편을 폭심 반대 방향으로 날린 뒤 중력으로 떨어뜨립니다. 6초 후 및 사막 전환 때 정리됩니다.
+
+
+## 거대 로봇·빨간 버튼·위성·분화구
+`Scripts/Story/OfficeRampageGame.Finale.cs`가 로봇 강하/탑승, 빨간 버튼 획득, 3단계 카메라와 위성 레이저를 담당합니다. 로봇·위성·지구는 기본 도형으로 만든 별도 디자인이며 외부 캐릭터 모델은 아닙니다. 지구는 대륙을 단순화한 연출용 모형입니다. 빨간 버튼 아이콘은 RedButtonIcon에서 생성하므로 별도 PNG가 필요하지 않습니다.
+
+`Scripts/Enemies/OfficeBossRobot.cs`에서 로봇 팔다리 움직임, `Scripts/World/OfficeCraterFloor.cs`에서 반구형 지형과 MeshCollider를 생성합니다. 분화구 반경은 Finale의 Build 호출에 있는 12입니다. 지형/충돌을 함께 변경해야 합니다.

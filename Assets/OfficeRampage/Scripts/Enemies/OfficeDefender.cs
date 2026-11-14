@@ -17,7 +17,7 @@ namespace OfficeRampage
         public bool Enraged { get; private set; }
         public bool PhaseTwo { get; private set; }
         public bool Alive { get { return Health > 0; } }
-        public Vector3 AimPoint { get { return transform.position + Vector3.up * (dog ? .48f : 1.15f); } }
+        public Vector3 AimPoint { get { return transform.position + Vector3.up * (dog ? .48f : PhaseTwo ? 3.5f : 1.15f); } }
         public Transform visual, warning, flames;
         public TextMesh label;
         public string displayName;
@@ -47,10 +47,12 @@ namespace OfficeRampage
         {
             if (!Alive || Dormant || !game.RunActive || game.CombatLocked || !game.IsCurrentRoom(room)) return;
             Health = boss ? OfficeCombatRules.DamageResult(Health, amount, MaxHealth, PhaseTwo) : Mathf.Max(0, Health - amount);
+            if(boss && PhaseTwo && !game.OrbitalRequested) Health=Mathf.Max(MaxHealth*.2f,Health);
             game.DefenderImpact(this);
             if (boss && !Enraged && OfficeCombatRules.Rage(Health, MaxHealth))
             { Enraged = true; if (flames != null) flames.gameObject.SetActive(true); game.BossRaged(); }
             if (boss && !PhaseTwo && OfficeCombatRules.Gift(Health, MaxHealth)) game.RequestSecretWeapon();
+            if(boss && PhaseTwo && Health<=MaxHealth*.2f) game.RequestOrbitalWeapon();
             UpdateLabel();
             if (!Alive)
             {
@@ -65,7 +67,10 @@ namespace OfficeRampage
             navigation = newNavigation; roomWidth = width; roomEnd = end;
             path = null; pendingAttack = -1; recovery = 0; attackClock = 2;
             if (warning != null) warning.gameObject.SetActive(false);
-            displayName += " / 돈 갑옷 · 2페이즈"; UpdateLabel();
+            displayName += " / 거대 로봇 · 2페이즈";
+            body.height=6.6f;body.radius=1.05f;body.center=Vector3.up*3.3f;
+            if(label!=null) label.transform.localPosition=Vector3.up*7;
+            UpdateLabel();
         }
         public void Teleport(Vector3 position)
         { body.enabled = false; transform.position = position; body.enabled = true; path = null; }
@@ -128,7 +133,7 @@ namespace OfficeRampage
         private void Move(Vector3 velocity, float dt)
         {
             Vector3 next = transform.position + velocity * dt;
-            next.x = Mathf.Clamp(next.x, -roomWidth / 2 + .5f, roomWidth / 2 - .5f);
+            next.x = Mathf.Clamp(next.x, -roomWidth / 2 + (PhaseTwo?1.3f:.5f), roomWidth / 2 - (PhaseTwo?1.3f:.5f));
             next.z = Mathf.Clamp(next.z, roomStart + .7f, roomEnd - .7f);
             body.Move(next - transform.position + Vector3.down * 3 * dt);
             if (velocity.sqrMagnitude > .01f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(velocity), dt * 12);
