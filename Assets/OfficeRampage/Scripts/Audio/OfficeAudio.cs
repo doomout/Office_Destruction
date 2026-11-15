@@ -18,6 +18,7 @@ namespace OfficeRampage
         private int activeMusic, voice, impactFrame = -1, impactsThisFrame;
         private float duckUntil;
         private bool paused;
+        private AudioClip orbitalLaser;
 
         private void Awake()
         {
@@ -50,6 +51,11 @@ namespace OfficeRampage
         private AudioClip Load(string key)
         {
             if (clips.TryGetValue(key, out var cached)) return cached;
+            if(key=="Sfx/orbitalLaser")
+            {
+                if(orbitalLaser==null) orbitalLaser=BuildOrbitalLaser();
+                clips[key]=orbitalLaser;return orbitalLaser;
+            }
             string replacement=null;
             switch(key)
             {
@@ -176,6 +182,21 @@ namespace OfficeRampage
             duckUntil = Time.unscaledTime + .12f;
         }
 
+        private AudioClip BuildOrbitalLaser()
+        {
+            const int rate=44100;const float duration=2.6f;var data=new float[(int)(rate*duration)];
+            double phase=0;var random=new System.Random(812);
+            for(int i=0;i<data.Length;i++)
+            {
+                float t=i/(float)rate;
+                double frequency=180+1800*System.Math.Exp(-t*8)+35*System.Math.Sin(t*42);
+                phase+=frequency*System.Math.PI*2/rate;
+                double envelope=System.Math.Min(1,t/.015)*System.Math.Min(1,(duration-t)/.25);
+                data[i]=(float)(envelope*(.24*System.Math.Sin(phase)+.13*System.Math.Sin(phase*2.013)+.08*System.Math.Sin(phase*5)+.025*(random.NextDouble()*2-1)));
+            }
+            var clip=AudioClip.Create("Orbital laser discharge",data.Length,1,rate,false);clip.SetData(data,0);return clip;
+        }
+        private void OnDestroy() { if(orbitalLaser!=null) Destroy(orbitalLaser); }
         public void Finish(bool victory)
         {
             if (transition != null) StopCoroutine(transition);

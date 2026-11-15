@@ -11,7 +11,7 @@ namespace OfficeRampage
         public bool OrbitalRequested { get { return orbitalRequested; } }
         private void ResetFinale()
         {
-            orbitalRequested=orbitalReady=orbitalUsed=finaleCamera=false;orbitalZoomStage=0;
+            orbitalRequested=orbitalReady=orbitalUsed=finaleCamera=false;orbitalZoomStage=0;robotDeliveryStage=0;bossEjected=false;
             RenderSettings.fog=true;
         }
         private Texture2D RedButtonIcon()
@@ -39,7 +39,9 @@ namespace OfficeRampage
             finaleCamera=true;
             var robot=new GameObject("CEO giant robot").transform;robot.SetParent(bossUnit.transform,false);
             var red=new Color(.5f,.035f,.045f);var steel=new Color(.15f,.21f,.27f);
-            RobotPart(robot,"Armored torso",new Vector3(0,3.9f,0),new Vector3(2.8f,2.4f,1.45f),red);
+            RobotPart(robot,"Lower torso",new Vector3(0,3.05f,0),new Vector3(2.8f,.7f,1.45f),red);
+            RobotPart(robot,"Upper torso",new Vector3(0,4.25f,0),new Vector3(2.8f,1.6f,1.45f),red);
+            RobotPart(robot,"Waist seam",new Vector3(0,3.44f,0),new Vector3(2.82f,.06f,1.47f),steel);
             RobotPart(robot,"Reactor",new Vector3(0,4.1f,.78f),new Vector3(.7f,.7f,.12f),Cyan);
             RobotPart(robot,"Head",new Vector3(0,5.85f,0),new Vector3(1.3f,1.2f,1.15f),steel);
             RobotPart(robot,"Visor",new Vector3(0,5.9f,.59f),new Vector3(1.05f,.25f,.1f),Color.red);
@@ -53,6 +55,7 @@ namespace OfficeRampage
                 RobotPart(arm,"Forearm",new Vector3(0,-1.1f,.15f),new Vector3(.95f,1.6f,1.1f),steel);
                 RobotPart(arm,"Fist cannon",new Vector3(0,-1.8f,.6f),new Vector3(1.1f,.9f,1.4f),red);
             }
+            yield return DeliverRobotFromOrbit(robot);
             robot.localPosition=Vector3.up*35;
             Vector3 target=bossUnit.transform.position+Vector3.up*3;
             view.transform.position=target+new Vector3(-12,8,-16);view.transform.LookAt(target);view.fieldOfView=58;
@@ -63,7 +66,7 @@ namespace OfficeRampage
                 yield return null;
             }
             robot.localPosition=Vector3.zero;audioBus.Play("explosion",.65f);shake=3;
-            var pilot=bossUnit.visual;pilot.SetParent(robot,false);
+            var pilot=bossUnit.visual;pilot.name="CEO pilot";pilot.SetParent(robot,false);
             Vector3 from=new Vector3(0,0,2),seat=new Vector3(0,3.2f,.85f);pilot.localPosition=from;
             t=0;while(t<1.5f)
             { if(RunActive) { t+=Time.deltaTime;pilot.localPosition=Vector3.Lerp(from,seat,Mathf.SmoothStep(0,1,t/1.5f));pilot.localScale=Vector3.one*Mathf.Lerp(1,.7f,t/1.5f); } yield return null; }
@@ -109,20 +112,8 @@ namespace OfficeRampage
         {
             var space=new GameObject("Orbital cinematic").transform;space.SetParent(world,false);
             Vector3 earth=impact+Vector3.down*181;
-            Shape(space,"Earth",earth,Vector3.one*360,new Color(.025f,.16f,.55f),false,PrimitiveType.Sphere);
-            Vector2[][] outlines={
-                new[]{new Vector2(-168,65),new Vector2(-140,70),new Vector2(-110,73),new Vector2(-60,55),new Vector2(-65,45),new Vector2(-82,25),new Vector2(-80,9),new Vector2(-100,16),new Vector2(-117,32),new Vector2(-128,52)},
-                new[]{new Vector2(-80,10),new Vector2(-60,8),new Vector2(-35,-7),new Vector2(-42,-23),new Vector2(-68,-55),new Vector2(-76,-30)},
-                new[]{new Vector2(-17,35),new Vector2(10,37),new Vector2(35,30),new Vector2(50,10),new Vector2(35,-20),new Vector2(18,-35),new Vector2(8,-5),new Vector2(-17,10)},
-                new[]{new Vector2(-10,36),new Vector2(-5,58),new Vector2(25,70),new Vector2(85,72),new Vector2(150,60),new Vector2(160,45),new Vector2(120,20),new Vector2(105,0),new Vector2(80,8),new Vector2(50,30)},
-                new[]{new Vector2(113,-22),new Vector2(130,-11),new Vector2(150,-20),new Vector2(153,-38),new Vector2(130,-35),new Vector2(115,-34)},
-                new[]{new Vector2(-55,60),new Vector2(-22,70),new Vector2(-25,82),new Vector2(-55,82)}
-            };
-            foreach(var outline in outlines)
-            {
-                var land=new GameObject("Continent");land.transform.SetParent(space,false);
-                land.AddComponent<OfficeOrbitLand>().Build(outline,earth,Mat(new Color(.14f,.5f,.28f)));
-            }
+            var globe=Shape(space,"Earth",earth,Vector3.one*360,Color.white,false,PrimitiveType.Sphere);
+            globe.AddComponent<OfficeEarthVisual>().Initialize();
             satellites=new Transform[5];
             for(int i=0;i<5;i++)
             {
@@ -159,7 +150,7 @@ namespace OfficeRampage
                 beam.transform.rotation=Quaternion.LookRotation(delta);
                 var core=Shape(lasers,"Laser white core",(from+impact)/2,new Vector3(1,1,delta.magnitude+.1f),Color.white,false);core.transform.rotation=beam.transform.rotation;
             }
-            Shape(space,"Orbital impact glow",impact,Vector3.one*22,Color.white,false,PrimitiveType.Sphere);audioBus.Play("thunder",.8f);
+            Shape(space,"Orbital impact glow",impact,Vector3.one*22,Color.white,false,PrimitiveType.Sphere);audioBus.Play("orbitalLaser",.8f);
             yield return SceneWait(2.3f);
             if(arena!=null) arena.gameObject.SetActive(true);space.gameObject.SetActive(false);Destroy(space.gameObject);
             RenderSettings.fog=fog;view.backgroundColor=sky;
@@ -168,8 +159,13 @@ namespace OfficeRampage
             crater.AddComponent<OfficeCraterFloor>().Build(current.width+50,current.start,current.end,impact,12,Mat(new Color(.48f,.32f,.18f)));
             bossUnit.Teleport(new Vector3(impact.x,-11.9f,impact.z));
             controller.enabled=false;player.position=new Vector3(Mathf.Clamp(impact.x+(impact.x>0?-15:15),-current.width/2+2,current.width/2-2),.1f,Mathf.Clamp(impact.z,current.start+2,current.end-2));controller.enabled=true;vertical=0;
-            audioBus.Play("explosion",1);CreateBlast(impact,false);
-            yield return CameraFlight(impact+new Vector3(-20,24,-30),impact+Vector3.down*5,1.6f);yield return SceneWait(1.2f);
+            audioBus.Play("explosion",1);
+            var blast=CreateBlast(impact,true);blast.name="Orbital double nuclear blast";blast.transform.localScale=Vector3.one*2;
+            foreach(var light in blast.GetComponentsInChildren<Light>()) light.range*=2;
+            yield return CameraFlight(impact+new Vector3(-58,40,-75),impact+Vector3.up*19,1.2f);
+            yield return SceneWait(5.2f);
+            blast.gameObject.SetActive(false);Destroy(blast.gameObject);
+            yield return ShatterRobotAndEject(bossUnit);
             view.farClipPlane=oldFar;finaleCamera=false;combatLocked=false;
             bossUnit.Hit(bossUnit.MaxHealth*10);
         }

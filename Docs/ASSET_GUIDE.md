@@ -193,6 +193,13 @@ Assets/OfficeRampage/Art/
 
 
 ## 거대 로봇·빨간 버튼·위성·분화구
-`Scripts/Story/OfficeRampageGame.Finale.cs`가 로봇 강하/탑승, 빨간 버튼 획득, 3단계 카메라와 위성 레이저를 담당합니다. 로봇·위성·지구는 기본 도형으로 만든 별도 디자인이며 외부 캐릭터 모델은 아닙니다. 지구는 대륙을 단순화한 연출용 모형입니다. 빨간 버튼 아이콘은 RedButtonIcon에서 생성하므로 별도 PNG가 필요하지 않습니다.
+`Scripts/Story/OfficeRampageGame.Finale.cs`가 로봇 강하/탑승, 빨간 버튼 획득, 3단계 카메라와 위성 레이저를 담당합니다. 로봇·위성·지구는 기본 도형으로 만든 별도 디자인이며 외부 캐릭터 모델은 아닙니다. 지구는 `Resources/OfficeSpace/earth_daymap.jpg`를 구면에 적용합니다. Solar System Scope 제작, CC BY 4.0이며 `Art/Earth-LICENSE.md`와 첫 메뉴 표기를 유지하세요. 빨간 버튼 아이콘은 RedButtonIcon에서 생성하므로 별도 PNG가 필요하지 않습니다.
 
 `Scripts/Enemies/OfficeBossRobot.cs`에서 로봇 팔다리 움직임, `Scripts/World/OfficeCraterFloor.cs`에서 반구형 지형과 MeshCollider를 생성합니다. 분화구 반경은 Finale의 Build 호출에 있는 12입니다. 지형/충돌을 함께 변경해야 합니다.
+
+
+## 우주 수송대 / 대표 탈출 / 2배 핵폭발
+- `Story/OfficeRampageGame.SpaceDelivery.cs`: 우주 수송대·로봇 투하·대기권 진입, 로봇 상하 분리와 대표 포물선 탈출. 인체는 분리하지 않습니다. 조종사의 원래 Character model을 그대로 옮깁니다.
+- `Effects/OfficeEarthVisual.cs`: 실지도 재질과 파란 대기 테두리, 생성 재질 정리. 지구 이미지 교체 시 가로:세로 2:1의 정사각형이 아닌 위경도 지도를 사용하세요.
+- `Story/OfficeRampageGame.Finale.cs`: 위성 공격의 Nuclear blast를 크기2로 생성. 기존 BFG 핵폭발은 크기1 유지. 폭발을 6.4초 보여준 뒤 로봇 분리/탈출로 이어집니다.
+- `Audio/OfficeAudio.cs`의 BuildOrbitalLaser: 외부 음원이 아닌 프로젝트 자체 합성 전자음. Sfx/orbitalLaser 키로 재생하고 기존 음소거/효과음 볼륨/일시정지를 따릅니다.

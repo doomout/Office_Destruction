@@ -574,7 +574,7 @@ namespace OfficeRampage
         {
             if (menuPage != MenuPage.Game) { DrawFrontEnd(); return; }
             if (world == null) return;
-            if(finaleCamera && orbitalUsed && !paused) return;
+            if(finaleCamera && !paused) return;
             EnsureMenuStyles();
             if (titleStyle == null)
             {

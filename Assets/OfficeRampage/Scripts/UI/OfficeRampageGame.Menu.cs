@@ -102,6 +102,7 @@ namespace OfficeRampage
         private void DrawMainPage()
         {
             var credits=new GUIStyle(menuSmall){fontSize=13};
+            GUI.Label(new Rect(80,615,1120,22),"지구 지도: Solar System Scope / solarsystemscope.com (CC BY 4.0)",credits);
             GUI.Label(new Rect(80,638,1120,26),"아이콘: Delapouite · Lorc · Skoll · DarkZaitzev / game-icons.net (CC BY 3.0) · 효과음: kurt · rubberduck · StarNinjas (CC0)",credits);
             if (MenuButton(new Rect(80, 215, 400, 65), "사무실 파괴", true)) { SaveMenuSettings(); BeginIntro(); return; }
             if (MenuButton(new Rect(80, 295, 400, 65), "무한파괴")) menuPage = MenuPage.Endless;

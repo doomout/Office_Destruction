@@ -174,3 +174,11 @@ Unity에서 함께 확인할 항목:
 - Enemies/OfficeBossRobot.cs: 로봇 보행. UI/OfficeRampageGame.WeaponHUD.cs: 빨간 버튼 및 ??? 표시.
 
 - Effects/OfficeOrbitLand.cs: 간략화한 대륙 윤곽을 구면 Mesh로 나누어 생성하고 연출 종료 시 Mesh를 정리합니다.
+
+
+## 우주 투하 및 대표 탈출 엔딩
+- SpaceDelivery partial의 robotDeliveryStage(1 대기/2 투하/3 지상)와 bossEjected는 ResetFinale에서 초기화합니다.
+- 지구/우주 수송대는 임시 Orbital cinematic 아래, 로봇은 지상 전환 전 대표 루트로 되돌려 배치합니다. 카메라 far clip·안개·배경 복원 후 임시 우주 오브젝트 제거.
+- ShatterRobotAndEject는 로봇을 world로 분리해 잔해로 남기고 조종사는 통째로 분리해 착지시킵니다. 이후 unit.visual은 온전한 CEO pilot을 가리킵니다. 기존 모델을 자르거나 교체하지 않습니다.
+- 일반 무기로 로봇을 쓰러뜨려도 같은 분리/탈출 엔딩이 적용됩니다. 위성 공격은 그 앞에 2배 핵폭발을 추가합니다.
+- Ending의 2페이즈 분기는 대표를 다시 옆으로 회전시키지 않고 엎어진 자세를 유지합니다. 기존 엔딩 버튼/대사·새 게임 초기화 유지.

@@ -31,6 +31,12 @@ namespace OfficeRampage
         }
         private IEnumerator BossCollapse(OfficeDefender unit)
         {
+            if(unit.PhaseTwo)
+            {
+                if(!bossEjected) { finaleCamera=true;yield return ShatterRobotAndEject(unit);finaleCamera=false; }
+                UpdateEndingCamera();yield return SceneWait(1);
+                endingPlaying=false;combatLocked=false;End(true);yield break;
+            }
             Quaternion initial=unit.visual.localRotation; float elapsed=0;
             while(elapsed<1.6f)
             {
@@ -49,6 +55,7 @@ namespace OfficeRampage
         {
             if(bossUnit==null) return;
             Vector3 target=bossUnit.transform.position+Vector3.up*.7f;
+            if(bossEjected) { view.fieldOfView=55;view.transform.position=target+new Vector3(-5,5,-7);view.transform.LookAt(target);return; }
             view.fieldOfView=55; view.transform.position=target+(bossUnit.PhaseTwo?new Vector3(-10,32,-14):new Vector3(-5,2.6f,-6));
             view.transform.LookAt(target);
         }
