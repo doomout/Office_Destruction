@@ -155,7 +155,8 @@ namespace OfficeRampage
             unit.warning.position = unit.transform.position + Vector3.up * .045f;
             unit.warning.rotation = Quaternion.LookRotation(forward);
             Color color = kind == 1 ? Cyan : kind == 2 ? new Color(1, .85f, .25f) : Orange;
-            if (kind == 2 || kind==3) Shape(unit.warning, "Paper trajectory", new Vector3(0, 0, range / 2), new Vector3(.12f, .025f, range), color, false);
+            if(kind==5) Shape(unit.warning,"Robot charge warning",new Vector3(0,0,range/2),new Vector3(6.4f,.025f,range),Orange,false);
+            else if (kind == 2 || kind==3) Shape(unit.warning, "Paper trajectory", new Vector3(0, 0, range / 2), new Vector3(.12f, .025f, range), color, false);
             else
                 for (int i = 0; i <= 12; i++)
                 {

@@ -72,6 +72,7 @@ namespace OfficeRampage
             { if(RunActive) { t+=Time.deltaTime;pilot.localPosition=Vector3.Lerp(from,seat,Mathf.SmoothStep(0,1,t/1.5f));pilot.localScale=Vector3.one*Mathf.Lerp(1,.7f,t/1.5f); } yield return null; }
             RobotPart(robot,"Cockpit frame",new Vector3(0,3.1f,1.05f),new Vector3(1.5f,.25f,.35f),steel);
             bossUnit.visual=robot;robot.gameObject.AddComponent<OfficeBossRobot>().Initialize(this,bossUnit);
+            ResetAmmo();Notify("탄약 보급 완료 · 권총 200 / 샷건 100 / 로켓 20",4);
             finaleCamera=false;
         }
         public void RequestOrbitalWeapon()

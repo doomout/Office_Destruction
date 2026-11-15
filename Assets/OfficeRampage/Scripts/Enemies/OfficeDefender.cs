@@ -88,6 +88,7 @@ namespace OfficeRampage
             if (rising > 0) { rising = Mathf.Max(0, rising - dt); game.SetBossPose(this, 1 - rising); return; }
             if (TickDistraction(dt)) return;
             Vector3 toward = game.PlayerPosition - transform.position; toward.y = 0;
+            if(PhaseTwo) { TickRobot(dt,toward); return; }
             if (recovery > 0) { recovery -= dt; game.AnimateDefenderAttack(this, 1 - recovery / .35f); return; }
             if (pendingAttack >= 0)
             {

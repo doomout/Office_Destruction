@@ -41,6 +41,7 @@ namespace OfficeRampage
                 yield return null;
             }
             robot.SetParent(bossUnit.transform,false);robot.localScale=Vector3.one;robot.localPosition=Vector3.up*35;
+            robot.localRotation=Quaternion.identity;
             space.gameObject.SetActive(false);Destroy(space.gameObject);arena.gameObject.SetActive(true);
             RenderSettings.fog=fog;view.backgroundColor=sky;view.farClipPlane=oldFar;robotDeliveryStage=3;
         }
