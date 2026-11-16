@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace OfficeRampage
@@ -20,10 +20,10 @@ namespace OfficeRampage
 
         public struct Point
         {
-            public float x, z, yaw;
+            public float x, z, yaw, footprintX,footprintZ,footprintWidth,footprintDepth;
             public int kind;
-            public Point(float x, float z, int kind = 0) { this.x = x; this.z = z; this.kind = kind; this.yaw=0; }
-            public Area Footprint { get { return kind <= 1 ? new Area(x, z, 2.9f, 1.9f) : new Area(x, z, 1.7f, 1.5f); } }
+            public Point(float x, float z, int kind = 0) { this.x = x; this.z = z; this.kind = kind; this.yaw=0;footprintX=footprintZ=footprintWidth=footprintDepth=0; }
+            public Area Footprint { get { return footprintWidth>0 ? new Area(footprintX,footprintZ,footprintWidth,footprintDepth) : kind <= 1 ? new Area(x, z, 2.9f, 1.9f) : new Area(x, z, 1.7f, 1.5f); } }
         }
 
         public float width, length;
