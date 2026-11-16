@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 namespace OfficeRampage
 {
@@ -178,6 +178,7 @@ namespace OfficeRampage
             }
             Shape(space,"Orbital impact glow",impact,Vector3.one*22,Color.white,false,PrimitiveType.Sphere);audioBus.Play("orbitalLaser",.8f);
             yield return SceneWait(2.3f);
+            yield return SplitEarth(space);
             if(arena!=null) arena.gameObject.SetActive(true);space.gameObject.SetActive(false);Destroy(space.gameObject);
             RenderSettings.fog=fog;view.backgroundColor=sky;
             var floor=arena.Find("Sand floor");if(floor!=null) floor.gameObject.SetActive(false);
@@ -186,11 +187,6 @@ namespace OfficeRampage
             bossUnit.Teleport(new Vector3(impact.x,-11.9f,impact.z));
             controller.enabled=false;player.position=new Vector3(Mathf.Clamp(impact.x+(impact.x>0?-15:15),-current.width/2+2,current.width/2-2),.1f,Mathf.Clamp(impact.z,current.start+2,current.end-2));controller.enabled=true;vertical=0;
             audioBus.Play("explosion",1);
-            var blast=CreateBlast(impact,true);blast.name="Orbital double nuclear blast";blast.transform.localScale=Vector3.one*2;
-            foreach(var light in blast.GetComponentsInChildren<Light>()) light.range*=2;
-            yield return CameraFlight(impact+new Vector3(-58,40,-75),impact+Vector3.up*19,1.2f);
-            yield return SceneWait(5.2f);
-            blast.gameObject.SetActive(false);Destroy(blast.gameObject);
             yield return ShatterRobotAndEject(bossUnit);
             view.farClipPlane=oldFar;finaleCamera=false;combatLocked=false;
             bossUnit.Hit(bossUnit.MaxHealth*10);

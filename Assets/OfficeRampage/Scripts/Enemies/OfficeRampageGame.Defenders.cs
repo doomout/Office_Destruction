@@ -49,7 +49,7 @@ namespace OfficeRampage
                 for(int i=0;i<amount;i++)
                 {
                     var p=spawnPositions[cursor++];
-                    var unit=CreateDefender(root,room,navigation,new Vector3(p.x,.08f,room.start+p.z),runCompany.UnitName(rank,i),OfficeCompanySettings.Health[rank],false,false);
+                    var unit=CreateDefender(root,room,navigation,new Vector3(p.x,.08f,room.start+p.z),runCompany.UnitName(rank,i),room.number==1?100:OfficeCompanySettings.Health[rank],false,false);
                     ApplyCompanyIdentity(unit,rank,i);
                 }
             }

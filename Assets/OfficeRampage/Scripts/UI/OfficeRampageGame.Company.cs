@@ -101,13 +101,15 @@ namespace OfficeRampage
         {
             if(current==null || current.number!=4 || bossFight || ended || LivingDefenders(4)>0) return;
             if(securityWavePending) return;
-            if(!securityWaveStarted) { securityWavePending=true; dogRoomDoor.Open(); StartCoroutine(RevealSecurity()); return; }
-            bossFight=true; guardRoomDoor.Open();
+            if(!securityWaveStarted) { securityWavePending=true; RemoveStageBarrier(dogRoomDoor); StartCoroutine(RevealSecurity()); return; }
+            bossFight=true; RemoveStageBarrier(guardRoomDoor);
             if(bossUnit==null)
             {
                 ClearDecoy(); endingLine="오늘은 대표가 없군요. 이제 퇴근합시다!"; End(true); return;
             }
             if(bossChair!=null) bossChair.SetActive(false);
+            bossUnit.patrolStart=-1;
+            if(activeFloor!=null)bossUnit.navigation=new OfficeNavigation(activeFloor.ReadLayout().CreateLayout());
             bossUnit.Wake(); audioBus.ChangeRoom(6);
             Notify("경비까지 모두 처치했습니다! 대표전 시작!",4);
         }

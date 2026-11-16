@@ -12,7 +12,7 @@ namespace OfficeRampage
             while(!RunActive) yield return null;
             if(current==null || current.number!=4 || ended || bossUnit==null) { securityWavePending=false; yield break; }
             securityWaveStarted=true;
-            var layout=OfficeFixedFloor.Load(4).CreateLayout();
+            var layout=activeFloor!=null?activeFloor.ReadLayout().CreateLayout():OfficeFixedFloor.Load(4).CreateLayout();
             var navigation=new OfficeNavigation(layout);
             var points=OfficeFixedFloor.Load(4).EnemyPoints();
             for(int i=0;i<5;i++)
@@ -22,7 +22,7 @@ namespace OfficeRampage
                 var pos=activeFloor!=null?activeFloor.guardSpawns[i].position:new Vector3(-8+i*4,.08f,current.start+26+(i%2)*4);
                 var at=new OfficeLayout.Point(pos.x,pos.z-current.start);
                 var unit=CreateDefender(bossUnit.transform.parent,current,navigation,new Vector3(at.x,.08f,current.start+at.z),"경비 · "+label,kind==4?160:kind==3?120:140,false,false);
-                unit.guard=true;unit.securityWeapon=kind;unit.patrolStart=dogRoomDoor.transform.position.z+1;unit.patrolEnd=guardRoomDoor.transform.position.z-1;
+                unit.guard=true;unit.securityWeapon=kind;unit.patrolStart=current.start+.7f;unit.patrolEnd=guardRoomDoor.transform.position.z-1;
                 unit.visual.GetComponent<OfficeCharacterVisual>()?.SetIdentity(false,i,0);
                 foreach(Transform child in unit.visual)
                     if(child.name=="A4 hand" || (kind!=0 && child.name=="Baton")) child.gameObject.SetActive(false);

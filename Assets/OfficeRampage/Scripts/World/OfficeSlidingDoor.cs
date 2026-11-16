@@ -13,6 +13,7 @@ namespace OfficeRampage
         private bool opening;
         private float progress;
         public bool IsOpen { get { return progress >= 1; } }
+        public void RemoveBarrier(){opening=true;progress=1;barrier.enabled=false;gameObject.SetActive(false);}
         public void Open()
         {
             if (opening) return;
