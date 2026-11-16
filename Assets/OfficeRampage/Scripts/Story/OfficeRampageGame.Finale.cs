@@ -5,6 +5,9 @@ namespace OfficeRampage
     public sealed partial class OfficeRampageGame
     {
         private bool orbitalRequested,orbitalReady,orbitalUsed,finaleCamera;
+        private Coroutine orbitalDropRoutine;
+        private float orbitalDropElapsed;
+        private Transform orbitalDropVisual;
         private Texture2D redButtonTexture;
         private int orbitalZoomStage;
         public int OrbitalZoomStage { get { return orbitalZoomStage; } }
@@ -12,6 +15,7 @@ namespace OfficeRampage
         private void ResetFinale()
         {
             orbitalRequested=orbitalReady=orbitalUsed=finaleCamera=false;orbitalZoomStage=0;robotDeliveryStage=0;bossEjected=false;
+            orbitalDropRoutine=null;orbitalDropVisual=null;orbitalDropElapsed=0;
             RenderSettings.fog=true;
         }
         private Texture2D RedButtonIcon()
@@ -78,12 +82,34 @@ namespace OfficeRampage
         public void RequestOrbitalWeapon()
         {
             if(orbitalRequested || bossUnit==null || !bossUnit.PhaseTwo || ended) return;
-            orbitalRequested=true;ResetElements();whirlwindLeft=whirlwindReady=0;ClearDecoy();
-            combatLocked=true;StartCoroutine(DropOrbitalButton());
+            orbitalRequested=true;orbitalDropElapsed=0;combatLocked=true;
+            ResetElements();whirlwindLeft=whirlwindReady=0;ClearDecoy();
+            orbitalDropRoutine=StartCoroutine(DropOrbitalButton());
+        }
+        private void TickOrbitalReward(float dt)
+        {
+            if(bossUnit==null || !bossUnit.PhaseTwo || !bossUnit.Alive || orbitalUsed || orbitalReady)return;
+            if(!orbitalRequested && !combatLocked && bossUnit.Health<=bossUnit.MaxHealth*.2f+.01f)RequestOrbitalWeapon();
+            if(!orbitalRequested)return;
+            orbitalDropElapsed+=dt;
+            // Reward availability must not depend forever on a cosmetic coroutine completing.
+            if(orbitalDropElapsed>=4)
+            {
+                if(orbitalDropRoutine!=null)StopCoroutine(orbitalDropRoutine);
+                CompleteOrbitalReward();
+            }
+        }
+        private void CompleteOrbitalReward()
+        {
+            if(orbitalReady || orbitalUsed)return;
+            if(orbitalDropVisual!=null)Destroy(orbitalDropVisual.gameObject);
+            orbitalDropVisual=null;orbitalDropRoutine=null;orbitalReady=true;SetWeapon(7);combatLocked=false;cooldown=.4f;
+            Notify("??? 획득 · 8번 빨간 버튼 · 새로 왼쪽 클릭하면 발동",6);
         }
         private IEnumerator DropOrbitalButton()
         {
             var drop=new GameObject("Mystery weapon sky drop").transform;drop.SetParent(world,false);BuildRedButton(drop);drop.localScale=Vector3.one*2;
+            orbitalDropVisual=drop;
             Vector3 landing=player.position+avatar.forward*1.7f;landing.y=.3f;landing.x=Mathf.Clamp(landing.x,-current.width/2+1,current.width/2-1);landing.z=Mathf.Clamp(landing.z,current.start+1,current.end-1);
             float t=0;
             while(t<.8f)
@@ -91,8 +117,7 @@ namespace OfficeRampage
             for(int i=0;i<3;i++) Trail(landing+Vector3.up*30+Random.insideUnitSphere,landing,Cyan);
             audioBus.Play("thunder",.75f);Impact(landing,Cyan,Vector3.up,18);
             yield return SceneWait(.7f);
-            Destroy(drop.gameObject);orbitalReady=true;SetWeapon(7);combatLocked=false;cooldown=.4f;
-            Notify("??? 획득 · 8번 빨간 버튼 · 새로 왼쪽 클릭하면 발동",6);
+            CompleteOrbitalReward();
         }
         private void ActivateOrbital()
         {

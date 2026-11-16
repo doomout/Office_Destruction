@@ -48,12 +48,13 @@ namespace OfficeRampage
         {
             if (!Alive || Dormant || !game.RunActive || game.CombatLocked || !game.IsCurrentRoom(room)) return;
             Health = boss ? OfficeCombatRules.DamageResult(Health, amount, MaxHealth, PhaseTwo) : Mathf.Max(0, Health - amount);
-            if(boss && PhaseTwo && !game.OrbitalRequested) Health=Mathf.Max(MaxHealth*.2f,Health);
+            // Preserve a lethal hit for the reward, but never pin ongoing combat at 20%.
+            if(boss && PhaseTwo && !game.OrbitalRequested) Health=Mathf.Max(1,Health);
+            if(boss && PhaseTwo && Health<=MaxHealth*.2f+.01f) game.RequestOrbitalWeapon();
             game.DefenderImpact(this);
             if (boss && !Enraged && OfficeCombatRules.Rage(Health, MaxHealth))
             { Enraged = true; if (flames != null) flames.gameObject.SetActive(true); game.BossRaged(); }
             if (boss && !PhaseTwo && OfficeCombatRules.Gift(Health, MaxHealth)) game.RequestSecretWeapon();
-            if(boss && PhaseTwo && Health<=MaxHealth*.2f) game.RequestOrbitalWeapon();
             UpdateLabel();
             if (!Alive)
             {
