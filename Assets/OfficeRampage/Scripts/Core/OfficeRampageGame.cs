@@ -107,7 +107,7 @@ namespace OfficeRampage
             view.fieldOfView = 72;
             view.backgroundColor = Navy;
             view.clearFlags = CameraClearFlags.SolidColor;
-            current = BuildRoom(1, 0);
+            current = BuildRoom(1, 0); ApplyFloorEntry();
             Notify("1층 로비 · 직원을 모두 처치하면 엘리베이터가 열립니다.", 5);
             LockCursor(true);
             UpdateCamera();
@@ -164,6 +164,9 @@ namespace OfficeRampage
 
         private Room BuildRoom(int number, float start)
         {
+            var prefab=Resources.Load<OfficeFloorPrefab>("OfficeFloors/Floor"+number);
+            if(prefab!=null)return BuildPrefabRoom(number,start,prefab);
+            activeFloor=null;
             bool arena = number == 4;
             var layout = OfficeFixedFloor.Load(number).CreateLayout();
             var room = new Room { number = number, start = start,
@@ -420,7 +423,7 @@ namespace OfficeRampage
             if (mouse != null && (weaponIndex == 4 || (weaponIndex==7 && orbitalReady) ? mouse.leftButton.wasPressedThisFrame : mouse.leftButton.isPressed) && Cursor.lockState == CursorLockMode.Locked && cooldown <= 0) Attack();
             if (ended || CombatLocked) return;
             SealFinalRoom();
-            if (current.number < 4 && current.unlocked && current.door.IsOpen && player.position.z > current.end + .7f && Mathf.Abs(player.position.x) < 1.45f)
+            if (current.number < 4 && current.unlocked && current.door.IsOpen && InsideElevator())
                 StartCoroutine(RideElevator());
             if (player.position.y < -8)
             {

@@ -54,7 +54,7 @@ namespace OfficeRampage
         private void BuildWaitingSecretary(Transform root,Room room)
         {
             waitingSecretary=new GameObject("Waiting secretary").transform;waitingSecretary.SetParent(root,false);
-            waitingSecretary.localPosition=new Vector3(10,.08f,room.start+48);
+            waitingSecretary.position=activeFloor!=null?activeFloor.secretarySpawn.position:new Vector3(10,.08f,room.start+48);
             BuildPerson(waitingSecretary,false);waitingSecretary.GetComponent<OfficeCharacterVisual>()?.SetIdentity(true,0,0);
             waitingSecretary.gameObject.AddComponent<OfficeSecretaryIdle>().game=this;
             FloorSign(waitingSecretary,"비서",new Vector3(0,2.3f,0),.1f);

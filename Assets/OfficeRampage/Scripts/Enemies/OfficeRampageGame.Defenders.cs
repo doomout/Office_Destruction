@@ -40,7 +40,7 @@ namespace OfficeRampage
                 var p=spawnPositions[cursor++];
                 CreateDefender(root,room,navigation,new Vector3(p.x,.08f,room.start+p.z),
                     "경비견 "+(i+1),random.Next(100,201),true,false);
-                defenders[defenders.Count-1].patrolEnd=room.start+17;
+                defenders[defenders.Count-1].patrolEnd=activeFloor!=null?activeFloor.dogDoor.transform.position.z-1:room.start+17;
             }
             for(int rank=0;rank<OfficeCompanySettings.Ranks.Length;rank++)
             {
@@ -56,15 +56,15 @@ namespace OfficeRampage
             if (room.number != 4) return;
             bossChair = new GameObject("CEO chair");
             bossChair.transform.SetParent(root, false);
-            bossChair.transform.position = new Vector3(-3, 0, room.end - 5);
+            bossChair.transform.position = activeFloor!=null?activeFloor.bossSpawn.position-Vector3.up*.08f:new Vector3(-3, 0, room.end - 5);
             Shape(bossChair.transform, "Seat", new Vector3(0, .55f, 0), new Vector3(1.3f, .2f, 1.1f), Navy, false);
             Shape(bossChair.transform, "Backrest", new Vector3(0, 1.2f, .48f), new Vector3(1.3f, 1.4f, .2f), Navy, false);
             Shape(bossChair.transform, "Chair base", new Vector3(0, .25f, 0), new Vector3(.2f, .5f, .2f), Color.gray, false);
             bossUnit = CreateDefender(root, room, navigation, bossChair.transform.position + Vector3.up * .08f,
                 runCompany.UnitName(OfficeCompanySettings.RepresentativeRank,0), OfficeDefenseRules.BossHealth, false, true);
             ApplyCompanyIdentity(bossUnit,OfficeCompanySettings.RepresentativeRank,0);
-            bossUnit.transform.rotation = Quaternion.Euler(0, 180, 0);
-            bossUnit.patrolStart=room.start+37; BuildWaitingSecretary(root,room);
+            bossUnit.transform.rotation = activeFloor!=null?activeFloor.bossSpawn.rotation:Quaternion.Euler(0,180,0);
+            bossUnit.patrolStart=activeFloor!=null?activeFloor.guardDoor.transform.position.z+1:room.start+37; BuildWaitingSecretary(root,room);
         }
 
         private OfficeDefender CreateDefender(Transform root, Room room, OfficeNavigation navigation,

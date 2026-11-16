@@ -1,6 +1,6 @@
 # Office Rampage — 사무실 파괴
 
-직원들과 싸우고 사무집기를 부수며 대표에게 도전하는 3인칭 액션 게임입니다. 사무실은 저장된 고정 배치를 읽어 생성하고, 인간 캐릭터는 무료 Kenney 모델을 사용합니다. 무기·가구·효과는 현재 코드 생성 방식입니다. 이 문서는 **2026-11-16 현재 구현**을 기준으로 합니다.
+직원들과 싸우고 사무집기를 부수며 대표에게 도전하는 3인칭 액션 게임입니다. 사무실은 Unity에서 직접 편집하는 층별 프리팹을 불러오고, 인간 캐릭터는 무료 Kenney 모델을 사용합니다. 무기·효과는 코드 생성 방식이며 가구·벽·배경 모델은 층 프리팹에 저장됩니다. 이 문서는 **2026-11-16 현재 구현**을 기준으로 합니다.
 
 ## 실행
 
@@ -10,6 +10,10 @@
 4. 첫 메뉴 → 사무실 파괴 → 도입 이야기에서 선택합니다.
 
 URP 17.5.0, Input System 1.19.0을 사용합니다. 입력 설정은 **Both**이며, 게임 조작은 Input System, 한글 이름 입력은 기본 TextField/IME를 사용합니다.
+
+## 층 디자인 편집
+
+Play를 끈 뒤 **Tools → Office Rampage → Floors → 원하는 층 편집**을 선택하세요. 가구·벽·직원 시작점을 W/E/R로 편집하고 Ctrl+S로 저장합니다. 정상 게임은 이 프리팹을 그대로 사용합니다. [그림으로 층 편집하기](Docs/VISUAL_FLOOR_EDITING.md)에 전체 절차와 주의사항을 정리했습니다.
 
 ## 먼저 볼 문서
 
@@ -39,7 +43,8 @@ Assets/OfficeRampage/
   Art/KenneyMiniCharacters/  인간 모델·URP 재질·프리팹·CC0 라이선스
   Art/             기타 교체용 모델·재질·텍스처·프리팹 보관 공간
   Resources/OfficeCharacters/  캐릭터 카탈로그
-  Resources/OfficeLayouts/     층별 고정 배치 JSON
+  Resources/OfficeFloors/      실제 게임이 사용하는 편집 가능 층 프리팹
+  Resources/OfficeLayouts/     이전 JSON 배치/복구용 보관
 Docs/              유지보수·교체 안내
 Tools/             규칙 검사 및 초기 음원 도입 도구
 ```
@@ -128,7 +133,7 @@ Tools/             규칙 검사 및 초기 음원 도입 도구
 
 ## 고정 사무실과 새 캐릭터
 
-층별 크기·가구 종류/위치/방향·파티션·적 시작 위치·포션 위치는 `Resources/OfficeLayouts/floor1.json`~`floor4.json`에 고정 저장합니다. 새 게임마다 같은 배치이며, 적은 시작 후 기존 AI에 따라 움직입니다. 설정의 최초 이름 생성, 전투 동작 타이밍, 파편 효과 등은 별개입니다.
+층별 가구·벽·배경과 인물/포션 시작 위치는 `Resources/OfficeFloors/Floor1.prefab`~`Floor4.prefab`에 저장합니다. JSON은 이전 배치와 복구용이며 정상 플레이는 프리팹을 우선 사용합니다.
 
 인간 캐릭터는 [Kenney Mini Characters 2.0](https://kenney.nl/assets/mini-characters)의 남성 6종/여성 6종을 사용합니다. CC0 라이선스 원문과 출처를 `Art/KenneyMiniCharacters`에 보관했습니다. 주인공·직원·대표·비서·더미·출근 군중에 적용되며, 개방형 사무실 가구와 경비견 모델은 기존 방식입니다. 걷기/달리기/공격 애니메이션을 연결하고 기존 충돌 크기·체력·무기·스킬 규칙은 유지합니다.
 

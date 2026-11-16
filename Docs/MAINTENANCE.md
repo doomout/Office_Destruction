@@ -1,5 +1,8 @@
 # 유지보수 안내
 
+> **2026-11-16 변경:** 정상 게임의 층 배치는 이제 `Resources/OfficeFloors/Floor1~4.prefab`을 직접 편집합니다. [그래픽 편집 가이드](VISUAL_FLOOR_EDITING.md)를 먼저 보세요. 아래 JSON 설명은 이전 배치/복구용이며 프리팹이 있는 게임에 직접 반영되지 않습니다.
+
+
 기준: 2026-11-14. 기능을 찾을 때는 아래 표에서 폴더를 고른 다음 함수 이름을 검색하세요. 파일 수를 억지로 줄이지 않고 관련 기능끼리 묶었습니다.
 
 ## 어디부터 고칠까?
@@ -193,3 +196,13 @@ Unity에서 함께 확인할 항목:
 - 구역별 이동 제한은 `OfficeDefender.patrolStart/patrolEnd`로 적용합니다. roomStart는 길찾기 좌표 원점이므로 구역 제한 용도로 바꾸지 마세요. 로봇 전환 때 구역 제한을 해제합니다.
 - BFG 지급 임계값은 `OfficeCombatRules.Gift`의 50%. 기다리는 비서를 재사용하며 전달 동안 떨림을 끄고 비서실 문으로 왕복합니다.
 - 검사: Codex 격리 프로젝트의 FourFloorValidation은 네 층 길찾기, 100% 처치 문, 이동/충돌, 엘리베이터 정리, 구역별 호위와 비서, BFG 이후 엔딩까지 실행합니다. 기존 5층/60%/시간제 가정의 검사 스크립트는 이번 규칙의 기준이 아닙니다.
+
+
+## 그래픽 층 편집 연결 파일
+
+- `World/OfficeFloorPrefab.cs`: 저장된 실제 가구와 충돌체에서 배치/길찾기 정보 추출. 활성 Collider를 사용하므로 새 벽 복제도 반영. 시간별 이동 장애물인 미닫이 문은 길찾기 장애물에서 제외하고 실제 Collider로 잠금.
+- `World/OfficeRampageGame.PrefabFloors.cs`: 프리팹 인스턴스와 파괴 가구/포션/문/인물 연결. 편집용 인물 미리보기는 숨기고 회사 설정으로 실제 인물을 생성.
+- `Editor/OfficeFloorEditor.cs`: 층별 Prefab Mode 메뉴, 편집 화면 천장/외벽 숨김, 길찾기 검사.
+- `Resources/OfficeFloors`, `Art/FloorMaterials`: 저장된 실제 배치와 공유 재질. 프리팹 이름/경로와 .meta GUID 보존.
+- `OfficeFixedFloor.Load`는 프리팹을 우선 읽고 프리팹이 없을 때에만 이전 JSON으로 복구합니다. 실제 프리팹 수정에는 JSON 캐시가 사용되지 않습니다.
+- 생성용 기존 `BuildRoom`은 복구 경로입니다. 신규 수정은 편집 가능한 프리팹에서 시작하세요.

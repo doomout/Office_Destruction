@@ -19,9 +19,10 @@ namespace OfficeRampage
             {
                 int kind=i<2?0:i<4?3:4;
                 string label=kind==0?"몽둥이":kind==3?"권총":"장거리 샷건";
-                var at=new OfficeLayout.Point(-8+i*4,26+(i%2)*4);
+                var pos=activeFloor!=null?activeFloor.guardSpawns[i].position:new Vector3(-8+i*4,.08f,current.start+26+(i%2)*4);
+                var at=new OfficeLayout.Point(pos.x,pos.z-current.start);
                 var unit=CreateDefender(bossUnit.transform.parent,current,navigation,new Vector3(at.x,.08f,current.start+at.z),"경비 · "+label,kind==4?160:kind==3?120:140,false,false);
-                unit.guard=true;unit.securityWeapon=kind;unit.patrolStart=current.start+19;unit.patrolEnd=current.start+35;
+                unit.guard=true;unit.securityWeapon=kind;unit.patrolStart=dogRoomDoor.transform.position.z+1;unit.patrolEnd=guardRoomDoor.transform.position.z-1;
                 unit.visual.GetComponent<OfficeCharacterVisual>()?.SetIdentity(false,i,0);
                 foreach(Transform child in unit.visual)
                     if(child.name=="A4 hand" || (kind!=0 && child.name=="Baton")) child.gameObject.SetActive(false);

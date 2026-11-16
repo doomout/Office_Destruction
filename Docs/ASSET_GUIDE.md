@@ -1,5 +1,8 @@
 # 그래픽·음악 교체 가이드
 
+> **2026-11-16 변경:** 정상 게임의 층 배치는 이제 `Resources/OfficeFloors/Floor1~4.prefab`을 직접 편집합니다. [그래픽 편집 가이드](VISUAL_FLOOR_EDITING.md)를 먼저 보세요. 아래 JSON 설명은 이전 배치/복구용이며 프리팹이 있는 게임에 직접 반영되지 않습니다.
+
+
 현재 프로젝트 기준: 2026-11-14. 먼저 프로젝트를 백업하고 **Play를 종료한 상태**에서 수정하세요. 한 번에 한 종류만 바꾸면 문제 원인을 찾기 쉽습니다.
 
 ## 먼저 알아둘 구조
@@ -154,7 +157,7 @@ Assets/OfficeRampage/Art/
 
 공용 colormap을 편집하면 여러 인물이 함께 달라집니다. 한 명만 바꾸려면 텍스처와 머티리얼을 복제하고 해당 프리팹 Renderer에 별도로 연결하세요. 재생성 메뉴를 다시 실행하면 이 수동 변경이 덮일 수 있습니다.
 
-## 고정 배치 직접 편집
+## 이전 JSON 배치 편집 — 복구용
 
 `Assets/OfficeRampage/Resources/OfficeLayouts/floor1.json`~`floor4.json`을 백업한 뒤 수정합니다. 실행 시 난수로 배치하지 않고 이 좌표를 그대로 읽습니다.
 
@@ -213,3 +216,13 @@ Assets/OfficeRampage/Art/
 - `World/OfficeRampageGame.FloorIdentity.cs`: 로비 마감, 책상 의자, 층/방 안내, 4층 두 문과 비서 생성.
 - 4층은 z=18/36의 문, z=42 이후 오른쪽 비서실입니다. 비서실 문은 x=6, z=46~50이며 비서 전달 동선도 이 문을 사용합니다. 구역을 옮길 때 JSON 벽과 코드의 문·비서 동선을 함께 수정하세요.
 - `Story/OfficeSecretaryIdle.cs`는 떨림만 담당하며 적/처치 수에 포함되지 않습니다.
+
+
+## 그래픽 층 편집 연결 파일
+
+- `World/OfficeFloorPrefab.cs`: 저장된 실제 가구와 충돌체에서 배치/길찾기 정보 추출. 활성 Collider를 사용하므로 새 벽 복제도 반영. 시간별 이동 장애물인 미닫이 문은 길찾기 장애물에서 제외하고 실제 Collider로 잠금.
+- `World/OfficeRampageGame.PrefabFloors.cs`: 프리팹 인스턴스와 파괴 가구/포션/문/인물 연결. 편집용 인물 미리보기는 숨기고 회사 설정으로 실제 인물을 생성.
+- `Editor/OfficeFloorEditor.cs`: 층별 Prefab Mode 메뉴, 편집 화면 천장/외벽 숨김, 길찾기 검사.
+- `Resources/OfficeFloors`, `Art/FloorMaterials`: 저장된 실제 배치와 공유 재질. 프리팹 이름/경로와 .meta GUID 보존.
+- `OfficeFixedFloor.Load`는 프리팹을 우선 읽고 프리팹이 없을 때에만 이전 JSON으로 복구합니다. 실제 프리팹 수정에는 JSON 캐시가 사용되지 않습니다.
+- 생성용 기존 `BuildRoom`은 복구 경로입니다. 신규 수정은 편집 가능한 프리팹에서 시작하세요.

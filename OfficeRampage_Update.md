@@ -248,3 +248,15 @@
 - 미확인: 사용자가 수동 플레이할 때의 전투 난이도 및 카메라 체감. 자동 점프 검사는 컨트롤러 상승 여유이며 실제 키 조작 장기 플레이를 대신하지 않음.
 - 실행: Unity에서 Play 종료 후 파일 임포트 완료 → 새 게임. 1~3층 직원 전원 처치 후 엘리베이터, 4층 구역 순서, 대표 50%에서 비서 전달 확인.
 - README·에셋 교체·유지보수 문서 갱신. 백업: Codex outputs/FourFloorUpdateBackup. 결과: outputs/FourFloorUpdate-validation.txt.
+
+
+## 2026-11-16 — Unity 그래픽 편집용 층 프리팹
+- Resources/OfficeFloors/Floor1~4.prefab에 실제 가구·파티션·벽·천장·배경·문·포션·시작점 저장. 48개 공유 재질은 Art/FloorMaterials에 저장. 프리팹을 실제 런타임 층으로 인스턴스화하고 가구 파괴/문/포션/적·보스 진행을 연결.
+- Tools → Office Rampage → Floors → 각 층 편집 메뉴 추가. Prefab Mode에서 Play 없이 W/E/R·Ctrl+D로 편집하고 Ctrl+S 저장. 천장/외벽은 SceneVisibility로 편집 화면에서만 숨기며 메뉴로 다시 표시. 기존 게임 씬 유지.
+- 고정 인원 시작점과 대표·비서·보디가드·플레이어 시작점, 비서 출입 동선점을 제공. 인물 미리보기는 실행 시 숨기며 실제 이름·성별은 기존 회사 설정 사용.
+- 실제 Collider에서 장애물 영역을 추출하여 가구 이동·회전·크기와 추가/복제한 벽도 길찾기에 반영. 프리팹 자산의 비활성 계층에서도 문/가구 소속을 인식하도록 수정하여 미닫이 문을 영구 장애물로 오인하지 않음.
+- OfficeFixedFloor는 프리팹을 우선 읽고 JSON은 프리팹이 없는 경우의 복구 경로로 보관. 정상 편집은 JSON과 무관.
+- 실제 검사: 격리 Unity 6000.5.1f1 컴파일/Play PASS. 편집 메뉴의 Prefab Mode 열기, 새 벽 길찾기 등록, 저장된 가구 위치·30도 회전·크기 변경의 실제 런타임 반영과 피해 처리, 영구 재질 참조 검사. 테스트용 수정은 원복 후 설치. 네 층 이동/점프 여유/충돌/경로/인원/문/엘리베이터 정리, 비서 50% 전달, BFG→로봇/탄약→위성/엔딩/재시작 검사 통과. 렌더 이미지 확인.
+- 미확인: 사용자가 자유롭게 크게 개조한 뒤의 모든 경로·난이도. 층 루트와 고정 인원 수·대표층 앞뒤 구역 순서는 유지하고, Inspector 배치 검사 및 실제 Play로 확인 필요.
+- 문서: Docs/VISUAL_FLOOR_EDITING.md 신규, README/에셋 가이드/유지보수 갱신. 기존 씬/Unity 설정/기존 .meta GUID 유지.
+- 백업: Codex outputs/VisualFloorUpdateBackup. 검사 결과: outputs/VisualFloorUpdate-validation.txt. Unity 임포트 후 Play를 끈 상태에서 층 편집 메뉴를 사용.

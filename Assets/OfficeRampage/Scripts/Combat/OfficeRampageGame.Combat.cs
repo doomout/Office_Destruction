@@ -215,9 +215,9 @@ namespace OfficeRampage
             var secretary=waitingSecretary;
             secretary.GetComponent<OfficeSecretaryIdle>().enabled=false;
             Vector3 start=secretary.position;
-            Vector3 doorway=new Vector3(5,.08f,current.start+48);
+            Vector3 doorway=activeFloor!=null?activeFloor.secretaryDoor.position:new Vector3(5,.08f,current.start+48);
             Vector3 destination=player.position+avatar.forward*2;
-            destination.x=Mathf.Clamp(destination.x,-10,4.5f);destination.z=Mathf.Clamp(destination.z,current.start+38,current.end-2);destination.y=.08f;
+            destination.x=Mathf.Clamp(destination.x,-current.width/2+2,doorway.x-.5f);destination.z=Mathf.Clamp(destination.z,bossUnit.patrolStart+1,current.end-2);destination.y=.08f;
             var gift = Shape(secretary, "BFG 18 case", new Vector3(0, 1, .5f), new Vector3(.8f, .35f, .6f), Color.green, false);
             float t = 0;
             while (t < 1.5f)

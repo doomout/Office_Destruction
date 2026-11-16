@@ -28,7 +28,7 @@ namespace OfficeRampage
             if(combatLocked) yield break;
             combatLocked=true; ClearDecoy();
             int next=current.number+1; var door=current.door;
-            controller.enabled=false; player.position=new Vector3(0,.08f,current.end+1.8f);
+            controller.enabled=false; player.position=current.door.transform.TransformPoint(new Vector3(0,.08f,1.8f));
             yaw=180; pitch=8; avatar.rotation=Quaternion.Euler(0,yaw,0); vertical=0;
             cinematicText=next+"층으로 이동합니다";
             for(float t=0;t<1;)
@@ -52,7 +52,7 @@ namespace OfficeRampage
             yield return null; // Destruction completes before creating the next floor.
             current=BuildRoom(next,0);
             player.position=new Vector3(0,.08f,3); yaw=0; pitch=13; avatar.rotation=Quaternion.identity;
-            controller.enabled=true; Physics.SyncTransforms(); invulnerability=2;
+            controller.enabled=true; ApplyFloorEntry(); Physics.SyncTransforms(); invulnerability=2;
             audioBus.ChangeRoom(next); cinematicText=""; combatLocked=false;
             Notify(next==4?"대표층 · 경비견을 모두 처치하세요. 시간 제한은 없습니다.":next+"층 도착 · 직원을 모두 처치하면 엘리베이터가 열립니다.",4);
             UpdateCamera();
