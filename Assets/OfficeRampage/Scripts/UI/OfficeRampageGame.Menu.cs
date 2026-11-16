@@ -94,7 +94,7 @@ namespace OfficeRampage
                 else if (menuPage == MenuPage.Units) DrawCompanySettings();
                 else if (menuPage == MenuPage.Intro) DrawIntro();
                 else DrawInformationPage();
-                GUI.Label(new Rect(80, 673, 1100, 30), "사무실 파괴  /  " + OfficeMenuRules.Label(difficulty) + "  /  시작 " + OfficeMenuRules.Duration(difficulty) / 60 + "분  /  3콤보마다 +5초", menuSmall);
+                GUI.Label(new Rect(80, 673, 1100, 30), "로비 → 사무실 → 임원층 → 대표층  /  시간 제한 없음", menuSmall);
             }
             finally { GUI.matrix = previous; GUI.color = previousColor; }
         }
@@ -112,9 +112,9 @@ namespace OfficeRampage
             Box(new Rect(535, 215, 665, 410), new Color(.055f, .1f, .15f));
             Box(new Rect(535, 215, 665, 5), Cyan);
             GUI.Label(new Rect(567, 240, 600, 45), "처음 오셨나요?", menuHeading);
-            GUI.Label(new Rect(567, 302, 590, 105), "가구 60% 파괴 + 적 60% 처치 시 출구가 열립니다.\n초록 포션은 체력 +30! 대표방은 시간 무제한입니다.", menuText);
+            GUI.Label(new Rect(567, 302, 590, 105), "직원을 모두 처치하면 다음 층으로 이동합니다.\n가구 파괴는 선택! 전자기기는 폭발을 조심하세요.", menuText);
             GUI.Label(new Rect(567, 422, 590, 150), "WASD 이동  ·  마우스 조준  ·  왼쪽 클릭 공격\n스페이스 점프  ·  시프트 달리기  ·  1~7 무기 · 8 비에프지 18\nEsc 일시정지  ·  M 음소거", menuText);
-            GUI.Label(new Rect(567, 572, 590, 36), "음량과 제한시간은 ‘설정’에서 바꿀 수 있어요.", menuSmall);
+            GUI.Label(new Rect(567, 572, 590, 36), "음량과 직원 이름·성별은 ‘설정’에서 바꿀 수 있어요.", menuSmall);
         }
 
         // Keep Unity's slider interaction, but draw high-contrast graphics independent of its dark skin.
@@ -149,15 +149,9 @@ namespace OfficeRampage
             bool changed = GUI.changed;
             if (MenuButton(new Rect(80, 470, 485, 55), audioBus.Muted ? "전체 소리: 꺼짐 (눌러서 켜기)" : "전체 소리: 켜짐 (눌러서 끄기)"))
             { audioBus.Muted = !audioBus.Muted; changed = true; }
-            GUI.Label(new Rect(650, 270, 550, 60), "난이도 / 시작 제한시간", menuHeading);
-            for (int i = 0; i < 3; i++)
-            {
-                if (MenuButton(new Rect(650, 340 + i * 70, 550, 58),
-                    (difficulty == i ? "[선택] " : "") + OfficeMenuRules.Label(i) + "  ·  " + OfficeMenuRules.Duration(i) / 60 + "분", difficulty == i))
-                { difficulty = i; changed = true; }
-            }
-            if (changed) SaveMenuSettings();
-            GUI.Label(new Rect(650, 560, 550, 65), "3콤보마다 +5초!\n자동 저장 · 다음 게임부터 적용됩니다.", menuSmall);
+            GUI.Label(new Rect(650,270,550,60),"진행 방식",menuHeading);
+            GUI.Label(new Rect(650,340,550,170),"시간 제한 없음\n직원 전원 처치 → 엘리베이터 개방\n가구 파괴는 진행 조건에서 제외\n대표층: 경비견 → 보디가드 → 대표",menuText);
+            if(changed) SaveMenuSettings();
             if (MenuButton(new Rect(80, 535, 485, 45), "유닛 설정")) OpenCompanySettings();
             if (MenuButton(new Rect(80, 590, 300, 55), "뒤로")) { SaveMenuSettings(); menuPage = MenuPage.Main; }
         }
@@ -168,7 +162,7 @@ namespace OfficeRampage
             if (menuPage == MenuPage.Story)
             {
                 heading = "스토리";
-                body = "끝없는 야근, 쌓이는 업무, 그리고 또 내려온 추가 지시.\n오늘만큼은 참지 않기로 했습니다.\n\n책상과 집기를 부수며 사무실을 돌파하세요.\n마지막 사무실에서 경비견을 이기고 대표에게 도전하세요!\n\n전자제품은 폭발해 체력을 깎고, 정수기는 체력을 회복시킵니다.\n제한시간 안에 살아남아 마지막 승부를 끝내세요.";
+                body = "끝없는 야근, 쌓이는 업무, 그리고 또 내려온 추가 지시.\n오늘만큼은 참지 않기로 했습니다.\n\n책상과 집기를 부수며 사무실을 돌파하세요.\n마지막 사무실에서 경비견을 이기고 대표에게 도전하세요!\n\n전자제품은 폭발해 체력을 깎고, 정수기는 체력을 회복시킵니다.\n로비부터 임원층까지 돌파하고 마지막 승부를 끝내세요.";
             }
             else if (menuPage == MenuPage.Endless)
             {
@@ -178,7 +172,7 @@ namespace OfficeRampage
             else
             {
                 heading = "오늘은 여기까지?";
-                body = "게임을 종료하시겠습니까?\n사운드와 난이도 설정은 저장됩니다.";
+                body = "게임을 종료하시겠습니까?\n사운드와 유닛 설정은 저장됩니다.";
             }
             GUI.Label(new Rect(80, 215, 1100, 55), heading, menuHeading);
             GUI.Label(new Rect(80, 290, 1100, 290), body, menuText);

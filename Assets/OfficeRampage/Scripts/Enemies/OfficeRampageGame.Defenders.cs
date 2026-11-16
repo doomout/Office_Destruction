@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace OfficeRampage
@@ -34,12 +34,13 @@ namespace OfficeRampage
             spawnedEnemies[room.number]=count;
             var spawnPositions=OfficeFixedFloor.Load(room.number).EnemyPoints();
             int cursor=0;
-            int fixedCount=room.number==1?OfficeCompanySettings.GuardCount:room.number==5?OfficeCompanySettings.DogCount:0;
+            int fixedCount=room.number==1?OfficeCompanySettings.GuardCount:room.number==4?OfficeCompanySettings.DogCount:0;
             for(int i=0;i<fixedCount;i++)
             {
                 var p=spawnPositions[cursor++];
                 CreateDefender(root,room,navigation,new Vector3(p.x,.08f,room.start+p.z),
-                    OfficeDefenseRules.Name(room.number,i),OfficeDefenseRules.Health(room.number,i,random),room.number==5,false);
+                    "경비견 "+(i+1),random.Next(100,201),true,false);
+                defenders[defenders.Count-1].patrolEnd=room.start+17;
             }
             for(int rank=0;rank<OfficeCompanySettings.Ranks.Length;rank++)
             {
@@ -52,10 +53,10 @@ namespace OfficeRampage
                     ApplyCompanyIdentity(unit,rank,i);
                 }
             }
-            if (room.number != 5) return;
+            if (room.number != 4) return;
             bossChair = new GameObject("CEO chair");
             bossChair.transform.SetParent(root, false);
-            bossChair.transform.position = new Vector3(0, 0, room.end - 5);
+            bossChair.transform.position = new Vector3(-3, 0, room.end - 5);
             Shape(bossChair.transform, "Seat", new Vector3(0, .55f, 0), new Vector3(1.3f, .2f, 1.1f), Navy, false);
             Shape(bossChair.transform, "Backrest", new Vector3(0, 1.2f, .48f), new Vector3(1.3f, 1.4f, .2f), Navy, false);
             Shape(bossChair.transform, "Chair base", new Vector3(0, .25f, 0), new Vector3(.2f, .5f, .2f), Color.gray, false);
@@ -63,6 +64,7 @@ namespace OfficeRampage
                 runCompany.UnitName(OfficeCompanySettings.RepresentativeRank,0), OfficeDefenseRules.BossHealth, false, true);
             ApplyCompanyIdentity(bossUnit,OfficeCompanySettings.RepresentativeRank,0);
             bossUnit.transform.rotation = Quaternion.Euler(0, 180, 0);
+            bossUnit.patrolStart=room.start+37; BuildWaitingSecretary(root,room);
         }
 
         private OfficeDefender CreateDefender(Transform root, Room room, OfficeNavigation navigation,
@@ -177,12 +179,12 @@ namespace OfficeRampage
             score += unit.boss ? 5000 : unit.dog ? 300 : 200;
             if (unit.boss) { BeginBossEnding(unit); return; }
             RefreshExit(rooms.Find(r => r.number == unit.room));
-            if (unit.room == 5) CheckFinalRoster();
+            if (unit.room == 4) CheckFinalRoster();
         }
 
         private void SealFinalRoom()
         {
-            if (current.number != 5 || finalRoomSealed || player.position.z <= current.start + 2) return;
+            if (current.number != 4 || finalRoomSealed || player.position.z <= current.start + 2) return;
             finalRoomSealed = true;
             var seal = Shape(world, "Final room entry seal", new Vector3(0, 2.5f, current.start), new Vector3(current.width, 5f, .35f), Orange);
             seal.GetComponent<Renderer>().enabled = false;

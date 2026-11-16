@@ -10,18 +10,18 @@ namespace OfficeRampage
             // Leave the hit/area-damage iteration before adding members to defenders.
             yield return null;
             while(!RunActive) yield return null;
-            if(current==null || current.number!=5 || ended || bossUnit==null) { securityWavePending=false; yield break; }
+            if(current==null || current.number!=4 || ended || bossUnit==null) { securityWavePending=false; yield break; }
             securityWaveStarted=true;
-            var layout=OfficeFixedFloor.Load(5).CreateLayout();
+            var layout=OfficeFixedFloor.Load(4).CreateLayout();
             var navigation=new OfficeNavigation(layout);
-            var points=OfficeFixedFloor.Load(5).EnemyPoints();
+            var points=OfficeFixedFloor.Load(4).EnemyPoints();
             for(int i=0;i<5;i++)
             {
                 int kind=i<2?0:i<4?3:4;
                 string label=kind==0?"몽둥이":kind==3?"권총":"장거리 샷건";
-                var at=points[i];
+                var at=new OfficeLayout.Point(-8+i*4,26+(i%2)*4);
                 var unit=CreateDefender(bossUnit.transform.parent,current,navigation,new Vector3(at.x,.08f,current.start+at.z),"경비 · "+label,kind==4?160:kind==3?120:140,false,false);
-                unit.guard=true;unit.securityWeapon=kind;
+                unit.guard=true;unit.securityWeapon=kind;unit.patrolStart=current.start+19;unit.patrolEnd=current.start+35;
                 unit.visual.GetComponent<OfficeCharacterVisual>()?.SetIdentity(false,i,0);
                 foreach(Transform child in unit.visual)
                     if(child.name=="A4 hand" || (kind!=0 && child.name=="Baton")) child.gameObject.SetActive(false);
@@ -35,8 +35,8 @@ namespace OfficeRampage
                 }
                 Impact(unit.AimPoint,Cyan,Vector3.up,8);
             }
-            spawnedEnemies[5]+=5;securityWavePending=false;
-            Notify("숨겨진 경비 5명 등장! 경비까지 처치해야 대표를 공격할 수 있습니다.",5);
+            spawnedEnemies[4]+=5;securityWavePending=false;
+            Notify("보디가드실 개방 · 5명을 모두 처치하면 대표실이 열립니다.",5);
         }
         private void FireSecurityGun(OfficeDefender unit,int kind,Vector3 direction)
         {

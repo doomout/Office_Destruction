@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -67,7 +67,7 @@ namespace OfficeRampage
             debris.Clear();
             world = new GameObject("Generated Office Rampage").transform;
             world.SetParent(transform);
-            remaining = OfficeMenuRules.Duration(difficulty); hp = 100; yaw = 0; pitch = 13; vertical = 0;
+            remaining = 0; hp = 100; yaw = 0; pitch = 13; vertical = 0;
             score = combo = weaponIndex = 0;
             cooldown = comboLeft = invulnerability = swing = shake = 0;
             ended = won = paused = bossFight = false;
@@ -108,7 +108,7 @@ namespace OfficeRampage
             view.backgroundColor = Navy;
             view.clearFlags = CameraClearFlags.SolidColor;
             current = BuildRoom(1, 0);
-            Notify("물건 60% 파괴와 적 60% 처치를 달성하면 출구가 열립니다.", 5);
+            Notify("1층 로비 · 직원을 모두 처치하면 엘리베이터가 열립니다.", 5);
             LockCursor(true);
             UpdateCamera();
         }
@@ -164,7 +164,7 @@ namespace OfficeRampage
 
         private Room BuildRoom(int number, float start)
         {
-            bool arena = number == 5;
+            bool arena = number == 4;
             var layout = OfficeFixedFloor.Load(number).CreateLayout();
             var room = new Room { number = number, start = start,
                 width = layout.width, end = start + layout.length, layoutName = layout.name };
@@ -248,6 +248,7 @@ namespace OfficeRampage
             for (int side = -1; side <= 1; side += 2)
                 Shape(root, "Floor edge", new Vector3(side * room.width / 2, .025f, middle), new Vector3(.12f, .05f, length), Cyan, false);
             BuildOfficeShell(room,root);
+            BuildFloorIdentity(room,root);
             SetupDefenders(room, layout, root);
             SpawnHealingPotions(room, layout);
             ApplyKoreanWorldFont(root);
@@ -374,11 +375,6 @@ namespace OfficeRampage
             if (ended || paused) return;
             float dt = Time.deltaTime;
             if (CombatLocked) { UpdateCamera(); return; }
-            if (OfficeProgressRules.TimerRuns(current.number))
-            {
-                remaining = Mathf.Max(0, remaining - dt);
-                if (remaining <= 0) { End(false); return; }
-            }
             cooldown -= dt; comboLeft -= dt; noticeLeft -= dt; invulnerability -= dt;
             if (comboLeft <= 0) combo = 0;
             if (mouse != null && Cursor.lockState == CursorLockMode.Locked)
@@ -424,7 +420,7 @@ namespace OfficeRampage
             if (mouse != null && (weaponIndex == 4 || (weaponIndex==7 && orbitalReady) ? mouse.leftButton.wasPressedThisFrame : mouse.leftButton.isPressed) && Cursor.lockState == CursorLockMode.Locked && cooldown <= 0) Attack();
             if (ended || CombatLocked) return;
             SealFinalRoom();
-            if (current.number < 5 && current.unlocked && current.door.IsOpen && player.position.z > current.end + .7f && Mathf.Abs(player.position.x) < 1.45f)
+            if (current.number < 4 && current.unlocked && current.door.IsOpen && player.position.z > current.end + .7f && Mathf.Abs(player.position.x) < 1.45f)
                 StartCoroutine(RideElevator());
             if (player.position.y < -8)
             {
@@ -506,7 +502,7 @@ namespace OfficeRampage
             {
                 combo = comboLeft > 0 ? combo + 1 : 1; comboLeft=4;
                 ChargeWhirlwind(); ChargeElements(); score+=Mathf.Min(combo,20)*15;
-                if(combo%3==0) { remaining+=5; Notify("콤보 "+combo+" · 제한시간 +5초",2); audioBus.Play("combo",.45f); }
+                if(combo%3==0) { Notify("콤보 "+combo+" · 스킬 충전!",2); audioBus.Play("combo",.45f); }
             }
             RefreshExit(room);
             float previousHealth = hp;
@@ -591,18 +587,14 @@ namespace OfficeRampage
             if (endingPlaying || (ended && won)) { DrawEndingScreen(); GUI.matrix = previous; return; }
             Box(new Rect(22, 20, 350, 182), new Color(.02f, .04f, .07f, .92f));
             GUI.Label(new Rect(38, 28, 300, 40), "사무실 파괴", titleStyle);
-            GUI.Label(new Rect(38, 74, 300, 28), bossFight ? "대표 사무실" : "사무실 " + current.number + " / 5", labelStyle);
-            string objective = current.number == 5 ? (bossFight ? "대표 체력 " + (bossUnit != null ? Mathf.CeilToInt(bossUnit.Health) : 0) : (securityWaveStarted ? "남은 경비: " : "남은 경비견: ") + LivingDefenders(5)) : "파괴 " + current.destroyed + " / " + current.required + (current.unlocked ? " · 출구 열림" : " · 출구 잠김");
+            GUI.Label(new Rect(38, 74, 300, 28), bossFight ? "대표 사무실" : current.number + "층 / 4층", labelStyle);
+            string objective = current.number == 4 ? (bossFight ? "대표 체력 " + Mathf.CeilToInt(bossUnit.Health) : (securityWaveStarted ? "남은 보디가드: " : "남은 경비견: ") + LivingDefenders(4)) : "남은 직원 " + LivingDefenders(current.number) + (current.unlocked ? " · 출구 열림" : " · 전원 처치 필요");
             GUI.Label(new Rect(38, 108, 300, 24), objective, smallStyle);
             GUI.Label(new Rect(38, 144, 340, 24), current.layoutName + " / " + current.width + " x " + (current.end - current.start) + " 미터", smallStyle);
-            if (current.number < 5) GUI.Label(new Rect(38, 177, 320, 24), "처치 " + (EnemyTotal(current.number) - LivingDefenders(current.number)) + " / " + OfficeProgressRules.Required(EnemyTotal(current.number)) + " 필요", smallStyle);
-            Box(new Rect(545, 20, 190, 86), OfficeProgressRules.TimerRuns(current.number) && remaining < 20 ? new Color(.65f, .1f, .07f, .95f) : Navy);
-            GUI.Label(new Rect(555, 22, 170, 28), OfficeProgressRules.TimerRuns(current.number) ? "남은 시간" : "대표전", centeredStyle);
-            int seconds = Mathf.CeilToInt(remaining);
-            GUI.Label(new Rect(555, 54, 190, 42), OfficeProgressRules.TimerRuns(current.number) ? (seconds / 60).ToString("00") + ":" + (seconds % 60).ToString("00") : "시간 무제한", titleStyle);
+            if (current.number < 4) GUI.Label(new Rect(38, 177, 320, 24), "처치 " + (EnemyTotal(current.number) - LivingDefenders(current.number)) + " / " + OfficeProgressRules.Required(EnemyTotal(current.number)) + " 필요", smallStyle);
             Box(new Rect(1018, 20, 240, 86), Navy);
             GUI.Label(new Rect(1034, 29, 215, 30), "점수  " + score.ToString("N0"), labelStyle);
-            GUI.Label(new Rect(1034, 65, 215, 26), "콤보 " + combo + " / 3회마다 +5초", smallStyle);
+            GUI.Label(new Rect(1034, 65, 215, 26), "콤보 " + combo + " / 3회 스킬 충전", smallStyle);
             Box(new Rect(1034, 94, 208 * Mathf.Clamp01(comboLeft / 4), 4), Orange);
             if (noticeLeft > 0 && !ended) GUI.Label(new Rect(260, 205, 760, 40), notice, centeredStyle);
             if (bossFight && !ended)
@@ -623,7 +615,7 @@ namespace OfficeRampage
             {
                 Box(new Rect(0, 0, 1280, 720), new Color(.01f, .025f, .045f, .88f));
                 GUI.Label(new Rect(430, 245, 550, 55), paused ? "잠깐 쉬어가세요" : won ? "대표를 쓰러뜨렸습니다!" : "오늘은 여기까지…", titleStyle);
-                GUI.Label(new Rect(340, 325, 600, 40), paused ? "Esc를 누르면 계속합니다." : "점수 " + score.ToString("N0") + "  |  " + (won ? "대표 처치" : hp <= 0 ? "체력 소진" : "시간 초과"), centeredStyle);
+                GUI.Label(new Rect(340, 325, 600, 40), paused ? "Esc를 누르면 계속합니다." : "점수 " + score.ToString("N0") + "  |  " + (won ? "대표 처치" : "체력 소진"), centeredStyle);
                 GUI.Label(new Rect(340, 380, 600, 40), paused ? "계속하기 또는 시작 메뉴로 이동할 수 있습니다." : "재게임 버튼으로 첫 사무실부터 시작합니다.", centeredStyle);
                 if (MenuButton(new Rect(510, 450, 260, 48), paused ? "계속하기" : "재게임"))
                 {

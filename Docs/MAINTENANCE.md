@@ -1,4 +1,4 @@
-﻿# 유지보수 안내
+# 유지보수 안내
 
 기준: 2026-11-14. 기능을 찾을 때는 아래 표에서 폴더를 고른 다음 함수 이름을 검색하세요. 파일 수를 억지로 줄이지 않고 관련 기능끼리 묶었습니다.
 
@@ -13,10 +13,10 @@
 | 더미·화상 | `Combat/OfficeRampageGame.Decoy.cs`, `OfficeBurn.cs` |
 | 적 공격·이동·동결·유인 | `Enemies/OfficeDefender*.cs`, `OfficeRampageGame.Defenders.cs` |
 | 회사 직급·고정 인원·이름 저장 | `UI/OfficeCompanySettings.cs`, `OfficeRampageGame.Company.cs` |
-| 메뉴·난이도·이름 입력창 | `UI/OfficeRampageGame.Menu.cs`, `OfficeMenuRules.cs`, `OfficeNameEditor.cs` |
+| 메뉴·음량·이름 입력창 | `UI/OfficeRampageGame.Menu.cs`, `OfficeMenuRules.cs`, `OfficeNameEditor.cs` |
 | 가구 위치·통로·길찾기 | `World/OfficeLayout.cs`, `OfficeNavigation.cs` |
 | 물건 파괴·환경·회복 | `World/OfficeProp.cs`, `OfficeRules.cs`, `OfficeHealingPotion.cs` |
-| 60% 조건·제한시간·엘리베이터 | `World/OfficeRampageGame.Progress.cs`, `OfficeProgressRules.cs`, `OfficeRampageGame.Elevator.cs` |
+| 전원 처치 조건·엘리베이터 | `World/OfficeRampageGame.Progress.cs`, `OfficeProgressRules.cs`, `OfficeRampageGame.Elevator.cs` |
 | 도입 선택·출근 결말 | `Story/OfficeRampageGame.Intro.cs` |
 | 대표 사망·마지막 대사·엔딩 버튼 | `Story/OfficeRampageGame.Ending.cs` |
 | 비서·BFG·사막 전환 | `Combat/OfficeRampageGame.Combat.cs` |
@@ -69,7 +69,7 @@ Unity에서 함께 확인할 항목:
 - 한글 이름 입력/저장, 설정 취소/적용
 - 이동·점프·바닥/가구 충돌·달리기
 - 무기·F 스킬·더미·화상·동결과 콤보 제외
-- 60% 조건·문·엘리베이터 이동·이전 층 제거
+- 전원 처치 조건·문·엘리베이터 이동·이전 층 제거
 - 대표전·BFG·사막·엔딩·재시작
 - 출근 선택의 43명/12초 집중 공격과 사망 화면
 - 음악·효과음·볼륨·일시정지
@@ -182,3 +182,14 @@ Unity에서 함께 확인할 항목:
 - ShatterRobotAndEject는 로봇을 world로 분리해 잔해로 남기고 조종사는 통째로 분리해 착지시킵니다. 이후 unit.visual은 온전한 CEO pilot을 가리킵니다. 기존 모델을 자르거나 교체하지 않습니다.
 - 일반 무기로 로봇을 쓰러뜨려도 같은 분리/탈출 엔딩이 적용됩니다. 위성 공격은 그 앞에 2배 핵폭발을 추가합니다.
 - Ending의 2페이즈 분기는 대표를 다시 옆으로 회전시키지 않고 엎어진 자세를 유지합니다. 기존 엔딩 버튼/대사·새 게임 초기화 유지.
+
+
+## 2026-11-16 4층 구성과 시간 제한 폐지
+
+- `OfficeProgressRules.ExitReady`는 적 전원 처치만 검사합니다. 가구 수를 진행 조건에 다시 연결하지 마세요. `TimerRuns`는 항상 false, 게임 루프의 제한시간 감소/패배와 콤보 시간 보너스는 제거했습니다.
+- `OfficeCompanySettings.Rooms` = 1,2,2,2,2,2,3,3,3,3,4. 기존 이름/성별 저장 형식과 고정 총원 43명 유지.
+- 마지막 층 번호는 4입니다. 정상 플레이에서 floor5는 사용하지 않습니다.
+- `OfficeRampageGame.FloorIdentity.cs`의 두 내부 미닫이 문은 경비견/보디가드 전멸 시 각각 열립니다. `CheckFinalRoster`와 `RevealSecurity`가 진행을 연결합니다.
+- 구역별 이동 제한은 `OfficeDefender.patrolStart/patrolEnd`로 적용합니다. roomStart는 길찾기 좌표 원점이므로 구역 제한 용도로 바꾸지 마세요. 로봇 전환 때 구역 제한을 해제합니다.
+- BFG 지급 임계값은 `OfficeCombatRules.Gift`의 50%. 기다리는 비서를 재사용하며 전달 동안 떨림을 끄고 비서실 문으로 왕복합니다.
+- 검사: Codex 격리 프로젝트의 FourFloorValidation은 네 층 길찾기, 100% 처치 문, 이동/충돌, 엘리베이터 정리, 구역별 호위와 비서, BFG 이후 엔딩까지 실행합니다. 기존 5층/60%/시간제 가정의 검사 스크립트는 이번 규칙의 기준이 아닙니다.

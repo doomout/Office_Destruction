@@ -1,4 +1,4 @@
-﻿# 그래픽·음악 교체 가이드
+# 그래픽·음악 교체 가이드
 
 현재 프로젝트 기준: 2026-11-14. 먼저 프로젝트를 백업하고 **Play를 종료한 상태**에서 수정하세요. 한 번에 한 종류만 바꾸면 문제 원인을 찾기 쉽습니다.
 
@@ -124,7 +124,7 @@ Assets/OfficeRampage/Art/
 ## 변경 후 확인
 
 - Console에 컴파일 오류, Missing Script, 오디오 누락이 없는지 확인합니다.
-- 1층에서 이동·달리기·점프·바닥/가구 충돌, 남녀 외형, 파괴를 확인합니다.
+- 1층에서 이동·달리기·점프·바닥 충돌, 2층에서 가구 충돌, 남녀 외형, 파괴를 확인합니다.
 - 해당 무기와 F 스킬, 화상/동결/더미를 확인합니다.
 - 층 이동 후 이전 효과가 남지 않는지, BFG 사막 전환과 출근/대표 결말이 정상인지 확인합니다.
 - 음악은 각 층·대표전·음소거·일시정지·루프 경계를 들어봅니다.
@@ -156,16 +156,17 @@ Assets/OfficeRampage/Art/
 
 ## 고정 배치 직접 편집
 
-`Assets/OfficeRampage/Resources/OfficeLayouts/floor1.json`~`floor5.json`을 백업한 뒤 수정합니다. 실행 시 난수로 배치하지 않고 이 좌표를 그대로 읽습니다.
+`Assets/OfficeRampage/Resources/OfficeLayouts/floor1.json`~`floor4.json`을 백업한 뒤 수정합니다. 실행 시 난수로 배치하지 않고 이 좌표를 그대로 읽습니다.
 
 | 필드 | 의미 |
 | --- | --- |
 | width / length / name | 사무실 가로/세로/표시 이름 |
 | furniture | 가구: x, z 위치, yaw 회전, kind 종류 |
 | oil | 기름 위치 |
-| enemies | 적 시작 위치. 1~5층 순서로 18/11/7/6/5개 유지. 대표는 별도 의자 위치에 생성 |
+| enemies | 적 시작 위치. 1~4층 순서로 10/26/6/5개 유지. 대표는 별도 의자 위치에 생성 |
 | potions | 포션 위치. 층당 2개 유지 |
-| routes | 가구를 배치하지 않는 통로 영역 x/z/width/depth |
+| walls | 충돌·AI 길찾기에 함께 반영되는 파티션 x/z/width/depth |
+| routes | 배치 설계 참고용 통로 영역 x/z/width/depth (고정 배치 좌표를 자동 조정하지 않음) |
 
 가구 kind는 0 책상, 1 컴퓨터 책상, 2 정수기, 3 복사기, 4 캐비닛, 5 화분입니다. x=0은 가운데, z=0은 입구 쪽이며 출구는 z=length입니다. 가구는 `OfficeLayout.Point.Footprint` 크기를 고려해 서로와 통로를 침범하지 않게 옮깁니다. 인물과 포션은 가구 안에 배치하지 마세요. 적 시작 위치 배열의 순서는 해당 층의 직급 순서와 연결됩니다.
 
@@ -203,3 +204,12 @@ Assets/OfficeRampage/Art/
 - `Effects/OfficeEarthVisual.cs`: 실지도 재질과 파란 대기 테두리, 생성 재질 정리. 지구 이미지 교체 시 가로:세로 2:1의 정사각형이 아닌 위경도 지도를 사용하세요.
 - `Story/OfficeRampageGame.Finale.cs`: 위성 공격의 Nuclear blast를 크기2로 생성. 기존 BFG 핵폭발은 크기1 유지. 폭발을 6.4초 보여준 뒤 로봇 분리/탈출로 이어집니다.
 - `Audio/OfficeAudio.cs`의 BuildOrbitalLaser: 외부 음원이 아닌 프로젝트 자체 합성 전자음. Sfx/orbitalLaser 키로 재생하고 기존 음소거/효과음 볼륨/일시정지를 따릅니다.
+
+
+## 2026-11-16 층별 배경 편집
+
+- 정상 플레이는 floor1~4만 읽습니다. 기존 floor5.json은 호환용 보관 파일입니다.
+- 로비는 furniture를 비워 두며, 2층은 책상 묶음 사이 통로, 3층은 walls와 적 위치의 연결을 유지하세요.
+- `World/OfficeRampageGame.FloorIdentity.cs`: 로비 마감, 책상 의자, 층/방 안내, 4층 두 문과 비서 생성.
+- 4층은 z=18/36의 문, z=42 이후 오른쪽 비서실입니다. 비서실 문은 x=6, z=46~50이며 비서 전달 동선도 이 문을 사용합니다. 구역을 옮길 때 JSON 벽과 코드의 문·비서 동선을 함께 수정하세요.
+- `Story/OfficeSecretaryIdle.cs`는 떨림만 담당하며 적/처치 수에 포함되지 않습니다.

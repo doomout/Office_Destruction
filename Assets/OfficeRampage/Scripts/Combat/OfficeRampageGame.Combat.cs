@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -63,7 +63,7 @@ namespace OfficeRampage
             if (weaponIndex == 7)
             {
                 if(orbitalReady && !orbitalUsed) { ActivateOrbital(); return; }
-                if (!bfgReady || bfgUsed || current.number != 5 || bossUnit == null || bossUnit.PhaseTwo) return;
+                if (!bfgReady || bfgUsed || current.number != 4 || bossUnit == null || bossUnit.PhaseTwo) return;
                 bfgUsed = true; bfgReady = false; StartCoroutine(NuclearTransition()); return;
             }
             if(!SpendAmmo(weaponIndex)) return;
@@ -212,22 +212,22 @@ namespace OfficeRampage
         {
             whirlwindLeft = whirlwindReady = 0;
             combatLocked = true; cinematicText = "비서: 이걸 쓰세요! 비에프지 18, 딱 한 발이에요!";
-            var secretary = new GameObject("Hidden secretary").transform; secretary.SetParent(world);
-            Vector3 destination = player.position + avatar.forward * 2;
-            Vector3 start = new Vector3(current.width / 2 - 1, .08f, Mathf.Clamp(player.position.z + 4, current.start + 2, current.end - 2));
-            secretary.position = start; BuildPerson(secretary, false); secretary.GetComponent<OfficeCharacterVisual>()?.SetIdentity(true,0,0);
-            Shape(secretary, "Skirt", new Vector3(0, .65f, 0), new Vector3(.7f, .5f, .45f), new Color(.38f, .12f, .4f), false);
-            Shape(secretary, "Long hair", new Vector3(0, 1.6f, -.2f), new Vector3(.48f, .7f, .12f), Navy, false);
+            var secretary=waitingSecretary;
+            secretary.GetComponent<OfficeSecretaryIdle>().enabled=false;
+            Vector3 start=secretary.position;
+            Vector3 doorway=new Vector3(5,.08f,current.start+48);
+            Vector3 destination=player.position+avatar.forward*2;
+            destination.x=Mathf.Clamp(destination.x,-10,4.5f);destination.z=Mathf.Clamp(destination.z,current.start+38,current.end-2);destination.y=.08f;
             var gift = Shape(secretary, "BFG 18 case", new Vector3(0, 1, .5f), new Vector3(.8f, .35f, .6f), Color.green, false);
             float t = 0;
             while (t < 1.5f)
-            { if (RunActive) { t += Time.deltaTime; secretary.position = Vector3.Lerp(start, destination, t / 1.5f); secretary.LookAt(new Vector3(player.position.x, secretary.position.y, player.position.z)); } yield return null; }
+            { if (RunActive) { t += Time.deltaTime; float k=t/1.5f; secretary.position = k<.4f?Vector3.Lerp(start,doorway,k/.4f):Vector3.Lerp(doorway,destination,(k-.4f)/.6f); secretary.LookAt(new Vector3(player.position.x, secretary.position.y, player.position.z)); } yield return null; }
             gift.SetActive(false); bfgReady = true; SetWeapon(7); audioBus.Play("combo", .7f);
             cinematicText = "비에프지 18 획득! 왼쪽 클릭으로 발사 · 1회 사용";
             t = 0;
             while (t < 1.3f)
-            { if (RunActive) { t += Time.deltaTime; secretary.position = Vector3.Lerp(destination, start, t / 1.3f); secretary.LookAt(start + Vector3.forward); } yield return null; }
-            Destroy(secretary.gameObject); combatLocked = false; cinematicText = "";
+            { if (RunActive) { t += Time.deltaTime; float k=t/1.3f; secretary.position=k<.6f?Vector3.Lerp(destination,doorway,k/.6f):Vector3.Lerp(doorway,start,(k-.6f)/.4f); secretary.LookAt(start + Vector3.forward); } yield return null; }
+            Destroy(secretary.gameObject); waitingSecretary=null; combatLocked = false; cinematicText = "";
             cooldown = .5f; Notify("비에프지 18 준비 완료 · 왼쪽 클릭 발사 · 한 발만 사용 가능", 6);
         }
         private IEnumerator NuclearTransition()

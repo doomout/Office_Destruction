@@ -9,7 +9,7 @@ namespace OfficeRampage
         public const int RepresentativeRank=10;
         public static readonly string[] Ranks={"사원","주임","대리","과장","차장","부장","이사","상무","전무","부사장","대표"};
         public static readonly int[] Counts={10,8,6,5,4,3,2,2,1,1,1};
-        public static readonly int[] Rooms={1,1,2,2,3,3,4,4,4,4,5};
+        public static readonly int[] Rooms={1,2,2,2,2,2,3,3,3,3,4};
         public static readonly int[] Health={20,40,60,80,100,120,140,160,180,220,500};
         // Guards stay implemented, but disabled in the current roster.
         public const int GuardCount=0, DogCount=5;
@@ -70,7 +70,7 @@ namespace OfficeRampage
         { var person=ranks[rank].people[index]; return Ranks[rank]+" · "+person.name+(person.female?" (여)":" (남)"); }
         public int RoomCount(int room)
         {
-            if(room==5) return DogCount;
+            if(room==4) return DogCount;
             int total=room==1?GuardCount:0;
             for(int rank=0;rank<Ranks.Length;rank++) if(Rooms[rank]==room) total+=Counts[rank];
             return total;

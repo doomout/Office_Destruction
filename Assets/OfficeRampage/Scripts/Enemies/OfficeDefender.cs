@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 namespace OfficeRampage
 {
@@ -8,6 +8,7 @@ namespace OfficeRampage
         [System.NonSerialized] public OfficeNavigation navigation;
         public int room;
         public float roomStart, roomEnd, roomWidth;
+        public float patrolStart=-1,patrolEnd=-1;
         public bool dog, boss, guard, female;
         public int companyRank = -1;
         public int securityWeapon; // 0 baton, 3 pistol, 4 long-range shotgun
@@ -64,7 +65,7 @@ namespace OfficeRampage
         public void EnterPhaseTwo(OfficeNavigation newNavigation, float width, float end)
         {
             PhaseTwo = true; Health = OfficeCombatRules.PhaseTwoHealth(Health, MaxHealth); MaxHealth = Health;
-            navigation = newNavigation; roomWidth = width; roomEnd = end;
+            navigation = newNavigation; roomWidth = width; roomEnd = end; patrolStart=patrolEnd=-1;
             path = null; pendingAttack = -1; recovery = 0; attackClock = 2;
             if (warning != null) warning.gameObject.SetActive(false);
             displayName += " / 거대 로봇 · 2페이즈";
@@ -135,7 +136,7 @@ namespace OfficeRampage
         {
             Vector3 next = transform.position + velocity * dt;
             next.x = Mathf.Clamp(next.x, -roomWidth / 2 + (PhaseTwo?1.3f:.5f), roomWidth / 2 - (PhaseTwo?1.3f:.5f));
-            next.z = Mathf.Clamp(next.z, roomStart + .7f, roomEnd - .7f);
+            next.z = Mathf.Clamp(next.z, patrolStart>=0?patrolStart:roomStart + .7f, patrolEnd>=0?patrolEnd:roomEnd - .7f);
             body.Move(next - transform.position + Vector3.down * 3 * dt);
             if (velocity.sqrMagnitude > .01f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(velocity), dt * 12);
         }

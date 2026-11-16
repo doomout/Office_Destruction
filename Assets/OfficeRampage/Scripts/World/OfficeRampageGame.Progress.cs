@@ -1,17 +1,17 @@
-﻿using UnityEngine;
+using UnityEngine;
 namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
     {
         private void RefreshExit(Room room)
         {
-            if (room == null || room.number >= 5 || room.unlocked) return;
+            if (room == null || room.number >= 4 || room.unlocked) return;
             int totalEnemies = EnemyTotal(room.number);
             int defeated = totalEnemies - LivingDefenders(room.number);
             if (!OfficeProgressRules.ExitReady(room.destroyed, room.total, defeated, totalEnemies)) return;
             room.unlocked = true;
             room.door.Open();
-            Notify("물건 파괴와 적 처치 60% 달성! 문이 열립니다.", 3);
+            Notify("직원 전원 처치! 엘리베이터가 열립니다.", 3);
             audioBus.Play("door", .45f);
         }
         private void SpawnHealingPotions(Room room, OfficeLayout layout)

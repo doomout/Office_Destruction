@@ -9,6 +9,7 @@ namespace OfficeRampage
         public Renderer[] indicators;
         public Material openMaterial;
         public TextMesh sign;
+        public string openingText="엘리베이터 열리는 중";
         private bool opening;
         private float progress;
         public bool IsOpen { get { return progress >= 1; } }
@@ -17,7 +18,7 @@ namespace OfficeRampage
             if (opening) return;
             opening = true;
             foreach (var indicator in indicators) indicator.sharedMaterial = openMaterial;
-            sign.text = "엘리베이터 열리는 중";
+            sign.text = openingText;
         }
         private void Update()
         {

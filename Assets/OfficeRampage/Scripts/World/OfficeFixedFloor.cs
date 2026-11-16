@@ -10,7 +10,7 @@ namespace OfficeRampage
         public float width,length;
         public string name;
         public Spot[] furniture,oil,enemies,potions;
-        public Aisle[] routes;
+        public Aisle[] routes, walls;
         private static readonly Dictionary<int,OfficeFixedFloor> cache=new Dictionary<int,OfficeFixedFloor>();
         public static OfficeFixedFloor Load(int floor)
         {
@@ -25,6 +25,7 @@ namespace OfficeRampage
             foreach(var p in furniture) layout.furniture.Add(new OfficeLayout.Point(p.x,p.z,p.kind){yaw=p.yaw});
             foreach(var p in oil) layout.oil.Add(new OfficeLayout.Point(p.x,p.z));
             foreach(var p in routes) layout.route.Add(new OfficeLayout.Area(p.x,p.z,p.width,p.depth));
+            if(walls!=null) foreach(var p in walls) layout.walls.Add(new OfficeLayout.Area(p.x,p.z,p.width,p.depth));
             return layout;
         }
         public List<OfficeLayout.Point> EnemyPoints() { return Points(enemies); }

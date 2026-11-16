@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
@@ -99,10 +99,10 @@ namespace OfficeRampage
         }
         private void CheckFinalRoster()
         {
-            if(current==null || current.number!=5 || bossFight || ended || LivingDefenders(5)>0) return;
+            if(current==null || current.number!=4 || bossFight || ended || LivingDefenders(4)>0) return;
             if(securityWavePending) return;
-            if(!securityWaveStarted) { securityWavePending=true; StartCoroutine(RevealSecurity()); return; }
-            bossFight=true;
+            if(!securityWaveStarted) { securityWavePending=true; dogRoomDoor.Open(); StartCoroutine(RevealSecurity()); return; }
+            bossFight=true; guardRoomDoor.Open();
             if(bossUnit==null)
             {
                 ClearDecoy(); endingLine="오늘은 대표가 없군요. 이제 퇴근합시다!"; End(true); return;
