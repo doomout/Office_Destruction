@@ -1,10 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
     {
-        private enum MenuPage { Main, Settings, Units, Story, Endless, Quit, Intro, Game }
+        private enum MenuPage { Main, Settings, Units, Story, Endless, EndlessRanks, Quit, Intro, Game }
         private MenuPage menuPage = MenuPage.Main;
         private int difficulty = 1;
         private Font menuFont;
@@ -94,8 +94,9 @@ namespace OfficeRampage
                 else if (menuPage == MenuPage.Units) DrawCompanySettings();
                 else if (menuPage == MenuPage.Intro) DrawIntro();
                 else if(menuPage==MenuPage.Endless)DrawEndlessInfo();
+                else if(menuPage==MenuPage.EndlessRanks)DrawEndlessRanks();
                 else DrawInformationPage();
-                GUI.Label(new Rect(80, 673, 1100, 30), menuPage==MenuPage.Endless?"끝없는 적 · 바닥 장비 줍기 · 생존 기록 도전":"스토리: 로비 → 사무실 → 임원층 → 대표층  /  시간 제한 없음", menuSmall);
+                GUI.Label(new Rect(80, 673, 1100, 30), (menuPage==MenuPage.Endless||menuPage==MenuPage.EndlessRanks)?"끝없는 적 · 바닥 장비 줍기 · 생존 기록 도전":"스토리: 로비 → 사무실 → 임원층 → 대표층  /  시간 제한 없음", menuSmall);
             }
             finally { GUI.matrix = previous; GUI.color = previousColor; }
         }

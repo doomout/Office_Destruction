@@ -9,7 +9,7 @@ namespace OfficeRampage
         public bool IsEndless=>endlessMode;
         private float endlessTime,endlessSpawnClock,endlessSupplyClock,endlessPropClock,endlessArmor;
         private int endlessKills,endlessSpawned,endlessWeapon,endlessSpecialAmmo;
-        private const int EndlessEnemyCap=40,EndlessPickupCap=18;
+        private const int EndlessEnemyCap=80,EndlessPickupCap=18;
         private OfficeNavigation endlessNavigation;
         private Transform endlessRoot;
         private readonly List<OfficeEndlessPickup> endlessPickups=new List<OfficeEndlessPickup>();
@@ -22,7 +22,7 @@ namespace OfficeRampage
         private void BeginEndless(){endlessMode=true;ResetRun();}
         private void ResetEndlessState()
         {
-            ResetEndlessExtras();endlessTime=endlessKills=endlessSpawned=endlessWeapon=0;endlessArmor=0;endlessSpawnClock=5;endlessSupplyClock=8;endlessPropClock=10;
+            ResetEndlessRanking();ResetEndlessExtras();endlessTime=endlessKills=endlessSpawned=endlessWeapon=0;endlessArmor=0;endlessSpawnClock=5;endlessSupplyClock=8;endlessPropClock=10;
             endlessSpecialAmmo=0;endlessEquipAllowed=true;endlessAttackDelegate=false;endlessPickups.Clear();endlessProps.Clear();endlessPropPositions.Clear();nearbySupply=null;endlessTarget=null;
         }
         private Room BuildEndlessArena()
@@ -56,7 +56,7 @@ namespace OfficeRampage
             endlessTarget=null;float targetDistance=16;
             foreach(var unit in defenders){Vector3 delta=unit.transform.position-player.position;delta.y=0;if(delta.magnitude<targetDistance&&Vector3.Dot(Quaternion.Euler(0,yaw,0)*Vector3.forward,delta.normalized)>.85f){endlessTarget=unit;targetDistance=delta.magnitude;}}
             endlessSpawnClock-=dt;
-            if(endlessSpawnClock<=0){if(defenders.Count<EndlessEnemyCap)SpawnEndlessEnemy();endlessSpawnClock=Mathf.Max(.4f,1.5f-endlessTime/240);}
+            if(endlessSpawnClock<=0){for(int i=0;i<2&&defenders.Count<EndlessEnemyCap;i++)SpawnEndlessEnemy();endlessSpawnClock=Mathf.Max(.4f,1.5f-endlessTime/240);}
             endlessSupplyClock-=dt;
             if(endlessSupplyClock<=0)
             {

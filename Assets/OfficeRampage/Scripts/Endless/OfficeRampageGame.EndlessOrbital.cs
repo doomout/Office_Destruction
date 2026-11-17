@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 namespace OfficeRampage
 {
@@ -68,7 +68,7 @@ namespace OfficeRampage
                 SpawnProp(endlessRoot,current,endlessPropPositions[i],i%6);
                 var spawned=endlessRoot.GetChild(endlessRoot.childCount-1);endlessProps[i]=spawned.GetComponent<OfficeProp>();ApplyKoreanWorldFont(spawned);
             }
-            SeedEndlessEquipment();for(int i=0;i<12;i++)SpawnEndlessEnemy();
+            SeedEndlessEquipment();for(int i=0;i<24;i++)SpawnEndlessEnemy();
             endlessSpawnClock=1;endlessSupplyClock=8;endlessPropClock=10;
         }
     }

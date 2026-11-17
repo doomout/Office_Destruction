@@ -369,6 +369,7 @@ namespace OfficeRampage
                 if (keys != null && keys.escapeKey.wasPressedThisFrame) menuPage = MenuPage.Main;
                 return;
             }
+            if(endlessMode&&ended&&nameEditor!=null&&nameEditor.Active)return;
             var mouse = Mouse.current;
             if (keys != null && keys.mKey.wasPressedThisFrame) { audioBus.Muted = !audioBus.Muted; SaveMenuSettings(); }
             if (keys != null && keys.escapeKey.wasPressedThisFrame && !ended)
@@ -557,9 +558,11 @@ namespace OfficeRampage
         }
         private void End(bool victory)
         {
+            if(ended)return;
             if(endlessMode)SaveEndlessRecord();
             ended = true; won = victory; LockCursor(false);
             audioBus.Finish(victory);
+            if(endlessMode)PrepareEndlessRank();
         }
         private void OnApplicationFocus(bool focus)
         {

@@ -6,6 +6,7 @@ namespace OfficeRampage
         private static string SurvivalClock(float seconds){int t=Mathf.FloorToInt(seconds);return (t/60).ToString("00")+":"+(t%60).ToString("00");}
         private void DrawEndlessHUD()
         {
+            if(ended){DrawEndlessResult();return;}
             Box(new Rect(22,20,400,160),Navy);
             GUI.Label(new Rect(38,28,360,40),"무한 파괴 · "+SurvivalClock(endlessTime),titleStyle);
             GUI.Label(new Rect(38,78,360,28),"처치 "+endlessKills+"  ·  점수 "+score.ToString("N0"),labelStyle);
@@ -43,8 +44,9 @@ namespace OfficeRampage
         {
             GUI.Label(new Rect(80,215,1100,55),"무한 파괴 · 생존 도전",menuHeading);
             GUI.Label(new Rect(80,290,1100,240),"끝없이 몰려오는 직장 스트레스를 날려 버리세요.\nWASD 이동 · 마우스 조준 · 왼쪽 클릭 공격 · Shift 달리기\n바닥 장비 근처에서 E: 즉시 장착 / 갑옷·체력 보급\n숫자키로 무기 교체 불가 · 탄약 소진 시 기본 광선검으로 전환됩니다.\n가구는 다시 등장합니다. 전자기기 폭발은 적에게 피해를 줍니다.\n갑옷은 적 공격 피해의 70%를 내구도만큼 흡수합니다.",menuText);
-            if(MenuButton(new Rect(80,590,400,65),"생존 시작",true))BeginEndless();
-            if(MenuButton(new Rect(510,590,300,65),"뒤로"))menuPage=MenuPage.Main;
+            if(MenuButton(new Rect(80,590,360,65),"생존 시작",true))BeginEndless();
+            if(MenuButton(new Rect(470,590,350,65),"Top 10 랭킹"))OpenEndlessRanks();
+            if(MenuButton(new Rect(850,590,300,65),"뒤로"))menuPage=MenuPage.Main;
         }
     }
 }
