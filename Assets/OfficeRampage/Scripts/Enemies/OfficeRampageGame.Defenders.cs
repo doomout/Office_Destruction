@@ -100,7 +100,7 @@ namespace OfficeRampage
             var label = new GameObject("Rank and health").AddComponent<TextMesh>();
             label.transform.SetParent(unit.transform, false);
             label.transform.localPosition = Vector3.up * (dog ? 1.25f : 2.4f);
-            label.anchor = TextAnchor.MiddleCenter; label.fontSize = 36; label.characterSize = .075f;
+            label.anchor = TextAnchor.MiddleCenter; label.fontSize = 36; label.characterSize = .045f;
             label.color = isBoss ? Orange : dog ? new Color(1, .8f, .35f) : Color.white;
             if (defenderFont == null) defenderFont = Font.CreateDynamicFontFromOSFont(new[] { "Malgun Gothic", "Apple SD Gothic Neo", "Arial" }, 36);
             label.font = defenderFont;

@@ -15,7 +15,7 @@ namespace OfficeRampage
         {
             if(StunLeft<=0) return false;
             StunLeft=Mathf.Max(0,StunLeft-dt);
-            if(label!=null) label.text=displayName+"  "+Mathf.CeilToInt(Health)+" / "+MaxHealth+"\n번개 기절 "+StunLeft.ToString("0.0")+"초";
+            // The focused enemy's stun timer is shown as a compact HUD icon.
             if(StunLeft<=0) { UpdateLabel(); attackClock=Mathf.Max(attackClock,.6f); }
             return true;
         }

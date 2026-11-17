@@ -549,7 +549,7 @@ namespace OfficeRampage
             if (hp <= 0) End(false);
         }
 
-        private void Notify(string message, float duration) { notice = message; noticeLeft = duration; }
+        private void Notify(string message, float duration) { notice = message; noticeLeft = duration; SetCompactNotice(message); }
         public void PlayPropSound(int material, bool broken, Vector3 position) { audioBus.Impact(material, broken, position); }
         private void LockCursor(bool locked)
         {
@@ -615,7 +615,7 @@ namespace OfficeRampage
             GUI.Label(new Rect(1034, 29, 215, 30), "점수  " + score.ToString("N0"), labelStyle);
             GUI.Label(new Rect(1034, 65, 215, 26), "콤보 " + combo + " / 3회 스킬 충전", smallStyle);
             Box(new Rect(1034, 94, 208 * Mathf.Clamp01(comboLeft / 4), 4), Orange);
-            if (noticeLeft > 0 && !ended) GUI.Label(new Rect(260, 205, 760, 40), notice, centeredStyle);
+            DrawCompactNotice();
             if (bossFight && !ended)
             {
                 Box(new Rect(390, 119, 500, 18), Navy);
@@ -624,11 +624,9 @@ namespace OfficeRampage
             GUI.Label(new Rect(627, 342, 30, 32), "+", titleStyle);
             Box(new Rect(22, 617, 320, 80), Navy);
             GUI.Label(new Rect(38, 627, 290, 28), "체력  " + Mathf.CeilToInt(hp), labelStyle);
-            if (slowedByOil && !ended) GUI.Label(new Rect(38, 578, 300, 32), "기름! 이동속도 50%", labelStyle);
             Box(new Rect(38, 667, 285, 10), new Color(.2f, .25f, .3f));
             Box(new Rect(38, 667, 285 * hp / 100, 10), invulnerability > 0 ? Orange : Cyan);
             DrawWeaponSlots(); DrawSprintHUD();
-            GUI.Label(new Rect(375, 674, 800, 24), "WASD 이동 · 클릭 공격 · 1~8 무기 · F 스킬 · Shift 달리기 · Esc 일시정지", smallStyle);
             DrawExpansionOverlay();
             if (ended || paused)
             {

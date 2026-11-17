@@ -83,11 +83,7 @@ namespace OfficeRampage
         }
         private void DrawElementSkills()
         {
-            string text=thunderLeft>0?"토르의 망치!":iceLeft>0?"얼음 총알 · "+iceLeft.ToString("0.0")+"초":
-                weaponIndex==1&&thunderReady>0?"[F] 토르의 망치 · "+thunderReady.ToString("0.0")+"초 안에 발동":
-                weaponIndex==2&&iceReady>0?"[F] 얼음 총알 · "+iceReady.ToString("0.0")+"초 안에 발동":"";
-            if(text.Length==0) return; EnsureMenuStyles();
-            Box(new Rect(340,435,600,42),Navy); GUI.Label(new Rect(355,440,580,36),text,menuText);
+            // Skill status is drawn together by DrawCompactSkills.
         }
     }
 }

@@ -128,12 +128,7 @@ namespace OfficeRampage
         }
         private void DrawDecoyHUD()
         {
-            if(weaponIndex!=4 && lureLeft<=0) return;
-            EnsureMenuStyles(); Box(new Rect(225,485,830,44),Navy);
-            string text=weaponIndex==4?"미인계 더미 "+(DecoysPerOffice-decoysUsed[current.number])+"/3 · 우클릭: 조준/취소 · 좌클릭: 투척":"미인계 더미";
-            if(lureLeft>0) text+=" · 유인 "+lureLeft.ToString("0.0")+"초";
-            else if(decoyAiming && !decoyValid) text+=" · 투척 불가";
-            GUI.Label(new Rect(240,491,810,35),text,menuText);
+            // Lure count/timer is part of DrawCompactSkills.
         }
     }
 }

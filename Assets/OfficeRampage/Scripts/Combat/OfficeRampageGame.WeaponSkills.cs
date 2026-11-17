@@ -108,13 +108,7 @@ namespace OfficeRampage
 
         private void DrawWeaponSkills()
         {
-            DrawElementSkills();
-            if (whirlwindLeft <= 0 && whirlwindReady <= 0) return;
-            EnsureMenuStyles();
-            Box(new Rect(340, 535, 600, 42), Navy);
-            string text = whirlwindLeft > 0 ? "휠윈드 회전 중! " + whirlwindLeft.ToString("0.0") + "초" :
-                "[F] 휠윈드 발동 · " + whirlwindReady.ToString("0.0") + "초 남음" + (weaponIndex == 0 ? "" : " · 1번 방망이 장착");
-            GUI.Label(new Rect(355, 540, 580, 36), text, menuText);
+            DrawCompactSkills();
         }
     }
 }

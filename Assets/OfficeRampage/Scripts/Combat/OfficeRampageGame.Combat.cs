@@ -300,8 +300,7 @@ namespace OfficeRampage
         private void DrawExpansionOverlay()
         {
             DrawWeaponSkills(); DrawDecoyHUD();
-            if (desert && !combatLocked)
-                GUI.Label(new Rect(440, 145, 520, 35), "2페이즈 / 대표 전용 거대 로봇", labelStyle);
+            if (desert && !combatLocked) HudTile(1194,250,HudSymbol.Robot,"2",1,Orange);
             if (flash > 0)
             {
                 Box(new Rect(0, 0, 1280, 720), new Color(1, 1, .85f, flash));
@@ -309,8 +308,7 @@ namespace OfficeRampage
             }
             if (combatLocked && !string.IsNullOrEmpty(cinematicText))
             {
-                EnsureMenuStyles(); Box(new Rect(150, mushroomCamera ? 445 : 250, 980, 75), Navy);
-                GUI.Label(new Rect(180, mushroomCamera ? 458 : 270, 920, 60), cinematicText, menuText);
+                HudTile(1194,250,HudSymbol.Clock,"…",1,Cyan);
             }
         }
     }

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
@@ -53,11 +53,7 @@ namespace OfficeRampage
         }
         private void DrawSprintHUD()
         {
-            EnsureMenuStyles(); Box(new Rect(22,530,305,47),Navy);
-            string state=sprinting?"달리기":sprintExhausted?"소진 · 시프트 해제":"달리기 준비";
-            GUI.Label(new Rect(32,532,285,28),state+"  "+sprintEnergy.ToString("0.0")+"초",menuSmall);
-            Box(new Rect(32,564,285,7),new Color(.2f,.25f,.3f));
-            Box(new Rect(32,564,285*sprintEnergy/10,7),sprintExhausted?Orange:Cyan);
+            DrawCompactSprint();
         }
     }
 }
