@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,6 +28,7 @@ namespace OfficeRampage
         }
         private void BuildExpandedWeapon()
         {
+            if(endlessMode&&endlessSaber){BuildEndlessSaber();return;}
             if(BuildEndlessSpecialModel())return;
             if(weaponIndex==7 && orbitalReady) { BuildRedButton(weapon); return; }
             Color steel = new Color(.5f, .62f, .68f);

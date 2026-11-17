@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 namespace OfficeRampage
 {
@@ -22,14 +22,17 @@ namespace OfficeRampage
                 var car=endlessCars[i];car.life-=dt;
                 if(car.root==null||car.life<=0||endlessTrafficLeft<=0){if(car.root!=null)Destroy(car.root.gameObject);endlessCars.RemoveAt(i);continue;}
                 Vector3 from=car.root.position;float travel=22*dt;car.root.position+=car.direction*travel;
-                foreach(var hit in Physics.SphereCastAll(from+Vector3.up*.9f,1.3f,car.direction,travel))
-                {
-                    var enemy=hit.collider.GetComponentInParent<OfficeDefender>();var prop=hit.collider.GetComponentInParent<OfficeProp>();
-                    if(enemy!=null&&enemy.Alive&&car.people.Add(enemy))SkillDamage(()=>enemy.Hit(90));
-                    if(prop!=null&&car.furniture.Add(prop))SkillDamage(()=>prop.Hit(120,car.direction));
-                }
+                Vector3 center=from+Vector3.up*1.7f,halfSize=new Vector3(1.95f,1.6f,3.5f);
+                foreach(var col in Physics.OverlapBox(center,halfSize,car.root.rotation))HitEndlessCar(car,col);
+                foreach(var hit in Physics.BoxCastAll(center,halfSize,car.direction,car.root.rotation,travel))HitEndlessCar(car,hit.collider);
                 if(Mathf.Abs(car.root.position.x)>34||car.root.position.z < -2||car.root.position.z>66)car.life=0;
             }
+        }
+        private void HitEndlessCar(EndlessCar car,Collider col)
+        {
+            var enemy=col.GetComponentInParent<OfficeDefender>();var prop=col.GetComponentInParent<OfficeProp>();
+            if(enemy!=null&&enemy.Alive&&car.people.Add(enemy))SkillDamage(()=>enemy.Hit(90));
+            if(prop!=null&&car.furniture.Add(prop))SkillDamage(()=>prop.Hit(120,car.direction));
         }
         private void SpawnEndlessCar()
         {
@@ -47,6 +50,7 @@ namespace OfficeRampage
                 Shape(car.root,"Wheel",new Vector3(side*.91f,.4f,end*1.05f),new Vector3(.6f,.18f,.6f),Navy,false,PrimitiveType.Cylinder).transform.localRotation=Quaternion.Euler(0,0,90);
                 if(end>0)Shape(car.root,"Headlight",new Vector3(side*.6f,.8f,1.72f),new Vector3(.35f,.2f,.05f),Color.yellow,false);
             }
+            car.root.localScale=Vector3.one*2;
             endlessCars.Add(car);audioBus.Play("swing",.25f,.6f,start);
         }
     }

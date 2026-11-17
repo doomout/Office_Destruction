@@ -17,8 +17,8 @@ namespace OfficeRampage
         private readonly List<OfficeProp> endlessProps=new List<OfficeProp>();
         private OfficeEndlessPickup nearbySupply;
         private OfficeDefender endlessTarget;
-        private static readonly string[] EndlessWeapons={"야구빠따","망치","권총","기관총","미인계 더미","화염 샷건","로켓런처","BFG 18","번개 스테이플러","레이저 프린터","용암 커피포트","초강력 청소기","퇴근 종","위성 호출기","지옥문","교통사고"};
-        private static readonly int[] EndlessBases={0,1,2,3,4,5,6,7,2,3,5,6,1,7,7,7};
+        private static readonly string[] EndlessWeapons={"야구빠따","망치","권총","기관총","미인계 더미","화염 샷건","로켓런처","BFG 18","번개 스테이플러","레이저 프린터","용암 커피포트","초강력 청소기","퇴근 종","위성 호출기","지옥문","교통사고","헐크버스터"};
+        private static readonly int[] EndlessBases={0,1,2,3,4,5,6,7,2,3,5,6,1,7,7,7,7};
         private void BeginEndless(){endlessMode=true;ResetRun();}
         private void ResetEndlessState()
         {
@@ -72,7 +72,7 @@ namespace OfficeRampage
                 endlessPropClock=10;
             }
             nearbySupply=null;float nearest=2.5f;
-            foreach(var supply in endlessPickups)if(supply!=null){float d=Vector3.Distance(player.position,supply.transform.position);if(d<nearest){nearest=d;nearbySupply=supply;}}
+            foreach(var supply in endlessPickups)if(supply!=null&&(!EndlessMechActive||supply.kind!=0)){float d=Vector3.Distance(player.position,supply.transform.position);if(d<nearest){nearest=d;nearbySupply=supply;}}
             if(Keyboard.current!=null&&Keyboard.current.eKey.wasPressedThisFrame&&nearbySupply!=null)CollectEndless(nearbySupply);
         }
         private Vector3 SafeEndlessDrop()
@@ -98,7 +98,7 @@ namespace OfficeRampage
             if(endlessKills%4==0)SpawnEndlessPickup(endlessKills%12==0?1:2,0,unit.transform.position);
         }
         private float AbsorbEndlessDamage(float damage)
-        {float absorbed=Mathf.Min(endlessArmor,damage*.7f);endlessArmor-=absorbed;return damage-absorbed;}
+        {if(EndlessMechActive)damage*=.5f;float absorbed=Mathf.Min(endlessArmor,damage*.7f);endlessArmor-=absorbed;return damage-absorbed;}
         private void SaveEndlessRecord()
         {
             if(endlessTime>PlayerPrefs.GetFloat("OfficeRampage.Endless.BestTime",0))PlayerPrefs.SetFloat("OfficeRampage.Endless.BestTime",endlessTime);

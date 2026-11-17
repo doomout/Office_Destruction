@@ -14,9 +14,9 @@ namespace OfficeRampage
             var visual=new GameObject("Equipment preview").transform;visual.SetParent(pickup.transform,false);visual.localPosition=Vector3.up*.8f;
             if(kind==0)
             {
-                var oldWeapon=weapon;int oldIndex=weaponIndex,oldId=endlessWeapon;
-                try{weapon=visual;weaponIndex=EndlessBases[id];endlessWeapon=id;BuildExpandedWeapon();}
-                finally{weapon=oldWeapon;weaponIndex=oldIndex;endlessWeapon=oldId;}
+                var oldWeapon=weapon;int oldIndex=weaponIndex,oldId=endlessWeapon;bool oldSaber=endlessSaber;
+                try{endlessSaber=false;weapon=visual;weaponIndex=EndlessBases[id];endlessWeapon=id;BuildExpandedWeapon();}
+                finally{weapon=oldWeapon;weaponIndex=oldIndex;endlessWeapon=oldId;endlessSaber=oldSaber;}
             }
             else if(kind==1){Shape(visual,"Armor vest",Vector3.zero,new Vector3(.7f,.8f,.25f),Cyan,false);Shape(visual,"Armor plate",new Vector3(0,0,-.16f),new Vector3(.5f,.5f,.08f),Color.white,false);}
             else if(kind==3){Shape(visual,"Double damage crystal",Vector3.zero,Vector3.one*.7f,Color.magenta,false).transform.localRotation=Quaternion.Euler(25,45,25);}
@@ -27,12 +27,13 @@ namespace OfficeRampage
         private void CollectEndless(OfficeEndlessPickup pickup)
         {
             if(!endlessMode||!RunActive||CombatLocked||pickup==null||!endlessPickups.Contains(pickup)||Vector3.Distance(player.position,pickup.transform.position)>2.5f)return;
+            if(EndlessMechActive&&pickup.kind==0){Notify("탑승 종료 후 새 무기를 주울 수 있습니다",2);return;}
             if(pickup.kind==3){endlessDoubleDamageLeft=20;}
             else if(pickup.kind==1){if(endlessArmor>=100)return;endlessArmor=Mathf.Min(100,endlessArmor+60);}
             else if(pickup.kind==2){if(hp>=100)return;hp=Mathf.Min(100,hp+30);}
             else
             {
-                endlessUnarmed=false;ResetElements();whirlwindLeft=whirlwindReady=0;ClearDecoy();endlessWeapon=pickup.weaponId;
+                endlessSaber=false;ResetElements();whirlwindLeft=whirlwindReady=0;ClearDecoy();endlessWeapon=pickup.weaponId;
                 int index=EndlessBases[endlessWeapon];if(index==2)ammunition[2]=200;if(index==5)ammunition[5]=100;if(index==6)ammunition[6]=20;
                 if(endlessWeapon==4)decoysUsed[1]=0;
                 endlessSpecialAmmo=endlessWeapon==7||endlessWeapon>=13?1:endlessWeapon>=8?40:0;

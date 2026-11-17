@@ -25,7 +25,7 @@ namespace OfficeRampage
 
         private void TickWeaponSkills(float dt)
         {
-            if (!RunActive || CombatLocked) return;
+            if (!RunActive || CombatLocked || EndlessMechActive) return;
             whirlwindReady = Mathf.Max(0, whirlwindReady - dt);
             TickElements(dt);
             if (Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame) ActivateWeaponSkill();

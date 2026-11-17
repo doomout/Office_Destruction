@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -417,6 +417,7 @@ namespace OfficeRampage
             AnimatePlayerRun(dt, player.position - beforeMove);
             TickWeaponSkills(dt);
             avatar.rotation = Quaternion.Euler(0, yaw + (whirlwindLeft > 0 ? whirlwindAngle : 0), 0);
+            if(EndlessMechActive)endlessMechRoot.rotation=Quaternion.Euler(0,yaw,0);
             swing = Mathf.MoveTowards(swing, 0, dt * 5);
             weapon.localPosition = thunderLeft>0 ? new Vector3(.48f,1.65f,.1f) : new Vector3(.48f,.95f,.25f);
             weapon.localRotation = thunderLeft>0 ? Quaternion.Euler(-90,0,0) : Quaternion.Euler(weaponIndex == 4 ? swing * 100 - 20 : -swing * 60, -swing * 25, 0);
@@ -455,8 +456,8 @@ namespace OfficeRampage
             }
             view.fieldOfView = 72;
             Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
-            Vector3 pivot = player.position + Vector3.up * 1.55f;
-            Vector3 offset = rotation * (endlessMode?new Vector3(.65f,.6f,-8):new Vector3(.65f,.25f,-3.5f));
+            Vector3 pivot = player.position + Vector3.up * (EndlessMechActive?4.4f:1.55f);
+            Vector3 offset = rotation * (EndlessMechActive?new Vector3(1.4f,1,-14):endlessMode?new Vector3(.65f,.6f,-8):new Vector3(.65f,.25f,-3.5f));
             float distance = offset.magnitude;
             // Player visuals have no colliders; ignore the player's controller in camera casts.
             foreach (var hit in Physics.SphereCastAll(pivot, .16f, offset.normalized, distance, ~0, QueryTriggerInteraction.Ignore))
@@ -572,6 +573,7 @@ namespace OfficeRampage
             LockCursor(false);
             foreach (var material in materials.Values) if (material != null) Destroy(material);
             if (defenderFont != null) Destroy(defenderFont);
+            if(endlessEnergyMaterial!=null)Destroy(endlessEnergyMaterial);
         }
 
         private void Box(Rect rect, Color color)

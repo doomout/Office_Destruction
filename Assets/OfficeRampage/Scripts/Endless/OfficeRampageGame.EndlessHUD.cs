@@ -19,12 +19,12 @@ namespace OfficeRampage
             Box(new Rect(900,570,358,127),Navy);
             var weaponLabel=new GUIStyle(labelStyle){fontSize=20,wordWrap=false,padding=new RectOffset(0,0,0,0),alignment=TextAnchor.MiddleLeft};
             var ammoLabel=new GUIStyle(weaponLabel){fontSize=18};
-            GUI.Label(new Rect(918,580,322,30),endlessUnarmed?"맨주먹":EndlessWeapons[endlessWeapon],weaponLabel);
-            string amount=endlessUnarmed?"무제한":endlessWeapon>=7?endlessSpecialAmmo.ToString():endlessWeapon==4?(3-decoysUsed[1]).ToString():ammunition[weaponIndex]<0?"무제한":ammunition[weaponIndex].ToString();
+            GUI.Label(new Rect(918,580,322,30),endlessSaber?"광선검":EndlessWeapons[endlessWeapon],weaponLabel);
+            string amount=EndlessMechActive?endlessMechLeft.ToString("0.0")+"초 탑승":endlessSaber?"무제한":endlessWeapon>=7?endlessSpecialAmmo.ToString():endlessWeapon==4?(3-decoysUsed[1]).ToString():ammunition[weaponIndex]<0?"무제한":ammunition[weaponIndex].ToString();
             GUI.Label(new Rect(918,620,322,30),"남은 사용량: "+amount,ammoLabel);
             if(endlessDoubleDamageLeft>0)GUI.Label(new Rect(460,78,600,30),"피해 2배 · "+endlessDoubleDamageLeft.ToString("0.0")+"초",labelStyle);
             if(endlessDemonLeft>0||endlessTrafficLeft>0)GUI.Label(new Rect(460,112,700,30),"악마 지원 "+endlessDemonLeft.ToString("0.0")+"초 · 교통사고 "+endlessTrafficLeft.ToString("0.0")+"초",smallStyle);
-            GUI.Label(new Rect(918,660,330,25),"E: 바닥 장비 줍기 · 숫자키 교체 불가",smallStyle);
+            GUI.Label(new Rect(918,660,330,25),EndlessMechActive?"왼쪽 클릭: 거대 검 · 오른쪽 클릭: 광선":"E: 바닥 장비 줍기 · 숫자키 교체 불가",smallStyle);
             GUI.Label(new Rect(623,338,35,35),"+",labelStyle);DrawWeaponSkills();DrawSprintHUD();
             if(weaponIndex==4)DrawDecoyHUD();
             if(nearbySupply!=null&&!ended){Box(new Rect(340,460,600,56),Navy);GUI.Label(new Rect(355,470,570,40),"[E] "+nearbySupply.DisplayName,menuText);}
@@ -42,7 +42,7 @@ namespace OfficeRampage
         private void DrawEndlessInfo()
         {
             GUI.Label(new Rect(80,215,1100,55),"무한 파괴 · 생존 도전",menuHeading);
-            GUI.Label(new Rect(80,290,1100,240),"끝없이 몰려오는 직장 스트레스를 날려 버리세요.\nWASD 이동 · 마우스 조준 · 왼쪽 클릭 공격 · Shift 달리기\n바닥 장비 근처에서 E: 즉시 장착 / 갑옷·체력 보급\n숫자키로 무기 교체 불가 · 탄약 소진 시 맨주먹으로 전환됩니다.\n가구는 다시 등장합니다. 전자기기 폭발은 적에게 피해를 줍니다.\n갑옷은 적 공격 피해의 70%를 내구도만큼 흡수합니다.",menuText);
+            GUI.Label(new Rect(80,290,1100,240),"끝없이 몰려오는 직장 스트레스를 날려 버리세요.\nWASD 이동 · 마우스 조준 · 왼쪽 클릭 공격 · Shift 달리기\n바닥 장비 근처에서 E: 즉시 장착 / 갑옷·체력 보급\n숫자키로 무기 교체 불가 · 탄약 소진 시 기본 광선검으로 전환됩니다.\n가구는 다시 등장합니다. 전자기기 폭발은 적에게 피해를 줍니다.\n갑옷은 적 공격 피해의 70%를 내구도만큼 흡수합니다.",menuText);
             if(MenuButton(new Rect(80,590,400,65),"생존 시작",true))BeginEndless();
             if(MenuButton(new Rect(510,590,300,65),"뒤로"))menuPage=MenuPage.Main;
         }
