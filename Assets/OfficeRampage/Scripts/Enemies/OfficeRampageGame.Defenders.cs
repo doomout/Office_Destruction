@@ -176,6 +176,7 @@ namespace OfficeRampage
         }
         public void DefenderDefeated(OfficeDefender unit)
         {
+            if(endlessMode){EndlessDefeated(unit);return;}
             score += unit.boss ? 5000 : unit.dog ? 300 : 200;
             if (unit.boss) { BeginBossEnding(unit); return; }
             RefreshExit(rooms.Find(r => r.number == unit.room));

@@ -52,7 +52,7 @@ namespace OfficeRampage
 
         private void ResetRun()
         {
-            StopAllCoroutines(); submissionPlaying=submissionEnded=false; ResetExpansion(); ResetSprint();
+            ResetEndlessState(); StopAllCoroutines(); submissionPlaying=submissionEnded=false; ResetExpansion(); ResetSprint();
             if (nameEditor != null) nameEditor.Close();
             runCompany = (companySettings ?? OfficeCompanySettings.CreateDefault()).Copy();
             System.Array.Clear(spawnedEnemies, 0, spawnedEnemies.Length);
@@ -107,8 +107,8 @@ namespace OfficeRampage
             view.fieldOfView = 72;
             view.backgroundColor = Navy;
             view.clearFlags = CameraClearFlags.SolidColor;
-            current = BuildRoom(1, 0); ApplyFloorEntry();
-            Notify("1층 로비 · 직원을 모두 처치하면 엘리베이터가 열립니다.", 5);
+            current = endlessMode?BuildEndlessArena():BuildRoom(1, 0); ApplyFloorEntry();
+            Notify(endlessMode?"무한 파괴 시작! 바닥 장비 앞에서 E로 줍기":"1층 로비 · 직원을 모두 처치하면 엘리베이터가 열립니다.", 5);
             LockCursor(true);
             UpdateCamera();
         }
@@ -332,7 +332,7 @@ namespace OfficeRampage
                 var label = new GameObject("Break effect label").AddComponent<TextMesh>();
                 label.transform.SetParent(t, false);
                 label.transform.localPosition = new Vector3(0, kind == OfficeRules.WaterCooler ? 2.1f : 1.95f, 0);
-                label.text = kind == OfficeRules.WaterCooler ? "체력 +5" : "체력 -5";
+                label.text = kind == OfficeRules.WaterCooler ? "체력 +5" : endlessMode?"폭발 · 적 피해":"체력 -5";
                 label.anchor = TextAnchor.MiddleCenter; label.fontSize = 36; label.characterSize = .09f;
                 label.color = kind == OfficeRules.WaterCooler ? new Color(.2f, 1, .5f) : Orange;
             }
@@ -348,6 +348,7 @@ namespace OfficeRampage
 
         private void SetWeapon(int index)
         {
+            if(endlessMode&&!endlessEquipAllowed)return;
             if (whirlwindLeft > 0 || thunderLeft>0) return;
             if (index < 0 || index > 7 || (index == 7 && (!bfgReady || bfgUsed) && !orbitalReady)) return;
             weapon.localScale=Vector3.one;
@@ -377,7 +378,7 @@ namespace OfficeRampage
             }
             if (ended || paused) return;
             float dt = Time.deltaTime;
-            TickOrbitalReward(dt);
+            if(endlessMode)TickEndless(dt);else TickOrbitalReward(dt);
             if (CombatLocked) { UpdateCamera(); return; }
             cooldown -= dt; comboLeft -= dt; noticeLeft -= dt; invulnerability -= dt;
             if (comboLeft <= 0) combo = 0;
@@ -423,6 +424,11 @@ namespace OfficeRampage
             TickDecoy(dt);
             if (mouse != null && (weaponIndex == 4 || (weaponIndex==7 && orbitalReady) ? mouse.leftButton.wasPressedThisFrame : mouse.leftButton.isPressed) && Cursor.lockState == CursorLockMode.Locked && cooldown <= 0) Attack();
             if (ended || CombatLocked) return;
+            if(endlessMode)
+            {
+                if(player.position.y < -8){controller.enabled=false;player.position=new Vector3(0,.2f,32);controller.enabled=true;vertical=0;Hurt(10);}
+                return;
+            }
             SealFinalRoom();
             if (current.number < 4 && current.unlocked && current.door.IsOpen && InsideElevator())
                 StartCoroutine(RideElevator());
@@ -450,11 +456,11 @@ namespace OfficeRampage
             view.fieldOfView = 72;
             Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
             Vector3 pivot = player.position + Vector3.up * 1.55f;
-            Vector3 offset = rotation * new Vector3(.65f, .25f, -3.5f);
+            Vector3 offset = rotation * (endlessMode?new Vector3(.65f,.6f,-8):new Vector3(.65f,.25f,-3.5f));
             float distance = offset.magnitude;
             // Player visuals have no colliders; ignore the player's controller in camera casts.
             foreach (var hit in Physics.SphereCastAll(pivot, .16f, offset.normalized, distance, ~0, QueryTriggerInteraction.Ignore))
-                if (hit.collider.gameObject != player.gameObject) distance = Mathf.Min(distance, Mathf.Max(.25f, hit.distance - .12f));
+                if (hit.collider.gameObject != player.gameObject && !(endlessMode && hit.collider.GetComponentInParent<OfficeDefender>()!=null)) distance = Mathf.Min(distance, Mathf.Max(.25f, hit.distance - .12f));
             view.transform.position = pivot + offset.normalized * distance;
             view.transform.rotation = rotation;
             shake = Mathf.MoveTowards(shake, 0, Time.deltaTime * 2);
@@ -499,6 +505,7 @@ namespace OfficeRampage
         public void PropDestroyed(int roomNumber, int kind, Vector3 position)
         {
             if (ended) return;
+            if(endlessMode){EndlessPropDestroyed(kind,position);return;}
             var room = rooms.Find(r => r.number == roomNumber);
             room.destroyed++;
             score += 100;
@@ -534,6 +541,7 @@ namespace OfficeRampage
         private void Hurt(float damage)
         {
             if (invulnerability > 0 || ended || CombatLocked) return;
+            if(endlessMode)damage=AbsorbEndlessDamage(damage);
             hp = Mathf.Max(0, hp - damage); invulnerability = 1; shake = 2;
             audioBus.Play("thud", .7f, .8f);
             if (hp <= 0) End(false);
@@ -548,6 +556,7 @@ namespace OfficeRampage
         }
         private void End(bool victory)
         {
+            if(endlessMode)SaveEndlessRecord();
             ended = true; won = victory; LockCursor(false);
             audioBus.Finish(victory);
         }
@@ -587,6 +596,7 @@ namespace OfficeRampage
             Matrix4x4 previous = GUI.matrix;
             float scale = Mathf.Min(Screen.width / 1280f, Screen.height / 720f);
             GUI.matrix = Matrix4x4.TRS(new Vector3((Screen.width - 1280 * scale) / 2, (Screen.height - 720 * scale) / 2), Quaternion.identity, Vector3.one * scale);
+            if(endlessMode){DrawEndlessHUD();GUI.matrix=previous;return;}
             if (submissionPlaying || submissionEnded) { DrawSubmission(); GUI.matrix=previous; return; }
             if (endingPlaying || (ended && won)) { DrawEndingScreen(); GUI.matrix = previous; return; }
             Box(new Rect(22, 20, 350, 182), new Color(.02f, .04f, .07f, .92f));

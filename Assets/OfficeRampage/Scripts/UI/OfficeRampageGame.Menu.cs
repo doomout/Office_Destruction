@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace OfficeRampage
 {
@@ -93,8 +93,9 @@ namespace OfficeRampage
                 else if (menuPage == MenuPage.Settings) DrawSettingsPage();
                 else if (menuPage == MenuPage.Units) DrawCompanySettings();
                 else if (menuPage == MenuPage.Intro) DrawIntro();
+                else if(menuPage==MenuPage.Endless)DrawEndlessInfo();
                 else DrawInformationPage();
-                GUI.Label(new Rect(80, 673, 1100, 30), "로비 → 사무실 → 임원층 → 대표층  /  시간 제한 없음", menuSmall);
+                GUI.Label(new Rect(80, 673, 1100, 30), menuPage==MenuPage.Endless?"끝없는 적 · 바닥 장비 줍기 · 생존 기록 도전":"스토리: 로비 → 사무실 → 임원층 → 대표층  /  시간 제한 없음", menuSmall);
             }
             finally { GUI.matrix = previous; GUI.color = previousColor; }
         }
@@ -104,16 +105,16 @@ namespace OfficeRampage
             var credits=new GUIStyle(menuSmall){fontSize=13};
             GUI.Label(new Rect(80,615,1120,22),"지구 지도: Solar System Scope / solarsystemscope.com (CC BY 4.0)",credits);
             GUI.Label(new Rect(80,638,1120,26),"아이콘: Delapouite · Lorc · Skoll · DarkZaitzev / game-icons.net (CC BY 3.0) · 효과음: kurt · rubberduck · StarNinjas (CC0)",credits);
-            if (MenuButton(new Rect(80, 215, 400, 65), "사무실 파괴", true)) { SaveMenuSettings(); BeginIntro(); return; }
-            if (MenuButton(new Rect(80, 295, 400, 65), "무한파괴")) menuPage = MenuPage.Endless;
+            if (MenuButton(new Rect(80, 215, 400, 65), "스토리 모드", true)) { SaveMenuSettings(); BeginIntro(); return; }
+            if (MenuButton(new Rect(80, 295, 400, 65), "무한 파괴")) menuPage = MenuPage.Endless;
             if (MenuButton(new Rect(80, 375, 400, 65), "설정")) menuPage = MenuPage.Settings;
             if (MenuButton(new Rect(80, 455, 400, 65), "스토리")) menuPage = MenuPage.Story;
             if (MenuButton(new Rect(80, 535, 400, 65), "끝내기")) menuPage = MenuPage.Quit;
             Box(new Rect(535, 215, 665, 410), new Color(.055f, .1f, .15f));
             Box(new Rect(535, 215, 665, 5), Cyan);
             GUI.Label(new Rect(567, 240, 600, 45), "처음 오셨나요?", menuHeading);
-            GUI.Label(new Rect(567, 302, 590, 105), "직원을 모두 처치하면 다음 층으로 이동합니다.\n가구 파괴는 선택! 전자기기는 폭발을 조심하세요.", menuText);
-            GUI.Label(new Rect(567, 422, 590, 150), "WASD 이동  ·  마우스 조준  ·  왼쪽 클릭 공격\n스페이스 점프  ·  시프트 달리기  ·  1~7 무기 · 8 비에프지 18\nEsc 일시정지  ·  M 음소거", menuText);
+            GUI.Label(new Rect(567, 302, 590, 105), "스토리: 직원을 모두 처치하고 대표에게 도전!\n무한 파괴: 장비를 주우며 끝없이 버티세요.", menuText);
+            GUI.Label(new Rect(567, 422, 590, 150), "WASD 이동 · 마우스 조준 · 왼쪽 클릭 공격\n스토리: 숫자키 무기 선택 / 무한 파괴: E로 줍기\nEsc 일시정지 · M 음소거", menuText);
             GUI.Label(new Rect(567, 572, 590, 36), "음량과 직원 이름·성별은 ‘설정’에서 바꿀 수 있어요.", menuSmall);
         }
 
@@ -163,11 +164,6 @@ namespace OfficeRampage
             {
                 heading = "스토리";
                 body = "끝없는 야근, 쌓이는 업무, 그리고 또 내려온 추가 지시.\n오늘만큼은 참지 않기로 했습니다.\n\n책상과 집기를 부수며 사무실을 돌파하세요.\n마지막 사무실에서 경비견을 이기고 대표에게 도전하세요!\n\n전자제품은 폭발해 체력을 깎고, 정수기는 체력을 회복시킵니다.\n로비부터 임원층까지 돌파하고 마지막 승부를 끝내세요.";
-            }
-            else if (menuPage == MenuPage.Endless)
-            {
-                heading = "무한파괴";
-                body = "준비 중입니다.\n\n현재 플레이할 수 있는 모드는 ‘사무실 파괴’입니다.\n시작 메뉴로 돌아가 사무실 파괴를 선택해 주세요.";
             }
             else
             {

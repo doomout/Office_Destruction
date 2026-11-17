@@ -28,6 +28,7 @@ namespace OfficeRampage
         }
         private void BuildExpandedWeapon()
         {
+            if(BuildEndlessSpecialModel())return;
             if(weaponIndex==7 && orbitalReady) { BuildRedButton(weapon); return; }
             Color steel = new Color(.5f, .62f, .68f);
             if (weaponIndex == 0 || weaponIndex == 1)
@@ -58,6 +59,7 @@ namespace OfficeRampage
         }
         private void AttackExpanded()
         {
+            if(endlessMode&&!endlessAttackDelegate){AttackEndless();return;}
             if (!RunActive || combatLocked || whirlwindLeft > 0 || thunderLeft>0) return;
             if (weaponIndex == 4) { ThrowDecoy(); return; }
             if (weaponIndex == 7)

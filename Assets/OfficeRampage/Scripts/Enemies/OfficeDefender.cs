@@ -113,7 +113,7 @@ namespace OfficeRampage
                 transform.rotation = Quaternion.LookRotation(lockedDirection);
                 game.ShowDefenderWarning(this, kind, range, lockedDirection); return;
             }
-            Patrol(dt, toward);
+            if(game.IsEndless)PatrolEndless(dt,toward);else Patrol(dt, toward);
         }
         private void Patrol(float dt, Vector3 toward)
         {

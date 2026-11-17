@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 namespace OfficeRampage
 {
@@ -9,6 +9,7 @@ namespace OfficeRampage
         private static readonly string[] OvertimeLines={"감히 어제 퇴근을 해?", "라떼는 말이야~ 사무실에서 살았어!", "주말이 왜 네 시간이야?", "이 정도는 열정으로 해야지!", "우린 가족 같은 회사잖아!", "야근 수당? 좋은 경험이잖아!", "그래도 내일은 정상 출근이야!", "월급은 동결인 거 알지?"};
         private void BeginIntro()
         {
+            endlessMode=false;
             menuPage=MenuPage.Intro; paused=true; Time.timeScale=0; LockCursor(false);
             audioBus.SetPaused(true);
         }
