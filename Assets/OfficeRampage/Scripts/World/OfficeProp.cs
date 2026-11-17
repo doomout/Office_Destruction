@@ -16,7 +16,7 @@ namespace OfficeRampage
         public void Hit(float damage, Vector3 direction)
         {
             if (broken || !game.RunActive) return;
-            health -= damage;
+            health -= game.PlayerDamage(damage);
             if (health <= 0 || Time.time >= nextImpactSound)
             {
                 game.PlayPropSound(soundMaterial, health <= 0, transform.position + Vector3.up);

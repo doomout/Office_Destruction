@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 namespace OfficeRampage
@@ -17,12 +17,12 @@ namespace OfficeRampage
         private readonly List<OfficeProp> endlessProps=new List<OfficeProp>();
         private OfficeEndlessPickup nearbySupply;
         private OfficeDefender endlessTarget;
-        private static readonly string[] EndlessWeapons={"야구빠따","망치","권총","기관총","미인계 더미","화염 샷건","로켓런처","BFG 18","번개 스테이플러","레이저 프린터","용암 커피포트","초강력 청소기","퇴근 종","위성 호출기"};
-        private static readonly int[] EndlessBases={0,1,2,3,4,5,6,7,2,3,5,6,1,7};
+        private static readonly string[] EndlessWeapons={"야구빠따","망치","권총","기관총","미인계 더미","화염 샷건","로켓런처","BFG 18","번개 스테이플러","레이저 프린터","용암 커피포트","초강력 청소기","퇴근 종","위성 호출기","지옥문","교통사고"};
+        private static readonly int[] EndlessBases={0,1,2,3,4,5,6,7,2,3,5,6,1,7,7,7};
         private void BeginEndless(){endlessMode=true;ResetRun();}
         private void ResetEndlessState()
         {
-            endlessTime=endlessKills=endlessSpawned=endlessWeapon=0;endlessArmor=0;endlessSpawnClock=5;endlessSupplyClock=8;endlessPropClock=10;
+            ResetEndlessExtras();endlessTime=endlessKills=endlessSpawned=endlessWeapon=0;endlessArmor=0;endlessSpawnClock=5;endlessSupplyClock=8;endlessPropClock=10;
             endlessSpecialAmmo=0;endlessEquipAllowed=true;endlessAttackDelegate=false;endlessPickups.Clear();endlessProps.Clear();endlessPropPositions.Clear();nearbySupply=null;endlessTarget=null;
         }
         private Room BuildEndlessArena()
@@ -45,15 +45,14 @@ namespace OfficeRampage
             }
             endlessNavigation=new OfficeNavigation(layout);
             controller.enabled=false;player.position=new Vector3(0,.08f,32);controller.enabled=true;pitch=30;
-            for(int i=0;i<6;i++)SpawnEndlessPickup(0,new[]{2,1,3,5,6,4}[i],new Vector3((i%3-1)*4,.08f,37+(i/3)*5));
-            SpawnEndlessPickup(1,0,new Vector3(-4,.08f,29));SpawnEndlessPickup(2,0,new Vector3(4,.08f,29));
+            SeedEndlessEquipment();
             FloorSign(endlessRoot,"무한 파괴 · 오래 버티고 마음껏 부수세요",new Vector3(0,4,63),.24f);
             ApplyKoreanWorldFont(endlessRoot);endlessEquipAllowed=false;return room;
         }
         private void TickEndless(float dt)
         {
             if(!endlessMode || !RunActive || CombatLocked)return;
-            endlessTime+=dt;defenders.RemoveAll(u=>u==null||!u.Alive);endlessPickups.RemoveAll(p=>p==null);
+            TickEndlessExtras(dt);endlessTime+=dt;defenders.RemoveAll(u=>u==null||!u.Alive);endlessPickups.RemoveAll(p=>p==null);
             endlessTarget=null;float targetDistance=16;
             foreach(var unit in defenders){Vector3 delta=unit.transform.position-player.position;delta.y=0;if(delta.magnitude<targetDistance&&Vector3.Dot(Quaternion.Euler(0,yaw,0)*Vector3.forward,delta.normalized)>.85f){endlessTarget=unit;targetDistance=delta.magnitude;}}
             endlessSpawnClock-=dt;
@@ -61,9 +60,9 @@ namespace OfficeRampage
             endlessSupplyClock-=dt;
             if(endlessSupplyClock<=0)
             {
-                int cycle=(int)(endlessTime/8);int id=cycle%14;
+                int cycle=(int)(endlessTime/8);int id=cycle%EndlessWeapons.Length;
                 if((id==7||id==13)&&endlessTime<90)id=8+cycle%5;
-                SpawnEndlessPickup(cycle%5==0?2:cycle%4==0?1:0,id,SafeEndlessDrop());endlessSupplyClock=8;
+                SpawnEndlessPickup(Random.value<.14f?3:cycle%5==0?2:cycle%4==0?1:0,id,SafeEndlessDrop());endlessSupplyClock=8;
             }
             endlessPropClock-=dt;
             if(endlessPropClock<=0)

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 namespace OfficeRampage
 {
@@ -6,17 +6,20 @@ namespace OfficeRampage
     {
         private void AttackEndless()
         {
-            if(!RunActive||CombatLocked||cooldown>0)return;
+            if(!RunActive||CombatLocked||cooldown>0||whirlwindLeft>0||thunderLeft>0)return;
+            EnsureEndlessFists();if(endlessUnarmed){PunchEndless();return;}
             if(endlessWeapon<7)
             {endlessAttackDelegate=true;try{AttackExpanded();}finally{endlessAttackDelegate=false;}return;}
             if(endlessSpecialAmmo<=0){Notify("탄약 소진 · 바닥의 새 장비를 주우세요",1);cooldown=.4f;return;}
             endlessSpecialAmmo--;swing=1;cooldown=endlessWeapon==7||endlessWeapon==13?2:endlessWeapon==12?1.1f:endlessWeapon==10?.28f:.45f;
             var origin=player.position+Vector3.up*1.2f;Vector3 forward=avatar.forward;
-            if(endlessWeapon==7||endlessWeapon==13)
+            if(endlessWeapon==13){StartCoroutine(EndlessOrbitalStrike());return;}
+            if(endlessWeapon==14){SummonEndlessDemon();return;}
+            if(endlessWeapon==15){endlessTrafficLeft=10;endlessCarClock=0;audioBus.Play("thunder",.4f);return;}
+            if(endlessWeapon==7)
             {
                 var center=player.position+forward*10;center.x=Mathf.Clamp(center.x,-28,28);center.z=Mathf.Clamp(center.z,4,60);
-                if(endlessWeapon==7){CreateBlast(center,true);audioBus.Play("explosion",.85f);}
-                else {for(int i=0;i<5;i++)Trail(center+new Vector3((i-2)*7,45,-12),center,Color.red);CreateBlast(center,false);audioBus.Play("orbitalLaser",.8f);}
+                CreateBlast(center,true);audioBus.Play("explosion",.85f);
                 SkillDamage(()=>EndlessArea(center,24,500,false));shake=4;return;
             }
             if(endlessWeapon==8)

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 namespace OfficeRampage
 {
@@ -47,6 +47,7 @@ namespace OfficeRampage
         public void Hit(float amount)
         {
             if (!Alive || Dormant || !game.RunActive || game.CombatLocked || !game.IsCurrentRoom(room)) return;
+            amount=game.PlayerDamage(amount);
             Health = boss ? OfficeCombatRules.DamageResult(Health, amount, MaxHealth, PhaseTwo) : Mathf.Max(0, Health - amount);
             // Preserve a lethal hit for the reward, but never pin ongoing combat at 20%.
             if(boss && PhaseTwo && !game.OrbitalRequested) Health=Mathf.Max(1,Health);

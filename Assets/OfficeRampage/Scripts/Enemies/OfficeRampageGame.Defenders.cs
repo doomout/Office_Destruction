@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace OfficeRampage
@@ -176,6 +176,7 @@ namespace OfficeRampage
         }
         public void DefenderDefeated(OfficeDefender unit)
         {
+            RegisterDefeatCombo(unit);
             if(endlessMode){EndlessDefeated(unit);return;}
             score += unit.boss ? 5000 : unit.dog ? 300 : 200;
             if (unit.boss) { BeginBossEnding(unit); return; }
