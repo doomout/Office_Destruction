@@ -89,50 +89,6 @@ Unity에서 함께 확인할 항목:
 - **컴파일 중복 정의:** 이동 전 파일과 이동 후 파일이 둘 다 남았는지 확인합니다. 원본을 복사만 한 뒤 둘 다 Assets에 두지 마세요.
 - **롤백:** 아래 이동 표를 역순으로 적용하고 `.meta`도 함께 되돌립니다. Editor 메뉴 경로와 빌드 씬 목록, Tools의 경로도 같은 버전으로 복구합니다. 덮어쓰기 전 현재 수정본을 보관하세요.
 
-## 전체 파일 이동 지도
-
-아래 표는 이번 정리 시점의 정확한 파일 이동 목록입니다. 각 `.meta`도 동일하게 이동했습니다.
-
-| 이전 | 현재 |
-| --- | --- |
-| OfficeRampageGame.cs | Scripts/Core/OfficeRampageGame.cs |
-| OfficeRampageGame.Sprint.cs | Scripts/Player/OfficeRampageGame.Sprint.cs |
-| OfficeRampageGame.Combat.cs | Scripts/Combat/OfficeRampageGame.Combat.cs |
-| OfficeRampageGame.WeaponSkills.cs | Scripts/Combat/OfficeRampageGame.WeaponSkills.cs |
-| OfficeRampageGame.Elements.cs | Scripts/Combat/OfficeRampageGame.Elements.cs |
-| OfficeRampageGame.Decoy.cs | Scripts/Combat/OfficeRampageGame.Decoy.cs |
-| OfficeCombatRules.cs | Scripts/Combat/OfficeCombatRules.cs |
-| OfficeProjectile.cs | Scripts/Combat/OfficeProjectile.cs |
-| OfficeBurn.cs | Scripts/Combat/OfficeBurn.cs |
-| OfficeDefender.cs | Scripts/Enemies/OfficeDefender.cs |
-| OfficeDefender.Distraction.cs | Scripts/Enemies/OfficeDefender.Distraction.cs |
-| OfficeDefender.Frozen.cs | Scripts/Enemies/OfficeDefender.Frozen.cs |
-| OfficeRampageGame.Defenders.cs | Scripts/Enemies/OfficeRampageGame.Defenders.cs |
-| OfficeDefenseRules.cs | Scripts/Enemies/OfficeDefenseRules.cs |
-| OfficeLayout.cs | Scripts/World/OfficeLayout.cs |
-| OfficeNavigation.cs | Scripts/World/OfficeNavigation.cs |
-| OfficeProp.cs | Scripts/World/OfficeProp.cs |
-| OfficeRules.cs | Scripts/World/OfficeRules.cs |
-| OfficeHealingPotion.cs | Scripts/World/OfficeHealingPotion.cs |
-| OfficeSlidingDoor.cs | Scripts/World/OfficeSlidingDoor.cs |
-| OfficeRampageGame.Elevator.cs | Scripts/World/OfficeRampageGame.Elevator.cs |
-| OfficeRampageGame.Progress.cs | Scripts/World/OfficeRampageGame.Progress.cs |
-| OfficeProgressRules.cs | Scripts/World/OfficeProgressRules.cs |
-| OfficeRampageGame.Effects.cs | Scripts/World/OfficeRampageGame.Effects.cs |
-| OfficeRampageGame.Menu.cs | Scripts/UI/OfficeRampageGame.Menu.cs |
-| OfficeRampageGame.Company.cs | Scripts/UI/OfficeRampageGame.Company.cs |
-| OfficeRampageGame.NameInput.cs | Scripts/UI/OfficeRampageGame.NameInput.cs |
-| OfficeNameEditor.cs | Scripts/UI/OfficeNameEditor.cs |
-| OfficeMenuRules.cs | Scripts/UI/OfficeMenuRules.cs |
-| OfficeCompanySettings.cs | Scripts/UI/OfficeCompanySettings.cs |
-| OfficeRampageGame.Intro.cs | Scripts/Story/OfficeRampageGame.Intro.cs |
-| OfficeRampageGame.Ending.cs | Scripts/Story/OfficeRampageGame.Ending.cs |
-| OfficeBlastEffect.cs | Scripts/Effects/OfficeBlastEffect.cs |
-| OfficeRocketTrail.cs | Scripts/Effects/OfficeRocketTrail.cs |
-| OfficeVisualEffect.cs | Scripts/Effects/OfficeVisualEffect.cs |
-| OfficeAudio.cs | Scripts/Audio/OfficeAudio.cs |
-| OfficeRampage.unity | Scenes/OfficeRampage.unity |
-
 
 ## 고정 배치·캐릭터 에셋 추가
 
@@ -170,14 +126,12 @@ Unity에서 함께 확인할 항목:
 - `Audio/OfficeAudio.cs`: shot/machinegun/shotgun 키는 기존 OfficeAudio/Sfx/shot 파일을 사용. 다른 새 효과음은 유지.
 
 
-## 거대 로봇·위성 피니시 / R 재시작 삭제
-- Core/OfficeRampageGame.cs: R키 재시작 분기 제거. 비밀 버튼은 새 클릭만 처리. Finale 카메라 중 일반 카메라 덮어쓰기 방지.
+## 거대 로봇·위성 피니시
 - Story/OfficeRampageGame.Finale.cs: DeployBossRobot → DropOrbitalButton → OrbitalStrike. 초기화는 ResetFinale. 카메라·우주 모형·버튼은 기존 world 아래 소유하며 새 게임에서 함께 제거.
 - Enemies/OfficeDefender.cs: 2페이즈 타격점 높이/6.6m 컨트롤러, 최초20% 임계점 클램프와 버튼 요청. 반복 지급 방지. 피니시 후 기존 엔딩 경로 사용.
 - Combat/OfficeRampageGame.Combat.cs: 사막 길이/폭2.5배(이전1.25배 대비 각각2배), 로봇 배치 coroutine 호출. 버튼은 BFG 소진 후8번 슬롯 재사용.
 - World/OfficeCraterFloor.cs: 반구형 하강 지형, MeshCollider, 생성 Mesh 정리. 기존 평평한 사막 바닥은 분화구 생성 시 비활성화.
 - Enemies/OfficeBossRobot.cs: 로봇 보행. UI/OfficeRampageGame.WeaponHUD.cs: 빨간 버튼 및 ??? 표시.
-
 - Effects/OfficeOrbitLand.cs: 간략화한 대륙 윤곽을 구면 Mesh로 나누어 생성하고 연출 종료 시 Mesh를 정리합니다.
 
 
@@ -201,7 +155,6 @@ Unity에서 함께 확인할 항목:
 
 
 ## 그래픽 층 편집 연결 파일
-
 - `World/OfficeFloorPrefab.cs`: 저장된 실제 가구와 충돌체에서 배치/길찾기 정보 추출. 활성 Collider를 사용하므로 새 벽 복제도 반영. 시간별 이동 장애물인 미닫이 문은 길찾기 장애물에서 제외하고 실제 Collider로 잠금.
 - `World/OfficeRampageGame.PrefabFloors.cs`: 프리팹 인스턴스와 파괴 가구/포션/문/인물 연결. 편집용 인물 미리보기는 숨기고 회사 설정으로 실제 인물을 생성.
 - `Editor/OfficeFloorEditor.cs`: 층별 Prefab Mode 메뉴, 편집 화면 천장/외벽 숨김, 길찾기 검사.
@@ -211,7 +164,6 @@ Unity에서 함께 확인할 항목:
 
 
 ## 2026-11-16 지구 분리 피니시와 배치/밸런스 보정
-
 - 대표의 분노는 50%, 비서의 BFG 18 전달은 20%입니다. 로봇 20%에서 받는 빨간 버튼과 구분합니다.
 - 마지막 위성 공격은 우주 화면에서 지구가 세로로 갈라지고 두 반구와 주황색 단면이 드러나는 연출입니다. 기존 마지막 2배 핵폭발을 대체하며 BFG 18의 건물 붕괴/버섯구름은 유지합니다. 이후 로봇 분리·대표 탈출·엔딩으로 이어집니다.
 - 대표층의 각 호위 전투가 끝나면 해당 가로 구역 벽과 문이 사라집니다. 경비견 전멸 뒤 보디가드는 첫 방으로도 이동하며, 대표전에서는 이전 구역까지 이동합니다. 벽 제거 후 길찾기를 새로 만듭니다.
