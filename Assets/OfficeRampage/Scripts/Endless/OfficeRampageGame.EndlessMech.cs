@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 namespace OfficeRampage
 {
@@ -22,6 +22,7 @@ namespace OfficeRampage
             endlessMechRoot=new GameObject("Player hulkbuster").transform;endlessMechRoot.SetParent(player,false);BuildEndlessMechFrame();
             avatar.gameObject.SetActive(false);endlessMechLeft=20;endlessMechShotClock=0;endlessMechSwing=0;endlessMechWalk=0;endlessMechPrevious=player.position;
             pitch=25;cooldown=.3f;audioBus.Play("explosion",.5f);shake=1.2f;
+            ChangeEndlessEnvironment();
             Notify("헐크버스터 탑승 · 20초 · 왼쪽 거대 검 / 오른쪽 광선",4);
         }
         private void ResetEndlessMech()

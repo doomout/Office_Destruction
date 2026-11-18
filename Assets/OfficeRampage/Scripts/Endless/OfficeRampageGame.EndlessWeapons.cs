@@ -22,7 +22,7 @@ namespace OfficeRampage
             {
                 var center=player.position+forward*10;center.x=Mathf.Clamp(center.x,-28,28);center.z=Mathf.Clamp(center.z,4,60);
                 CreateBlast(center,true);audioBus.Play("explosion",.85f);
-                SkillDamage(()=>EndlessArea(center,24,500,false));shake=4;return;
+                SkillDamage(()=>EndlessArea(center,24,500,false));ChangeEndlessEnvironment();shake=4;return;
             }
             if(endlessWeapon==8)
             {

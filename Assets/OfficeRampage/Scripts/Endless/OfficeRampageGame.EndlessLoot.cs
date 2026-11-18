@@ -23,7 +23,7 @@ namespace OfficeRampage
             else if(kind==3){Shape(visual,"Double damage crystal",Vector3.zero,Vector3.one*.7f,Color.magenta,false).transform.localRotation=Quaternion.Euler(25,45,25);}
             else {Shape(visual,"Health bottle",Vector3.zero,new Vector3(.4f,.6f,.4f),Color.green,false,PrimitiveType.Capsule);}
             var label=new GameObject("Equipment name").AddComponent<TextMesh>();label.transform.SetParent(pickup.transform,false);label.transform.localPosition=Vector3.up*1.7f;label.anchor=TextAnchor.MiddleCenter;label.fontSize=36;label.characterSize=.08f;label.text=pickup.DisplayName;label.color=color;
-            ApplyKoreanWorldFont(pickup.transform);endlessPickups.Add(pickup);
+            ApplyKoreanWorldFont(pickup.transform);StyleEndlessEnvironmentPickup(pickup.transform);endlessPickups.Add(pickup);
         }
         private void CollectEndless(OfficeEndlessPickup pickup)
         {

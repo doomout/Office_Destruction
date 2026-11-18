@@ -29,7 +29,7 @@ namespace OfficeRampage
                 yield return SceneWait(2.3f);yield return SplitEarth(space);
                 space.gameObject.SetActive(false);Destroy(space.gameObject);space=null;
                 ClearEndlessBattle();endlessRoot.gameObject.SetActive(true);
-                RenderSettings.fog=fog;view.backgroundColor=sky;view.farClipPlane=oldFar;finaleCamera=false;UpdateCamera();
+                RenderSettings.fog=fog;view.backgroundColor=sky;view.farClipPlane=oldFar;finaleCamera=false;UpdateCamera();ChangeEndlessEnvironment();
                 endlessOrbitalStage=2;Notify("전장 정리 완료 · 3초 후 다시 시작",3);
                 yield return SceneWait(3);
                 RestoreEndlessBattle();endlessOrbitalStage=3;Notify("적과 장비가 다시 등장했습니다!",3);
@@ -39,7 +39,7 @@ namespace OfficeRampage
                 if(space!=null)Destroy(space.gameObject);
                 if(endlessRoot!=null)endlessRoot.gameObject.SetActive(true);
                 if(view!=null){view.farClipPlane=oldFar;view.backgroundColor=sky;}
-                RenderSettings.fog=fog;finaleCamera=false;combatLocked=false;orbitalZoomStage=0;
+                RenderSettings.fog=fog;finaleCamera=false;combatLocked=false;orbitalZoomStage=0;ApplyEndlessEnvironmentLighting();
             }
         }
         private void ClearEndlessBattle()
