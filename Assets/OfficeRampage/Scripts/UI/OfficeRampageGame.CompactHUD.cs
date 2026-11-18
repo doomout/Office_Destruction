@@ -78,7 +78,7 @@ namespace OfficeRampage
             if(endlessMode)
             {
                 void Buff(HudSymbol icon,float left,float max,Color color){if(left<=0)return;HudTile(x,y,icon,left.ToString("0.0"),left/max,color);x+=64;}
-                Buff(HudSymbol.Double,endlessDoubleDamageLeft,20,new Color(.8f,.4f,1));
+                // Double damage has a dedicated, larger badge beside the weapon panel.
                 Buff(HudSymbol.Demon,endlessDemonLeft,10,Orange);Buff(HudSymbol.Car,endlessTrafficLeft,10,Color.yellow);
                 Buff(HudSymbol.Robot,endlessMechLeft,20,Cyan);
             }

@@ -27,7 +27,7 @@ namespace OfficeRampage
             GUI.Label(new Rect(623,338,35,35),"+",labelStyle);DrawWeaponSkills();DrawSprintHUD();
             if(weaponIndex==4)DrawDecoyHUD();
             DrawCompactPickup();
-            DrawCompactNotice();
+            DrawCompactNotice();DrawDoubleDamageBadge();
             if(paused||ended)
             {
                 Box(new Rect(280,200,720,330),new Color(.015f,.025f,.045f,.97f));

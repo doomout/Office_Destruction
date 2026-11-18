@@ -14,7 +14,7 @@ namespace OfficeRampage
         }
         private void ResetEndlessExtras()
         {
-            ResetEndlessDemon();ResetEndlessSupply();endlessGunKick=0;ResetEndlessMech();endlessSaber=endlessMode;endlessDoubleDamageLeft=endlessDemonLeft=endlessTrafficLeft=endlessCarClock=endlessDemonAttack=0;
+            ClearDoubleDamageVisual();ResetEndlessDemon();ResetEndlessSupply();endlessGunKick=0;ResetEndlessMech();endlessSaber=endlessMode;endlessDoubleDamageLeft=endlessDemonLeft=endlessTrafficLeft=endlessCarClock=endlessDemonAttack=0;
             endlessDemon=null;endlessCars.Clear();endlessOrbitalStage=0;
         }
         private void SeedEndlessEquipment()
@@ -27,6 +27,7 @@ namespace OfficeRampage
         private void TickEndlessExtras(float dt)
         {
             endlessDoubleDamageLeft=Mathf.Max(0,endlessDoubleDamageLeft-dt);
+            TickDoubleDamageVisual(dt);
             TickEndlessMech(dt);EnsureEndlessSaber();TickEndlessDemon(dt);TickEndlessTraffic(dt);
         }
         private void EnsureEndlessSaber()

@@ -30,7 +30,7 @@ namespace OfficeRampage
             if(!endlessMode||!RunActive||CombatLocked||pickup==null||!endlessPickups.Contains(pickup)||Vector3.Distance(player.position,pickup.transform.position)>2.5f)return;
             if(pickup.kind==0&&pickup.weaponId==4){endlessPickups.Remove(pickup);pickup.gameObject.SetActive(false);Destroy(pickup.gameObject);return;}
             if(EndlessMechActive&&pickup.kind==0){Notify("탑승 종료 후 새 무기를 주울 수 있습니다",2);return;}
-            if(pickup.kind==3){endlessDoubleDamageLeft=20;}
+            if(pickup.kind==3){endlessDoubleDamageLeft=20;ShowDoubleDamagePickup();}
             else if(pickup.kind==1){if(endlessArmor>=100)return;endlessArmor=Mathf.Min(100,endlessArmor+60);}
             else if(pickup.kind==2){if(hp>=100)return;hp=Mathf.Min(100,hp+30);}
             else

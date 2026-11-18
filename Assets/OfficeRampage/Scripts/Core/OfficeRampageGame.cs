@@ -563,7 +563,7 @@ namespace OfficeRampage
             if(endlessMode)SaveEndlessRecord();
             ended = true; won = victory; LockCursor(false);
             audioBus.Finish(victory);
-            if(endlessMode)PrepareEndlessRank();
+            if(endlessMode){ClearDoubleDamageVisual();PrepareEndlessRank();}
         }
         private void OnApplicationFocus(bool focus)
         {
