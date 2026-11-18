@@ -22,7 +22,7 @@ namespace OfficeRampage
         private void BeginEndless(){endlessMode=true;ResetRun();}
         private void ResetEndlessState()
         {
-            ResetEndlessRanking();ResetEndlessExtras();endlessTime=endlessKills=endlessSpawned=endlessWeapon=0;endlessArmor=0;endlessSpawnClock=5;endlessSupplyClock=8;endlessPropClock=10;
+            ResetEndlessRanking();ResetEndlessExtras();endlessTime=endlessKills=endlessSpawned=endlessWeapon=0;endlessArmor=0;endlessSpawnClock=5;endlessSupplyClock=EndlessWeaponInterval;endlessPropClock=10;
             endlessSpecialAmmo=0;endlessEquipAllowed=true;endlessAttackDelegate=false;endlessPickups.Clear();endlessProps.Clear();endlessPropPositions.Clear();nearbySupply=null;endlessTarget=null;
         }
         private Room BuildEndlessArena()
@@ -57,13 +57,7 @@ namespace OfficeRampage
             foreach(var unit in defenders){Vector3 delta=unit.transform.position-player.position;delta.y=0;if(delta.magnitude<targetDistance&&Vector3.Dot(Quaternion.Euler(0,yaw,0)*Vector3.forward,delta.normalized)>.85f){endlessTarget=unit;targetDistance=delta.magnitude;}}
             endlessSpawnClock-=dt;
             if(endlessSpawnClock<=0){for(int i=0;i<2&&defenders.Count<EndlessEnemyCap;i++)SpawnEndlessEnemy();endlessSpawnClock=Mathf.Max(.4f,1.5f-endlessTime/240);}
-            endlessSupplyClock-=dt;
-            if(endlessSupplyClock<=0)
-            {
-                int cycle=(int)(endlessTime/8);int id=cycle%EndlessWeapons.Length;
-                if((id==7||id==13)&&endlessTime<90)id=8+cycle%5;
-                SpawnEndlessPickup(Random.value<.14f?3:cycle%5==0?2:cycle%4==0?1:0,id,SafeEndlessDrop());endlessSupplyClock=8;
-            }
+            TickEndlessSupply(dt);
             endlessPropClock-=dt;
             if(endlessPropClock<=0)
             {

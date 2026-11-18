@@ -5,8 +5,9 @@ namespace OfficeRampage
     {
         private void SpawnEndlessPickup(int kind,int id,Vector3 at)
         {
+            if(kind==0&&id==4)return; // Preserve story IDs, exclude the decoy from all endless drops.
             endlessPickups.RemoveAll(p=>p==null);
-            if(endlessPickups.Count>=EndlessPickupCap){var old=endlessPickups[0];endlessPickups.RemoveAt(0);if(old!=null){old.gameObject.SetActive(false);Destroy(old.gameObject);}}
+            if(!MakeEndlessPickupSpace(kind))return;
             var pickup=new GameObject("Ground equipment").AddComponent<OfficeEndlessPickup>();pickup.transform.SetParent(endlessRoot,false);pickup.transform.position=at;
             pickup.kind=kind;pickup.weaponId=id;pickup.DisplayName=kind==1?"갑옷 · 내구도 +60":kind==2?"회복 · 체력 +30":kind==3?"피해 2배 · 20초":EndlessWeapons[id];
             var color=kind==3?Color.magenta:kind==1?Cyan:kind==2?Color.green:id>=7?new Color(1,.55f,.1f):Color.yellow;
@@ -27,6 +28,7 @@ namespace OfficeRampage
         private void CollectEndless(OfficeEndlessPickup pickup)
         {
             if(!endlessMode||!RunActive||CombatLocked||pickup==null||!endlessPickups.Contains(pickup)||Vector3.Distance(player.position,pickup.transform.position)>2.5f)return;
+            if(pickup.kind==0&&pickup.weaponId==4){endlessPickups.Remove(pickup);pickup.gameObject.SetActive(false);Destroy(pickup.gameObject);return;}
             if(EndlessMechActive&&pickup.kind==0){Notify("탑승 종료 후 새 무기를 주울 수 있습니다",2);return;}
             if(pickup.kind==3){endlessDoubleDamageLeft=20;}
             else if(pickup.kind==1){if(endlessArmor>=100)return;endlessArmor=Mathf.Min(100,endlessArmor+60);}
@@ -51,7 +53,7 @@ namespace OfficeRampage
             Color color=endlessWeapon==8?Cyan:endlessWeapon==9?Color.magenta:endlessWeapon==10?Orange:endlessWeapon==11?Color.blue:Color.yellow;
             Shape(weapon,"Special handle",new Vector3(0,0,.25f),new Vector3(.15f,.2f,.6f),Navy,false);
             if(endlessWeapon==8){Shape(weapon,"Stapler jaws",new Vector3(0,.15f,.6f),new Vector3(.3f,.2f,.8f),color,false);Shape(weapon,"Electric coil",new Vector3(0,.38f,.5f),new Vector3(.2f,.3f,.2f),color,false,PrimitiveType.Cylinder);}
-            if(endlessWeapon==9){Shape(weapon,"Printer body",new Vector3(0,.2f,.5f),new Vector3(.7f,.4f,.7f),Color.white,false);Shape(weapon,"Laser slot",new Vector3(0,.2f,.87f),new Vector3(.55f,.1f,.05f),color,false);}
+            if(endlessWeapon==9){Shape(weapon,"Printer body",new Vector3(0,.2f,.5f),new Vector3(.7f,.4f,.7f),Color.white,false);Shape(weapon,"Printer feed roller",new Vector3(0,.23f,.9f),new Vector3(.12f,.3f,.12f),Navy,false,PrimitiveType.Cylinder).transform.localRotation=Quaternion.Euler(0,0,90);Shape(weapon,"Laser slot",new Vector3(0,.2f,.87f),new Vector3(.55f,.1f,.05f),color,false);}
             if(endlessWeapon==10){Shape(weapon,"Coffee pot",new Vector3(0,.2f,.5f),new Vector3(.5f,.5f,.5f),color,false,PrimitiveType.Cylinder);Shape(weapon,"Spout",new Vector3(0,.2f,.85f),new Vector3(.15f,.15f,.5f),Navy,false);}
             if(endlessWeapon==11){Shape(weapon,"Vacuum tank",new Vector3(0,.2f,.4f),new Vector3(.55f,.6f,.5f),color,false,PrimitiveType.Capsule);Shape(weapon,"Vacuum nozzle",new Vector3(0,.1f,.9f),new Vector3(.8f,.18f,.4f),Color.gray,false);}
             if(endlessWeapon==12)Shape(weapon,"Clock-out bell",new Vector3(0,.15f,.55f),new Vector3(.7f,.6f,.7f),color,false,PrimitiveType.Sphere);

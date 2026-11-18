@@ -26,17 +26,24 @@ namespace OfficeRampage
             }
             if(endlessWeapon==8)
             {
+                endlessGunKick=.32f;origin=EndlessGunMuzzle();GlowFx("Stapler muzzle flash",origin,Vector3.one*.4f,Cyan,.25f,Vector3.zero);
                 var candidates=new List<OfficeDefender>();foreach(var enemy in defenders)if(enemy!=null&&enemy.Alive&&Vector3.Distance(origin,enemy.AimPoint)<18&&Vector3.Dot(forward,(enemy.AimPoint-origin).normalized)>.25f&&ClearDefenseSight(origin,enemy.AimPoint,player,enemy.transform))candidates.Add(enemy);
                 candidates.Sort((a,b)=>Vector3.SqrMagnitude(a.AimPoint-origin).CompareTo(Vector3.SqrMagnitude(b.AimPoint-origin)));Vector3 previous=origin;
-                for(int i=0;i<Mathf.Min(5,candidates.Count);i++){var enemy=candidates[i];Trail(previous,enemy.AimPoint,Cyan);previous=enemy.AimPoint;enemy.Hit(45);if(enemy.Alive)enemy.Stun(.7f);}
+                for(int i=0;i<Mathf.Min(5,candidates.Count);i++){var enemy=candidates[i];ElectricDischarge(previous,enemy.AimPoint);previous=enemy.AimPoint;enemy.Hit(45);if(enemy.Alive)enemy.Stun(.7f);}
+                if(candidates.Count==0)
+                {
+                    Vector3 end=origin+forward*18;foreach(var hit in Physics.RaycastAll(origin,forward,18))if(!IsPlayerCollider(hit.collider)&&Vector3.Distance(origin,hit.point)<Vector3.Distance(origin,end))end=hit.point;
+                    ElectricDischarge(origin,end);
+                }
                 audioBus.Play("thunder",.35f);return;
             }
             if(endlessWeapon==9)
             {
-                Vector3 direction=view.transform.forward;Vector3 target=view.transform.position+direction*45;direction=(target-origin).normalized;
+                endlessGunKick=.32f;origin=EndlessGunMuzzle();
+                Vector3 direction=EndlessAimDirection(origin,45);
                 var hits=Physics.RaycastAll(origin,direction,45);System.Array.Sort(hits,(a,b)=>a.distance.CompareTo(b.distance));var seen=new HashSet<OfficeDefender>();var props=new HashSet<OfficeProp>();Vector3 end=origin+direction*45;
                 foreach(var hit in hits){if(IsPlayerCollider(hit.collider))continue;var enemy=hit.collider.GetComponentInParent<OfficeDefender>();var prop=hit.collider.GetComponentInParent<OfficeProp>();if(enemy!=null){if(seen.Add(enemy))enemy.Hit(60);}else if(prop!=null){if(props.Add(prop))prop.Hit(80,direction);}else{end=hit.point;break;}}
-                Trail(origin,end,Color.magenta);audioBus.Play("orbitalLaser",.2f,1.8f);return;
+                PrinterBeam(origin,end);audioBus.Play("orbitalLaser",.2f,1.8f);return;
             }
             if(endlessWeapon==12)
             {SkillDamage(()=>EndlessArea(player.position,11,75,true));for(int i=0;i<20;i++){float angle=i*Mathf.PI/10;Fx("Bell wave",origin,Vector3.one*.2f,Color.yellow,.5f,new Vector3(Mathf.Cos(angle),0,Mathf.Sin(angle))*22);}audioBus.Play("thunder",.45f);return;}

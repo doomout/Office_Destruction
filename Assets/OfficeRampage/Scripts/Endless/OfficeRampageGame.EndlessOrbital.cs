@@ -57,7 +57,7 @@ namespace OfficeRampage
                 if(child==player||child==view.transform||child==endlessRoot||child.GetComponent<Light>()!=null)continue;
                 child.gameObject.SetActive(false);Destroy(child.gameObject);
             }
-            endlessCars.Clear();endlessDemon=null;endlessDemonLeft=endlessTrafficLeft=0;combatEffects.Clear();debris.Clear();
+            ResetEndlessDemon();endlessCars.Clear();endlessDemon=null;endlessDemonLeft=endlessTrafficLeft=0;combatEffects.Clear();debris.Clear();
             current.total=current.destroyed=0;
         }
         private void RestoreEndlessBattle()
@@ -69,7 +69,7 @@ namespace OfficeRampage
                 var spawned=endlessRoot.GetChild(endlessRoot.childCount-1);endlessProps[i]=spawned.GetComponent<OfficeProp>();ApplyKoreanWorldFont(spawned);
             }
             SeedEndlessEquipment();for(int i=0;i<24;i++)SpawnEndlessEnemy();
-            endlessSpawnClock=1;endlessSupplyClock=8;endlessPropClock=10;
+            endlessSpawnClock=1;endlessSupplyClock=EndlessWeaponInterval;endlessSupportClock=8;endlessPropClock=10;
         }
     }
 }

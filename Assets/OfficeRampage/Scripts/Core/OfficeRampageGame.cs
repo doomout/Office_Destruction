@@ -422,6 +422,7 @@ namespace OfficeRampage
             swing = Mathf.MoveTowards(swing, 0, dt * 5);
             weapon.localPosition = thunderLeft>0 ? new Vector3(.48f,1.65f,.1f) : new Vector3(.48f,.95f,.25f);
             weapon.localRotation = thunderLeft>0 ? Quaternion.Euler(-90,0,0) : Quaternion.Euler(weaponIndex == 4 ? swing * 100 - 20 : -swing * 60, -swing * 25, 0);
+            TickEndlessGunPose(dt);
             UpdateCamera();
             TickDecoy(dt);
             if (mouse != null && (weaponIndex == 4 || (weaponIndex==7 && orbitalReady) ? mouse.leftButton.wasPressedThisFrame : mouse.leftButton.isPressed) && Cursor.lockState == CursorLockMode.Locked && cooldown <= 0) Attack();
@@ -577,6 +578,7 @@ namespace OfficeRampage
             foreach (var material in materials.Values) if (material != null) Destroy(material);
             if (defenderFont != null) Destroy(defenderFont);
             if(endlessEnergyMaterial!=null)Destroy(endlessEnergyMaterial);
+            foreach(var mat in endlessGlowMaterials.Values)if(mat!=null)Destroy(mat);endlessGlowMaterials.Clear();
         }
 
         private void Box(Rect rect, Color color)
