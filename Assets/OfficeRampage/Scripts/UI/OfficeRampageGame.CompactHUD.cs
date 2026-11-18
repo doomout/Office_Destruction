@@ -84,6 +84,7 @@ namespace OfficeRampage
                 // Double damage has a dedicated, larger badge beside the weapon panel.
                 Buff(HudSymbol.Demon,endlessDemonLeft,10,Orange);Buff(HudSymbol.Car,endlessTrafficLeft,10,Color.yellow);
                 Buff(HudSymbol.Robot,endlessMechLeft,20,Cyan);
+                if(EndlessMechActive){HudTile(x,y,HudSymbol.Run,endlessMechDashCooldown>0?endlessMechDashCooldown.ToString("0.0"):"0",1-endlessMechDashCooldown/3,Color.green,"우클릭");x+=64;}
                 Buff(HudSymbol.Drone,droneLeft,10,Cyan);Buff(HudSymbol.Jet,jetLeft,5,Orange);Buff(HudSymbol.BlackHole,blackHoleLeft,5,Color.magenta);
             }
         }

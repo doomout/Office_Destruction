@@ -411,6 +411,7 @@ namespace OfficeRampage
             slowedByOil = IsStandingOnOil();
             speed = OfficeRules.MovementSpeed(speed, slowedByOil);
             Vector3 move = Quaternion.Euler(0, yaw, 0) * new Vector3(input.x, 0, input.y) * speed;
+            if(EndlessMechActive&&mechDashLeft>0)move=Vector3.zero;
             Vector3 beforeMove = player.position;
             var collision = controller.Move((move + Vector3.up * vertical) * dt);
             slowedByOil = IsStandingOnOil();
@@ -420,8 +421,7 @@ namespace OfficeRampage
             avatar.rotation = Quaternion.Euler(0, yaw + (whirlwindLeft > 0 ? whirlwindAngle : 0), 0);
             if(EndlessMechActive)endlessMechRoot.rotation=Quaternion.Euler(0,yaw,0);
             swing = Mathf.MoveTowards(swing, 0, dt * 5);
-            weapon.localPosition = thunderLeft>0 ? new Vector3(.48f,1.65f,.1f) : new Vector3(.48f,.95f,.25f);
-            weapon.localRotation = thunderLeft>0 ? Quaternion.Euler(-90,0,0) : Quaternion.Euler(weaponIndex == 4 ? swing * 100 - 20 : -swing * 60, -swing * 25, 0);
+            UpdateWeaponSwingPose();
             TickEndlessGunPose(dt);
             UpdateCamera();
             TickDecoy(dt);

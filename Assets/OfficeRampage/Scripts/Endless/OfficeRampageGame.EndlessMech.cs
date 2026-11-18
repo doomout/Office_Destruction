@@ -4,8 +4,8 @@ namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
     {
-        private Transform endlessMechRoot,endlessMechSword,endlessMechLeftLeg,endlessMechRightLeg;
-        private float endlessMechLeft,endlessMechShotClock,endlessMechSwing,endlessMechWalk;
+        private Transform endlessMechRoot,endlessMechSword,endlessMechOtherSword,endlessMechLeftLeg,endlessMechRightLeg;
+        private float endlessMechLeft,endlessMechDashCooldown,endlessMechSwing,endlessMechWalk;
         private Vector3 endlessMechPrevious,mechOldCenter;
         private float mechOldHeight,mechOldRadius;
         private bool mechShapeSaved;
@@ -20,10 +20,10 @@ namespace OfficeRampage
             player.position=new Vector3(Mathf.Clamp(player.position.x,-30,30),player.position.y,Mathf.Clamp(player.position.z,2,62));
             controller.height=6.6f;controller.radius=1.05f;controller.center=Vector3.up*3.3f;controller.enabled=true;
             endlessMechRoot=new GameObject("Player hulkbuster").transform;endlessMechRoot.SetParent(player,false);BuildEndlessMechFrame();
-            avatar.gameObject.SetActive(false);endlessMechLeft=20;endlessMechShotClock=0;endlessMechSwing=0;endlessMechWalk=0;endlessMechPrevious=player.position;
+            avatar.gameObject.SetActive(false);endlessMechLeft=20;endlessMechDashCooldown=0;endlessMechSwing=0;endlessMechWalk=0;endlessMechPrevious=player.position;
             pitch=25;cooldown=.3f;audioBus.Play("explosion",.5f);shake=1.2f;
             ChangeEndlessEnvironment();
-            Notify("헐크버스터 탑승 · 20초 · 왼쪽 거대 검 / 오른쪽 광선",4);
+            Notify("헐크버스터 탑승 · 20초 · 왼쪽 쌍검 / 오른쪽 대쉬",4);
         }
         private void ResetEndlessMech()
         {
@@ -33,8 +33,8 @@ namespace OfficeRampage
                 bool enabled=controller.enabled;controller.enabled=false;controller.radius=mechOldRadius;controller.height=mechOldHeight;controller.center=mechOldCenter;controller.enabled=enabled;
             }
             if(avatar!=null)avatar.gameObject.SetActive(true);
-            mechShapeSaved=false;endlessMechRoot=endlessMechSword=endlessMechLeftLeg=endlessMechRightLeg=null;
-            endlessMechLeft=endlessMechShotClock=endlessMechSwing=endlessMechWalk=0;
+            ResetMechDash();mechShapeSaved=false;endlessMechRoot=endlessMechSword=endlessMechOtherSword=endlessMechLeftLeg=endlessMechRightLeg=null;
+            endlessMechLeft=endlessMechDashCooldown=endlessMechSwing=endlessMechWalk=0;
         }
         private void TickEndlessMech(float dt)
         {
@@ -46,9 +46,11 @@ namespace OfficeRampage
             float angle=distance>.001f?Mathf.Sin(endlessMechWalk)*24:0;
             endlessMechLeftLeg.localRotation=Quaternion.Euler(angle,0,0);endlessMechRightLeg.localRotation=Quaternion.Euler(-angle,0,0);
             endlessMechRoot.rotation=Quaternion.Euler(0,yaw,0);endlessMechSwing=Mathf.Max(0,endlessMechSwing-dt*3);
-            endlessMechSword.localRotation=Quaternion.Euler(12,endlessMechSwing>0?Mathf.Lerp(75,-65,endlessMechSwing):0,0);
-            endlessMechShotClock-=dt;
-            if(Mouse.current!=null&&Mouse.current.rightButton.isPressed&&Cursor.lockState==CursorLockMode.Locked)FireEndlessMechLaser();
+            endlessMechSword.localRotation=HorizontalSwingRotation(endlessMechSwing);
+            endlessMechOtherSword.localRotation=Quaternion.Inverse(endlessMechSword.localRotation);
+            endlessMechDashCooldown=Mathf.Max(0,endlessMechDashCooldown-dt);
+            TickMechDash(dt);
+            if(Mouse.current!=null&&Mouse.current.rightButton.wasPressedThisFrame&&Cursor.lockState==CursorLockMode.Locked)StartMechDash();
         }
         private void AttackEndlessMech()
         {
@@ -56,23 +58,10 @@ namespace OfficeRampage
             cooldown=.75f;endlessMechSwing=1;shake=.7f;audioBus.Play("swing",.6f,.65f);
             Vector3 forward=Quaternion.Euler(0,yaw,0)*Vector3.forward;
             SkillDamage(()=>SweepWeapon(player.position+Vector3.up*1.35f,forward,7,140,120,false));
-            for(int i=-3;i<=3;i++)Fx("Mech sword arc",player.position+Vector3.up*1.5f+(Quaternion.Euler(0,i*18,0)*forward)*5,Vector3.one*.3f,Cyan,.2f,Vector3.zero);
-        }
-        private void FireEndlessMechLaser()
-        {
-            if(!EndlessMechActive||!RunActive||CombatLocked||endlessMechShotClock>0)return;
-            endlessMechShotClock=.7f;Vector3 origin=player.position+Vector3.up*3.4f;
-            Vector3 point=view.transform.position+view.transform.forward*50;
-            if(AimHit(view.transform.position,view.transform.forward,50,out var aim))point=aim.point;
-            Vector3 direction=(point-origin).normalized;Vector3 end=origin+direction*50;float distance=50;Collider target=null;
-            foreach(var hit in Physics.SphereCastAll(origin,.45f,direction,50))if(!IsPlayerCollider(hit.collider)&&hit.distance<distance){distance=hit.distance;end=hit.point;target=hit.collider;}
-            if(target!=null)
-            {
-                var enemy=target.GetComponentInParent<OfficeDefender>();var prop=target.GetComponentInParent<OfficeProp>();
-                SkillDamage(()=>{if(enemy!=null)enemy.Hit(90);if(prop!=null)prop.Hit(90,direction);});
-            }
-            var beam=Fx("Player mech laser",(origin+end)/2,new Vector3(.22f,.22f,Vector3.Distance(origin,end)),Cyan,.18f,Vector3.zero);
-            beam.transform.rotation=Quaternion.LookRotation(direction);audioBus.Play("orbitalLaser",.35f,1.5f);shake=.35f;
+            var arc=new Vector3[17];for(int i=0;i<arc.Length;i++)arc[i]=player.position+Vector3.up*2.8f+(Quaternion.Euler(0,-70+i*140f/16,0)*forward)*5;
+            EnergyStroke("Mech red sword arc",arc,Color.red,.16f,.22f);
+            for(int i=0;i<arc.Length;i++)arc[i]+=Vector3.up*.3f;
+            EnergyStroke("Mech green sword arc",arc,Color.green,.16f,.22f);
         }
     }
 }

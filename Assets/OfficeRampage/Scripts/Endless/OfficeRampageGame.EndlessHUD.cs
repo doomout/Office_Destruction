@@ -7,11 +7,7 @@ namespace OfficeRampage
         private void DrawEndlessHUD()
         {
             if(ended){DrawEndlessResult();return;}
-            Box(new Rect(22,20,400,160),Navy);
-            GUI.Label(new Rect(38,28,360,40),"무한 파괴 · "+SurvivalClock(endlessTime),titleStyle);
-            GUI.Label(new Rect(38,78,360,28),"처치 "+endlessKills+"  ·  점수 "+score.ToString("N0"),labelStyle);
-            GUI.Label(new Rect(38,112,360,26),"콤보 "+combo+" · 최고 생존 "+SurvivalClock(PlayerPrefs.GetFloat("OfficeRampage.Endless.BestTime",0)),smallStyle);
-            GUI.Label(new Rect(38,143,360,26),"활성 적 "+defenders.Count+" / "+EndlessEnemyCap+" · 계속 증원",smallStyle);
+            DrawEndlessTopStrip();
             if(endlessTarget!=null&&endlessTarget.Alive)HudTile(1194,30,HudSymbol.Skull,Mathf.CeilToInt(endlessTarget.Health).ToString(),endlessTarget.Health/endlessTarget.MaxHealth,Orange);
             Box(new Rect(22,570,305,127),Navy);GUI.Label(new Rect(38,577,280,26),"체력 "+Mathf.CeilToInt(hp)+" / 100",labelStyle);
             Box(new Rect(38,610,270,9),new Color(.2f,.25f,.3f));Box(new Rect(38,610,270*hp/100,9),Color.green);
@@ -37,6 +33,21 @@ namespace OfficeRampage
                 {if(ended)BeginEndless();else{paused=false;Time.timeScale=1;LockCursor(true);audioBus.SetPaused(false);}}
                 if(MenuButton(new Rect(650,385,300,58),"첫 메뉴로")){SaveEndlessRecord();ReturnToMainMenu();}
             }
+        }
+        private GUIStyle endlessTopStyle;
+        private void DrawEndlessTopStrip()
+        {
+            const float width=1150;
+            if(endlessTopStyle==null)endlessTopStyle=new GUIStyle(smallStyle)
+            {wordWrap=false,alignment=TextAnchor.MiddleCenter,padding=new RectOffset(0,0,0,0),richText=false};
+            string text="무한 파괴  ·  생존 "+SurvivalClock(endlessTime)
+                +"  |  처치 "+endlessKills.ToString("N0")+"  |  점수 "+score.ToString("N0")
+                +"  |  콤보 "+combo.ToString("N0")+"  |  적 "+defenders.Count+"/"+EndlessEnemyCap
+                +"  |  최고 "+SurvivalClock(PlayerPrefs.GetFloat("OfficeRampage.Endless.BestTime",0));
+            var content=new GUIContent(text);endlessTopStyle.fontSize=18;
+            while(endlessTopStyle.fontSize>10&&endlessTopStyle.CalcSize(content).x>width-24)endlessTopStyle.fontSize--;
+            Box(new Rect(22,12,width,34),new Color(.015f,.025f,.045f,.78f));
+            GUI.Label(new Rect(34,12,width-24,34),content,endlessTopStyle);
         }
         private void DrawEndlessInfo()
         {
