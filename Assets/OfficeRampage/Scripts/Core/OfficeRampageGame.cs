@@ -456,10 +456,11 @@ namespace OfficeRampage
                 view.transform.LookAt(mushroomCenter + Vector3.up * 9.5f);
                 return;
             }
-            view.fieldOfView = 72;
+            bool airView=endlessMode&&(droneLeft>0||jetLeft>0);
+            view.fieldOfView = airView?80:72;
             Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
-            Vector3 pivot = player.position + Vector3.up * (EndlessMechActive?4.4f:1.55f);
-            Vector3 offset = rotation * (EndlessMechActive?new Vector3(1.4f,1,-14):endlessMode?new Vector3(.65f,.6f,-8):new Vector3(.65f,.25f,-3.5f));
+            Vector3 pivot = player.position + Vector3.up * (EndlessMechActive?4.4f:airView?(jetLeft>0?5:3):1.55f);
+            Vector3 offset = rotation * (EndlessMechActive?new Vector3(1.4f,1,-14):airView?new Vector3(.65f,1,jetLeft>0?-20:-12):endlessMode?new Vector3(.65f,.6f,-8):new Vector3(.65f,.25f,-3.5f));
             float distance = offset.magnitude;
             // Player visuals have no colliders; ignore the player's controller in camera casts.
             foreach (var hit in Physics.SphereCastAll(pivot, .16f, offset.normalized, distance, ~0, QueryTriggerInteraction.Ignore))
@@ -563,7 +564,7 @@ namespace OfficeRampage
             if(endlessMode)SaveEndlessRecord();
             ended = true; won = victory; LockCursor(false);
             audioBus.Finish(victory);
-            if(endlessMode){ClearDoubleDamageVisual();PrepareEndlessRank();}
+            if(endlessMode){ResetAirSupport();ClearDoubleDamageVisual();PrepareEndlessRank();}
         }
         private void OnApplicationFocus(bool focus)
         {

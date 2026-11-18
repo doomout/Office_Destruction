@@ -11,9 +11,13 @@ namespace OfficeRampage
             EnsureEndlessSaber();if(endlessSaber){AttackEndlessSaber();return;}
             if(endlessWeapon<7)
             {endlessAttackDelegate=true;try{AttackExpanded();}finally{endlessAttackDelegate=false;}return;}
+            if(EndlessUltimateActive&&(endlessWeapon==7||endlessWeapon==13||endlessWeapon==16||endlessWeapon>=18)){cooldown=.3f;return;}
             if(endlessSpecialAmmo<=0){Notify("탄약 소진 · 바닥의 새 장비를 주우세요",1);cooldown=.4f;return;}
             endlessSpecialAmmo--;swing=1;cooldown=endlessWeapon==7||endlessWeapon==13?2:endlessWeapon==12?1.1f:endlessWeapon==10?.28f:.45f;
             var origin=player.position+Vector3.up*1.2f;Vector3 forward=avatar.forward;
+            if(endlessWeapon==17){SummonSupportDrones();return;}
+            if(endlessWeapon==18){StartJetStrike();return;}
+            if(endlessWeapon==19){StartBlackHole();return;}
             if(endlessWeapon==16){ActivateEndlessMech();return;}
             if(endlessWeapon==13){StartCoroutine(EndlessOrbitalStrike());return;}
             if(endlessWeapon==14){SummonEndlessDemon();return;}

@@ -57,7 +57,7 @@ namespace OfficeRampage
                 if(child==player||child==view.transform||child==endlessRoot||child.GetComponent<Light>()!=null)continue;
                 child.gameObject.SetActive(false);Destroy(child.gameObject);
             }
-            ResetEndlessDemon();endlessCars.Clear();endlessDemon=null;endlessDemonLeft=endlessTrafficLeft=0;combatEffects.Clear();debris.Clear();
+            ResetAirSupport();ResetEndlessDemon();endlessCars.Clear();endlessDemon=null;endlessDemonLeft=endlessTrafficLeft=0;combatEffects.Clear();debris.Clear();
             current.total=current.destroyed=0;
         }
         private void RestoreEndlessBattle()

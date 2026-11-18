@@ -3,7 +3,7 @@ namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
     {
-        private enum HudSymbol { Whirlwind, Thunder, Ice, Heart, Shield, Run, Skull, Door, Ammo, Weapon, Double, Demon, Car, Robot, Oil, Alert, Clock }
+        private enum HudSymbol { Whirlwind, Thunder, Ice, Heart, Shield, Run, Skull, Door, Ammo, Weapon, Double, Demon, Car, Robot, Oil, Alert, Clock, Drone, Jet, BlackHole }
         private GUIStyle hudNumber,hudKey;
         private HudSymbol hudNoticeSymbol;
         private string hudNoticeNumber="";
@@ -29,6 +29,9 @@ namespace OfficeRampage
             void Ring(float x,float y,float r,int segments=16){for(int i=0;i<segments;i++){float a=i*Mathf.PI*2/segments,b=(i+1)*Mathf.PI*2/segments;L(x+Mathf.Cos(a)*r,y+Mathf.Sin(a)*r,x+Mathf.Cos(b)*r,y+Mathf.Sin(b)*r);}}
             switch(icon)
             {
+                case HudSymbol.Drone:Ring(.2f,.2f,.15f);Ring(.8f,.2f,.15f);Ring(.2f,.8f,.15f);Ring(.8f,.8f,.15f);L(.2f,.2f,.8f,.8f);L(.2f,.8f,.8f,.2f);break;
+                case HudSymbol.Jet:L(.5f,.05f,.6f,.45f);L(.6f,.45f,.95f,.7f);L(.95f,.7f,.6f,.65f);L(.6f,.65f,.65f,.95f);L(.65f,.95f,.5f,.85f);L(.5f,.85f,.35f,.95f);L(.35f,.95f,.4f,.65f);L(.4f,.65f,.05f,.7f);L(.05f,.7f,.4f,.45f);L(.4f,.45f,.5f,.05f);break;
+                case HudSymbol.BlackHole:Ring(.5f,.5f,.2f);Ring(.5f,.5f,.4f);L(.05f,.7f,.95f,.3f);break;
                 case HudSymbol.Whirlwind:
                     for(int i=1;i<=30;i++){float a=(i-1)*.36f,b=i*.36f,r=.05f+(i-1)*.012f,s=.05f+i*.012f;L(.5f+Mathf.Cos(a)*r,.5f+Mathf.Sin(a)*r,.5f+Mathf.Cos(b)*s,.5f+Mathf.Sin(b)*s);}break;
                 case HudSymbol.Thunder:L(.6f,.05f,.22f,.55f);L(.22f,.55f,.55f,.48f);L(.55f,.48f,.38f,.95f);L(.38f,.95f,.8f,.38f);L(.8f,.38f,.5f,.43f);L(.5f,.43f,.6f,.05f);break;
@@ -81,6 +84,7 @@ namespace OfficeRampage
                 // Double damage has a dedicated, larger badge beside the weapon panel.
                 Buff(HudSymbol.Demon,endlessDemonLeft,10,Orange);Buff(HudSymbol.Car,endlessTrafficLeft,10,Color.yellow);
                 Buff(HudSymbol.Robot,endlessMechLeft,20,Cyan);
+                Buff(HudSymbol.Drone,droneLeft,10,Cyan);Buff(HudSymbol.Jet,jetLeft,5,Orange);Buff(HudSymbol.BlackHole,blackHoleLeft,5,Color.magenta);
             }
         }
         private void DrawFocusedStatus()

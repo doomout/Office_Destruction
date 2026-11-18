@@ -14,7 +14,7 @@ namespace OfficeRampage
         }
         private void ResetEndlessExtras()
         {
-            ClearDoubleDamageVisual();ResetEndlessDemon();ResetEndlessSupply();endlessGunKick=0;ResetEndlessMech();endlessSaber=endlessMode;endlessDoubleDamageLeft=endlessDemonLeft=endlessTrafficLeft=endlessCarClock=endlessDemonAttack=0;
+            ResetAirSupport();ClearDoubleDamageVisual();ResetEndlessDemon();ResetEndlessSupply();endlessGunKick=0;ResetEndlessMech();endlessSaber=endlessMode;endlessDoubleDamageLeft=endlessDemonLeft=endlessTrafficLeft=endlessCarClock=endlessDemonAttack=0;
             endlessDemon=null;endlessCars.Clear();endlessOrbitalStage=0;
         }
         private void SeedEndlessEquipment()
@@ -22,13 +22,14 @@ namespace OfficeRampage
             for(int i=0;i<8;i++)SpawnEndlessPickup(0,new[]{2,1,3,5,6,8,9,10}[i],new Vector3((i%4-1.5f)*4,.08f,37+(i/4)*5));
             SpawnEndlessPickup(0,14,new Vector3(-6,.08f,33));SpawnEndlessPickup(0,15,new Vector3(6,.08f,33));
             SpawnEndlessPickup(0,16,new Vector3(0,.08f,25));
+            SpawnEndlessPickup(0,17,new Vector3(-10,.08f,29));SpawnEndlessPickup(0,18,new Vector3(10,.08f,29));SpawnEndlessPickup(0,19,new Vector3(0,.08f,20));
             SpawnEndlessPickup(1,0,new Vector3(-4,.08f,29));SpawnEndlessPickup(2,0,new Vector3(4,.08f,29));
         }
         private void TickEndlessExtras(float dt)
         {
             endlessDoubleDamageLeft=Mathf.Max(0,endlessDoubleDamageLeft-dt);
             TickDoubleDamageVisual(dt);
-            TickEndlessMech(dt);EnsureEndlessSaber();TickEndlessDemon(dt);TickEndlessTraffic(dt);
+            TickEndlessMech(dt);EnsureEndlessSaber();TickEndlessDemon(dt);TickEndlessTraffic(dt);TickAirSupport(dt);
         }
         private void EnsureEndlessSaber()
         {

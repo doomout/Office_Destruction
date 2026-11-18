@@ -48,6 +48,7 @@ namespace OfficeRampage
         private bool BuildEndlessSpecialModel()
         {
             if(!endlessMode||endlessWeapon<8)return false;
+            if(endlessWeapon>=17){BuildAirSupportRemote();return true;}
             if(endlessWeapon>=14){BuildEndlessSummonWeapon();return true;}
             if(endlessWeapon==13){BuildRedButton(weapon);return true;}
             Color color=endlessWeapon==8?Cyan:endlessWeapon==9?Color.magenta:endlessWeapon==10?Orange:endlessWeapon==11?Color.blue:Color.yellow;

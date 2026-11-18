@@ -17,8 +17,8 @@ namespace OfficeRampage
         private readonly List<OfficeProp> endlessProps=new List<OfficeProp>();
         private OfficeEndlessPickup nearbySupply;
         private OfficeDefender endlessTarget;
-        private static readonly string[] EndlessWeapons={"야구빠따","망치","권총","기관총","미인계 더미","화염 샷건","로켓런처","BFG 18","번개 스테이플러","레이저 프린터","용암 커피포트","초강력 청소기","퇴근 종","위성 호출기","지옥문","교통사고","헐크버스터"};
-        private static readonly int[] EndlessBases={0,1,2,3,4,5,6,7,2,3,5,6,1,7,7,7,7};
+        private static readonly string[] EndlessWeapons={"야구빠따","망치","권총","기관총","미인계 더미","화염 샷건","로켓런처","BFG 18","번개 스테이플러","레이저 프린터","용암 커피포트","초강력 청소기","퇴근 종","위성 호출기","지옥문","교통사고","헐크버스터","드론 조종기","전투기 폭격 지원","블랙홀 생성기"};
+        private static readonly int[] EndlessBases={0,1,2,3,4,5,6,7,2,3,5,6,1,7,7,7,7,7,7,7};
         private void BeginEndless(){endlessMode=true;ResetRun();}
         private void ResetEndlessState()
         {
@@ -55,6 +55,7 @@ namespace OfficeRampage
             TickEndlessExtras(dt);endlessTime+=dt;TickEndlessEnvironment(dt);defenders.RemoveAll(u=>u==null||!u.Alive);endlessPickups.RemoveAll(p=>p==null);
             endlessTarget=null;float targetDistance=16;
             foreach(var unit in defenders){Vector3 delta=unit.transform.position-player.position;delta.y=0;if(delta.magnitude<targetDistance&&Vector3.Dot(Quaternion.Euler(0,yaw,0)*Vector3.forward,delta.normalized)>.85f){endlessTarget=unit;targetDistance=delta.magnitude;}}
+            if(EndlessUltimateActive){endlessSpawnClock=Mathf.Max(endlessSpawnClock,dt+1);endlessSupplyClock=Mathf.Max(endlessSupplyClock,dt+1);endlessSupportClock=Mathf.Max(endlessSupportClock,dt+1);endlessPropClock=Mathf.Max(endlessPropClock,dt+1);}
             endlessSpawnClock-=dt;
             if(endlessSpawnClock<=0){for(int i=0;i<2&&defenders.Count<EndlessEnemyCap;i++)SpawnEndlessEnemy();endlessSpawnClock=Mathf.Max(.4f,1.5f-endlessTime/240);}
             TickEndlessSupply(dt);
