@@ -45,7 +45,7 @@ namespace CodexStarter
             lightObject.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
             RenderSettings.ambientLight = new Color(0.6f, 0.65f, 0.7f);
 
-            var path = AssetDatabase.GenerateUniqueAssetPath("Assets/CodexStarter/Practice.unity");
+            var path = AssetDatabase.GenerateUniqueAssetPath("Assets/Samples/CodexStarter/Practice.unity");
             if (!EditorSceneManager.SaveScene(scene, path))
                 throw new System.IO.IOException("Could not save practice scene: " + path);
             Selection.activeGameObject = player;

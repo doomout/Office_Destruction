@@ -244,7 +244,7 @@
 
 ## 8. 유지보수 파일 지도
 
-`Assets/OfficeRampage/` 아래를 기능별로 나눠 관리합니다.
+`Assets/OfficeRampage/` 아래를 기능별로 나눠 관리합니다. 연습 프로젝트·Unity 기본 씬·튜토리얼은 `Assets/Samples/`에 모았습니다. 전체 폴더 안내와 새 무기 추가 절차는 [유지보수 안내](Docs/MAINTENANCE.md)를 참고하세요.
 
 | 폴더 | 담당 기능 |
 | --- | --- |
@@ -255,7 +255,11 @@
 | `Scripts/Enemies/` | 직원·경비견·보디가드·대표·보스 로봇 AI |
 | `Scripts/World/` | 층·가구·포션·문·엘리베이터·진행 조건 |
 | `Scripts/Story/` | 도입·출근 결말·비밀 무기·우주 연출·엔딩 |
-| `Scripts/Endless/` | 무한 전장·보급·특수 무기·배경·랭킹·HUD |
+| `Scripts/Endless/` | 무한 모드 진입·전장·환경·적 규칙 |
+| `Scripts/Endless/Weapons/` | 일반 특수 무기·발사 효과 |
+| `Scripts/Endless/Support/` | UFO·블랙홀·드론·전투기·로봇·위성·악마·교통사고 |
+| `Scripts/Endless/Pickups/` | 무기·보급 생성/획득·피해 2배 표시 |
+| `Scripts/Endless/UI/` | 무한 모드 HUD·랭킹·기록 저장 |
 | `Scripts/UI/` | 메뉴·음량·직원 설정·이름 입력·공통 폰트·아이콘 HUD |
 | `Scripts/Effects/` | 폭발·불꽃·우주 등 시각 효과 |
 | `Scripts/Audio/` | 음악·효과음 재생 |
@@ -265,10 +269,10 @@
 
 - 무기 수치: `Scripts/Combat/OfficeCombatRules.cs`
 - 직원 직급·인원: `Scripts/UI/OfficeCompanySettings.cs`
-- 무한 모드 상단 바: `Scripts/Endless/OfficeRampageGame.EndlessHUD.cs`
+- 무한 모드 상단 바: `Scripts/Endless/UI/OfficeRampageGame.EndlessHUD.cs`
 - 공통 스킬 아이콘: `Scripts/UI/OfficeRampageGame.CompactHUD.cs`
-- 플레이어 로봇: `Scripts/Endless/OfficeRampageGame.EndlessMech.cs`, `OfficeRampageGame.EndlessMechModel.cs`, `OfficeRampageGame.MechDash.cs`
-- 드론·전투기·블랙홀: `Scripts/Endless/OfficeRampageGame.AirSupport.cs`, `OfficeRampageGame.BlackHole.cs`
+- 플레이어 로봇: `Scripts/Endless/Support/OfficeRampageGame.EndlessMech.cs`, `OfficeRampageGame.EndlessMechModel.cs`, `OfficeRampageGame.MechDash.cs`
+- 드론·전투기·블랙홀: `Scripts/Endless/Support/OfficeRampageGame.AirSupport.cs`, `OfficeRampageGame.BlackHole.cs`
 - 공통 폰트: `Scripts/UI/OfficeGameFont.cs`
 
 `OfficeRampageGame.*`는 여러 파일에 나눈 **하나의 partial 클래스**입니다. 임의로 서로 다른 어셈블리로 분리하지 마세요. UnityEditor 코드는 `Editor/` 아래에 둡니다. 게임 로직 수정 후에는 컴파일 → 이동·점프·바닥·벽 충돌 → 변경 기능 → 실제 대상 플랫폼 순서로 확인하세요.

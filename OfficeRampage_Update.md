@@ -1,4 +1,4 @@
-﻿# OfficeRampage 업데이트 기록
+# OfficeRampage 업데이트 기록
 
 이 파일에 업데이트 내역을 누적합니다. 기존 기록을 보존하고 새 업데이트는 파일 끝에 추가합니다.
 
@@ -356,3 +356,13 @@ Unity 확인: GameFont.asset의 Font 참조 및 TTF Dynamic/Include Font Data �
 - 격리 Unity Editor 재컴파일에서 CS0414 및 C# 컴파일 오류 없음. 기존 Play 테스트의 이동·점프·바닥/벽 충돌 및 UFO 테스트 통과.
 - Unity에서 재컴파일 후 Console의 기존 메시지를 Clear하고 경고가 다시 발생하는지 확인하세요. Input Manager 사용 중단 예정 경고는 별개이므로 유지됩니다.
 - Web 빌드와 브라우저 검증, 위성 연출 전체 재생 검증은 이번 정리에서 실행하지 않았습니다.
+
+
+## 2026-11-24 — 유지보수용 폴더 재배치
+- 무한 모드 19개 스크립트를 Endless/Weapons, Support, Pickups, UI로 분류하고 진입·전장·환경·적 규칙은 Endless 루트에 유지했습니다.
+- 초기 CodexStarter, SampleScene, TutorialInfo와 튜토리얼 Readme 자산을 Assets/Samples 아래로 모았습니다. 기본 씬의 빌드 포함 설정은 보존하고 경로만 수정했습니다.
+- 기존 자산의 .meta 및 GUID, Resources 로딩 경로, 폰트, 시작 씬, 층 프리팹, 게임 로직/수치는 유지했습니다. Assets에는 실제로 비어 있는 폴더가 없어 폴더 삭제는 하지 않았습니다.
+- 샘플 생성/튜토리얼 도구의 경로, README와 현재 안내 문서를 갱신하고 Docs/MAINTENANCE.md를 현재 구조로 다시 작성했습니다. 전체 이동표는 Docs/REORGANIZATION_2026-11-24.md입니다.
+- 격리 Unity 검증: 이동한 자산/폴더 35개 GUID 경로, 4개 층 프리팹 Missing Script 검사, 폰트/캐릭터 카탈로그 로드, 빌드 씬 경로 확인 및 컴파일 통과. Play 이동·점프·바닥/벽 충돌과 기존 UFO 기능 검사 통과.
+- 확인 방법: Unity 재컴파일 종료 후 Assets/OfficeRampage와 Assets/Samples 확인 → OfficeRampage 시작 씬 Play → 층 편집 메뉴 및 무한 모드 확인. IDE 목록이 오래된 경우 Unity External Tools에서 프로젝트 파일을 재생성하세요.
+- 전체 스토리 완주·모든 무기·Web 빌드·브라우저 한글 입력은 이번 구조 정리에서 재검증하지 않았습니다.

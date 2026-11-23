@@ -62,7 +62,7 @@ fonttools varLib.instancer "Assets/Fonts/NotoSansKR-VariableFont_wght.ttf" wght=
 ## 수정 파일 목록
 
 - `Assets/OfficeRampage/Scripts/Core/OfficeRampageGame.cs`
-- `Assets/OfficeRampage/Scripts/Endless/OfficeRampageGame.EndlessLoot.cs`
+- `Assets/OfficeRampage/Scripts/Endless/Pickups/OfficeRampageGame.EndlessLoot.cs`
 - `Assets/OfficeRampage/Scripts/Enemies/OfficeRampageGame.Defenders.cs`
 - `Assets/OfficeRampage/Scripts/Story/OfficeRampageGame.Ending.cs`
 - `Assets/OfficeRampage/Scripts/Story/OfficeRampageGame.Intro.cs`

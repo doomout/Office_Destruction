@@ -1,171 +1,89 @@
-﻿# 유지보수 안내
+# 유지보수 안내
 
-> **2026-11-16 변경:** 정상 게임의 층 배치는 이제 `Resources/OfficeFloors/Floor1~4.prefab`을 직접 편집합니다. [그래픽 편집 가이드](VISUAL_FLOOR_EDITING.md)를 먼저 보세요. 아래 JSON 설명은 이전 배치/복구용이며 프리팹이 있는 게임에 직접 반영되지 않습니다.
+기준: 2026-11-24. 게임 동작을 바꾸지 않고 파일 위치를 정리했습니다. 파일명·클래스명과 기존 자산의 GUID는 유지합니다.
 
+## 프로젝트 입구
 
-기준: 2026-11-14. 기능을 찾을 때는 아래 표에서 폴더를 고른 다음 함수 이름을 검색하세요. 파일 수를 억지로 줄이지 않고 관련 기능끼리 묶었습니다.
-
-> **2026-11-17 추가:** 무한 파괴 전용 코드는 `Scripts/Endless/`에 있습니다. [모드 안내·수치·파일 지도](ENDLESS_MODE.md)를 참고하세요. 스토리 층 프리팹과 별도의 런타임 전장을 사용합니다.
-
-## 어디부터 고칠까?
-
-| 작업 | 시작 위치 (`Assets/OfficeRampage/Scripts/` 기준) |
+| 위치 | 용도 |
 | --- | --- |
-| 플레이 시작·이동·입력·기본 HUD | `Core/OfficeRampageGame.cs` |
-| 달리기 시간·게이지·다리 동작 | `Player/OfficeRampageGame.Sprint.cs` |
-| 공격력·사거리·재사용 간격 | `Combat/OfficeCombatRules.cs`, 실제 적용은 `Combat/OfficeRampageGame.Combat.cs` |
-| 스킬·스킬 콤보 제외 | `Combat/OfficeRampageGame.WeaponSkills.cs`, `OfficeRampageGame.Elements.cs` |
-| 더미·화상 | `Combat/OfficeRampageGame.Decoy.cs`, `OfficeBurn.cs` |
-| 적 공격·이동·동결·유인 | `Enemies/OfficeDefender*.cs`, `OfficeRampageGame.Defenders.cs` |
-| 회사 직급·고정 인원·이름 저장 | `UI/OfficeCompanySettings.cs`, `OfficeRampageGame.Company.cs` |
-| 메뉴·음량·이름 입력창 | `UI/OfficeRampageGame.Menu.cs`, `OfficeMenuRules.cs`, `OfficeNameEditor.cs` |
-| 가구 위치·통로·길찾기 | `World/OfficeLayout.cs`, `OfficeNavigation.cs` |
-| 물건 파괴·환경·회복 | `World/OfficeProp.cs`, `OfficeRules.cs`, `OfficeHealingPotion.cs` |
-| 전원 처치 조건·엘리베이터 | `World/OfficeRampageGame.Progress.cs`, `OfficeProgressRules.cs`, `OfficeRampageGame.Elevator.cs` |
-| 도입 선택·출근 결말 | `Story/OfficeRampageGame.Intro.cs` |
-| 대표 사망·마지막 대사·엔딩 버튼 | `Story/OfficeRampageGame.Ending.cs` |
-| 비서·BFG·사막 전환 | `Combat/OfficeRampageGame.Combat.cs` |
-| 폭발·로켓 꼬리·효과 수명 | `Effects/` |
-| 배경음·효과음·볼륨·전환 | `Audio/OfficeAudio.cs` |
+| `Assets/OfficeRampage/` | 실제 게임 코드·씬·그래픽·런타임 자산 |
+| `Assets/Fonts/` | 원본 한글 폰트. Resources의 GameFont.asset에서 참조 |
+| `Assets/Settings/` | 렌더 파이프라인 설정. 이름만 보고 삭제하지 마세요 |
+| `Assets/Samples/` | 초기 CodexStarter 연습 코드, 기본 SampleScene, Unity TutorialInfo |
+| `Assets/InputSystem_Actions.inputactions` | 프로젝트 입력 설정에서 참조하는 액션 자산 |
+| `Docs/` | 편집·리소스 교체·모드별 안내 |
+| `Tools/` | 규칙 검사·음원 가져오기 도구 |
+| `Packages/`, `ProjectSettings/` | 패키지·Unity 설정 |
+| `Library/`, `Temp/`, `Logs/` | Unity 생성 데이터. 유지보수용 소스 폴더가 아닙니다 |
 
-주의: 현재 `Core/OfficeRampageGame.cs`에는 `BuildPerson`, `SpawnProp`, `BuildRoom` 같은 기본 생성 함수도 있습니다. 이번 변경은 파일 이동 중심으로, 모든 함수를 새 클래스로 재설계한 것은 아닙니다. `World/OfficeRampageGame.Effects.cs`는 이름과 달리 문 생성/폭발 호출 보조 코드를 포함합니다.
+시작 씬은 `Assets/OfficeRampage/Scenes/OfficeRampage.unity`입니다. 빌드 목록의 SampleScene은 `Assets/Samples/Scenes/SampleScene.unity`로 경로만 변경했고 기존 포함 설정은 유지했습니다.
 
-## partial 클래스와 파일명
+## 기능별 코드 찾기
 
-`OfficeRampageGame.Menu.cs`, `OfficeRampageGame.Combat.cs` 등은 별도 컴포넌트가 아니라 **같은 OfficeRampageGame 클래스의 일부**입니다. 서로의 private 필드/함수를 사용합니다. 파일이 다른 폴더에 있어도 namespace와 클래스 선언을 유지하면 함께 컴파일됩니다. `OfficeDefender.*`도 같은 방식입니다.
+아래 경로는 `Assets/OfficeRampage/Scripts/` 기준입니다.
 
-현재 별도 asmdef를 추가하지 않았습니다. partial 파일을 임의로 서로 다른 어셈블리로 나누면 컴파일되지 않습니다. `Editor/`는 UnityEditor 전용 코드이며 런타임 코드와 구분해야 합니다.
+| 수정할 기능 | 위치 / 시작 파일 |
+| --- | --- |
+| 초기화·루프·입력·카메라·기본 생성 | `Core/OfficeRampageGame.cs` |
+| 외형·달리기·가로 휘두르기 | `Player/` |
+| 기본 무기 수치·콤보·상태 이상·투사체 | `Combat/OfficeCombatRules.cs`, `Combat/OfficeRampageGame.Combat.cs` |
+| 적 AI·보스·경비견·경비 | `Enemies/` |
+| 층·가구·문·엘리베이터·진행 조건 | `World/` |
+| 도입·대표 결말·우주 연출 | `Story/` |
+| 무한 모드 시작·루프 | `Endless/OfficeRampageGame.Endless.cs` |
+| 무한 모드 공통 초기화·적·환경 | `Endless/OfficeRampageGame.EndlessExtras.cs`, `OfficeDefender.Endless.cs`, `OfficeRampageGame.EndlessEnvironment.cs` |
+| 무한 모드 일반 무기·발사 효과 | `Endless/Weapons/` |
+| UFO·블랙홀·항공 지원·로봇·위성·악마·교통사고 | `Endless/Support/` |
+| 무한 보급 생성·획득·피해 2배 표시 | `Endless/Pickups/` |
+| 무한 모드 상단 HUD·랭킹·저장 | `Endless/UI/` |
+| 공통 메뉴·직원 설정·한글 입력·아이콘·폰트 | `UI/` |
+| 음악·효과음 | `Audio/OfficeAudio.cs` |
+| 폭발·불꽃·지구·건물 붕괴 | `Effects/` |
 
-## 수정 작업 순서
+`OfficeRampageGame.*`와 `OfficeDefender.*`는 여러 파일로 나눈 partial 클래스입니다. 폴더를 옮겨도 같은 클래스이며 서로 private 멤버를 공유합니다. 임의로 asmdef를 추가해 서로 다른 어셈블리로 나누지 마세요. `Core`의 기본 생성 함수 등 내부 설계까지 분리한 작업은 아닙니다.
 
-1. Play를 종료하고 Git 커밋 또는 프로젝트 백업을 만듭니다.
-2. 관련 파일/함수를 찾고 한 기능씩 수정합니다. 파일 이동 시 Unity Project 창을 쓰거나 원본 `.meta`를 반드시 함께 이동합니다.
-3. Unity 임포트·컴파일을 기다리고 Console 오류를 먼저 해결합니다.
-4. 해당 기능을 검사한 뒤 이동·점프·충돌, 층 이동, 재시작 같은 연결 기능을 확인합니다.
-5. 동작이 확인되면 README 또는 가이드를 갱신하고 `OfficeRampage_Update.md` 끝에 날짜/변경/검사/미확인 범위를 적습니다.
+## 눈으로 수정하는 자산
 
-`Library`, `Temp`, `Logs`, 생성된 `.csproj`는 직접 수정하지 않습니다. 폴더 이동 후 IDE 파일 목록이 낡았으면 Unity의 External Tools에서 프로젝트 파일 재생성을 사용하세요. 예전 절대 경로를 사용하는 개인 스크립트가 있다면 아래 이동 지도에 맞춰 수정합니다.
+`Assets/OfficeRampage/` 기준:
 
-## 실행 경로와 자산 참조
+| 자산 | 위치 |
+| --- | --- |
+| 실제 1~4층 배치 | `Resources/OfficeFloors/Floor1~4.prefab` |
+| 이전 배치·복구용 JSON | `Resources/OfficeLayouts/` (정상 플레이는 프리팹 우선) |
+| 직원 원본 모델·재질·프리팹 | `Art/KenneyMiniCharacters/` |
+| 층 재질 | `Art/FloorMaterials/` |
+| 캐릭터 카탈로그 | `Resources/OfficeCharacters/Catalog.asset` |
+| 음악·효과음 | `Resources/OfficeAudio/` |
+| 무기 PNG 아이콘 | `Resources/OfficeIcons/` |
+| 한글 폰트 연결 | `Resources/OfficeFonts/GameFont.asset` |
+| 지구 자산 | `Resources/OfficeSpace/` |
+| 음원 라이선스 | `AudioCredits/` |
 
-- 시작 씬: `Assets/OfficeRampage/Scenes/OfficeRampage.unity`
-- Unity 메뉴 경로 상수: `Assets/OfficeRampage/Editor/OfficeRampageSceneMenu.cs`
-- 빌드 씬 목록: `ProjectSettings/EditorBuildSettings.asset`
-- 오디오 검색 루트: `Resources/OfficeAudio` (폴더를 그대로 유지)
-- 기존 씬/스크립트의 GUID를 바꾸지 않았으므로 직렬화된 컴포넌트 참조는 유지됩니다. 기존 씬 내용은 수정하지 않고 위치만 옮겼습니다.
+층은 [그래픽 편집 가이드](VISUAL_FLOOR_EDITING.md), 모델·음악은 [교체 가이드](ASSET_GUIDE.md), 무한 모드는 [모드 안내](ENDLESS_MODE.md)를 참고하세요. 무한 전장은 실행 시 생성합니다.
 
-그래픽 교체는 [그래픽·음악 가이드](ASSET_GUIDE.md)를 보세요. `Art/`는 교체 자산 보관용이며 자동 로드 슬롯은 아닙니다.
+## 새 기능을 넣을 때
 
-## 검사 도구
+1. 게임 공통 기능은 해당 기능 폴더에, 무한 전용 기능은 `Endless`의 해당 하위 폴더에 추가합니다.
+2. 새 무한 무기는 `Endless.cs`의 이름/ID, `Weapons/OfficeRampageGame.EndlessWeapons.cs`의 공격 분기, `Pickups/OfficeRampageGame.EndlessLoot.cs`의 모델·탄약·획득, 보급 목록과 HUD를 함께 확인합니다. 파일만 추가한다고 자동 등록되지는 않습니다.
+3. 지속 소환 효과는 초기화·사망·일시정지·재시작 시 종료/복구 경로를 함께 만듭니다. 스킬 피해는 `SkillDamage`를 사용해 콤보를 다시 채우지 않도록 합니다.
+4. Editor 도구는 `Assets/OfficeRampage/Editor/`에 둡니다. 기존 층/캐릭터 재생성 도구는 수동 편집을 덮을 수 있으므로 실행 전 백업합니다.
 
-프로젝트 루트에서 PowerShell로 각각 실행합니다. 경로에 맞게 파일을 찾도록 이번 폴더 구조에 맞춰 수정했습니다.
+## 파일 이동과 빈 폴더
 
-```powershell
-powershell -NoProfile -File .\Tools\Test-OfficeLayout.ps1
-powershell -NoProfile -File .\Tools\Test-OfficeDefense.ps1
-powershell -NoProfile -File .\Tools\Test-CombatRules.ps1
-```
+- Unity Project 창에서 이동하거나 원본 `.meta`를 반드시 함께 이동합니다. 이름이 같아도 GUID가 바뀌면 씬·프리팹 참조가 끊깁니다.
+- `Resources` 아래 상대 경로는 런타임 로딩 계약입니다. 이번 정리에서는 Resources와 그 내용의 위치를 변경하지 않았습니다.
+- `Editor` 폴더는 에디터 전용 컴파일 구분입니다. 일반 폴더로 바꾸지 마세요.
+- `Scripts`, `Resources`, `OfficeAudio`처럼 직접 파일이 없어도 하위 폴더에 자산이 있으면 빈 폴더가 아닙니다. 이번 조사에서는 Assets에 내용이 전혀 없는 폴더가 없어 삭제하지 않았습니다.
+- 경로를 문자열로 사용하는 도구·빌드 씬 목록·문서를 이동과 함께 갱신합니다. 날짜별 과거 기록은 당시 경로를 보존합니다.
 
-각각 가구 배치/통로/환경, 적 규칙/길찾기, 전투 규칙을 검사합니다. 이 도구는 Unity 화면과 소리를 실행하지 않습니다. 일부 `OfficeDefenseRules`의 기존 규칙 검사와 실제 회사 설정의 43명 생성 검사는 범위가 다르므로 이 검사만으로 전체 플레이를 보장하지 않습니다.
+## 확인 순서
 
-Unity에서 함께 확인할 항목:
+1. Unity 재임포트/컴파일 후 Console 오류 및 Missing Script 확인.
+2. 시작 씬 Play → 이동·점프·바닥/벽 충돌 확인.
+3. 층 편집 메뉴로 Floor1~4 열기, 프리팹·재질·캐릭터·폰트·오디오 연결 확인.
+4. 변경 기능, 메뉴 복귀·재시작·일시정지 확인.
+5. Web 배포 시 별도로 빌드하고 브라우저에서 한글 표시와 입력을 확인.
 
-- 씬에 Missing Script가 없는지, 정상 시작되는지
-- 한글 이름 입력/저장, 설정 취소/적용
-- 이동·점프·바닥/가구 충돌·달리기
-- 무기·F 스킬·더미·화상·동결과 콤보 제외
-- 전원 처치 조건·문·엘리베이터 이동·이전 층 제거
-- 대표전·BFG·사막·엔딩·재시작
-- 출근 선택의 43명/12초 집중 공격과 사망 화면
-- 음악·효과음·볼륨·일시정지
+규칙 검사는 프로젝트 루트에서 `Tools/Test-OfficeLayout.ps1`, `Tools/Test-OfficeDefense.ps1`, `Tools/Test-CombatRules.ps1`을 각각 실행합니다. 규칙 검사만으로 화면·사운드·전체 플레이가 검증되지는 않습니다.
 
-이번 작업의 별도 Unity 자동 검사는 Codex 작업 공간의 `work/CombatValidation`에서 실행했습니다. 이 복제 프로젝트와 검사 파일은 배포 게임에 포함하지 않습니다. 프로젝트의 과거 `OfficeRampage_검증.md`, `OfficeRampage_사운드안내.md`는 초기 기록으로 남기고 안내 링크를 추가했습니다.
-
-## 문제 복구
-
-- **Missing Script:** 새로 만든 스크립트로 대체하기 전에 이동 전 `.meta` GUID와 현재 파일이 같은지 확인합니다.
-- **씬이 안 열림:** 새 `Scenes` 경로를 사용하고 Editor 메뉴 상수와 빌드 씬 경로를 확인합니다.
-- **음악 누락:** Resources 상대 경로/중복 이름/파일 형식과 Play 재시작 여부를 확인합니다.
-- **컴파일 중복 정의:** 이동 전 파일과 이동 후 파일이 둘 다 남았는지 확인합니다. 원본을 복사만 한 뒤 둘 다 Assets에 두지 마세요.
-- **롤백:** 아래 이동 표를 역순으로 적용하고 `.meta`도 함께 되돌립니다. Editor 메뉴 경로와 빌드 씬 목록, Tools의 경로도 같은 버전으로 복구합니다. 덮어쓰기 전 현재 수정본을 보관하세요.
-
-
-## 고정 배치·캐릭터 에셋 추가
-
-- `Scripts/World/OfficeFixedFloor.cs`: 고정 JSON 읽기, 런타임 배치 생성. 가구 좌표 편집은 `Resources/OfficeLayouts`에서 합니다.
-- `Scripts/Player/OfficeCharacterCatalog.cs`: 프리팹 배열 정의. 실제 값은 `Resources/OfficeCharacters/Catalog.asset`.
-- `Scripts/Player/OfficeCharacterVisual.cs`: 인간 외형 교체, 기존 도형 숨김, 이동/공격/동결 애니메이션 연결.
-- `Editor/OfficeArtBuilder.cs`: 원본 FBX의 Legacy 애니메이션·URP 재질·키 정규화 프리팹 생성. 카탈로그/프리팹 수동 편집을 덮으므로 재생성 전 백업합니다.
-- `Art/KenneyMiniCharacters`: 원본 FBX, 텍스처, 재질, 프리팹 및 CC0 출처. .meta를 포함해 함께 보관합니다.
-- 그래픽 교체 시 기존 Body/CharacterController를 제거하지 않고 시각 모델만 교체합니다. 새 모델 연결과 고정 JSON 편집 절차는 ASSET_GUIDE.md의 마지막 두 절을 확인하세요.
-
-
-## 무기창·탄약·실내·출근 대사
-
-- `Scripts/UI/OfficeRampageGame.WeaponHUD.cs`: 아이콘 실루엣, 잔탄 표시, 새 게임 탄약 지급과 1회 소비. 권총/샷건/로켓 수량은 `ResetAmmo`에서 조절합니다.
-- `Scripts/Combat/OfficeRampageGame.Combat.cs`: 발사 전에 탄약을 검사합니다. 빈 탄창은 발사/투사체 생성을 막고 무기 교체나 층 이동으로 재충전되지 않습니다.
-- `Scripts/Combat/OfficeRampageGame.Decoy.cs`: `DecoysPerOffice=3`, 조준/투척 제한과 HUD.
-- `Scripts/World/OfficeRampageGame.Architecture.cs`: 천장·창틀·벽 외형·도시 배경 생성. 기존 경계 Collider를 보존합니다.
-- `Scripts/World/OfficeRoofCutaway.cs`: 카메라가 천장보다 높을 때 지붕/벽 Renderer만 숨기는 처리. 충돌체는 유지합니다.
-- `Scripts/Story/OfficeRampageGame.Intro.cs`: `OvertimeLines` 대사 배열, 3겹 반경, 높은 연출 카메라. 15회×0.8초 공격 중 2회마다 대사를 바꿉니다.
-
-
-## 연속 낙뢰와 새 미디어 유지보수
-- Combat/OfficeRampageGame.Elements.cs: 3초·0.5초 간격 총 6웨이브, 웨이브당 낙뢰 3개. 탐색 반경 14m/타격 반경 1.7m, 사람 피해 12·기절 3초, 물건 피해 18. SkillDamage 범위에서 적용하여 콤보 보상 방지.
-- Enemies/OfficeDefender.Frozen.cs: Stun/TickStun. 기존 얼음과 기절을 독립적으로 감소시키고 두 상태 중 하나라도 남으면 이동/공격 중단. 일시정지·연출 중에는 시간 정지.
-- Player/OfficeCharacterVisual.cs와 Core/OfficeRampageGame.cs: 망치 치켜들기 자세. Combat/OfficeRampageGame.Combat.cs: 망치 머리 90도 회전.
-- UI/OfficeRampageGame.WeaponHUD.cs → Resources/OfficeIcons PNG. Audio/OfficeAudio.cs → Resources/OfficeAudio/CombatRefresh 효과음.
-- Story/OfficeRampageGame.Intro.cs: 출근 연출 상단 자막. 결과 버튼은 사망 후에만 표시.
-
-
-## 경비견 다음 경비 전투
-- `Enemies/OfficeRampageGame.Security.cs`: 마지막 경비견 처치 다음 프레임에 경비 5명 생성. 공격 중 defenders 목록을 변경하지 않도록 지연합니다. 재시작 시 coroutine과 securityWaveStarted/Pending 초기화.
-- `UI/OfficeRampageGame.Company.cs`의 CheckFinalRoster: 경비견 → 경비 → 대표 순서와 대표 무적 해제.
-- `Enemies/OfficeDefender.cs`의 securityWeapon: 0 근접/3 권총/4 장거리 샷건. 기존 직원 공격 종류는 유지.
-- `Effects/OfficeRageAura.cs`, `Effects/OfficeBuildingCollapse.cs`: 분노/핵폭발 외형. Play 일시정지 중 효과 시간 정지.
-- `Audio/OfficeAudio.cs`: shot/machinegun/shotgun 키는 기존 OfficeAudio/Sfx/shot 파일을 사용. 다른 새 효과음은 유지.
-
-
-## 거대 로봇·위성 피니시
-- Story/OfficeRampageGame.Finale.cs: DeployBossRobot → DropOrbitalButton → OrbitalStrike. 초기화는 ResetFinale. 카메라·우주 모형·버튼은 기존 world 아래 소유하며 새 게임에서 함께 제거.
-- Enemies/OfficeDefender.cs: 2페이즈 타격점 높이/6.6m 컨트롤러, 최초20% 임계점 클램프와 버튼 요청. 반복 지급 방지. 피니시 후 기존 엔딩 경로 사용.
-- Combat/OfficeRampageGame.Combat.cs: 사막 길이/폭2.5배(이전1.25배 대비 각각2배), 로봇 배치 coroutine 호출. 버튼은 BFG 소진 후8번 슬롯 재사용.
-- World/OfficeCraterFloor.cs: 반구형 하강 지형, MeshCollider, 생성 Mesh 정리. 기존 평평한 사막 바닥은 분화구 생성 시 비활성화.
-- Enemies/OfficeBossRobot.cs: 로봇 보행. UI/OfficeRampageGame.WeaponHUD.cs: 빨간 버튼 및 ??? 표시.
-- Effects/OfficeOrbitLand.cs: 간략화한 대륙 윤곽을 구면 Mesh로 나누어 생성하고 연출 종료 시 Mesh를 정리합니다.
-
-
-## 우주 투하 및 대표 탈출 엔딩
-- SpaceDelivery partial의 robotDeliveryStage(1 대기/2 투하/3 지상)와 bossEjected는 ResetFinale에서 초기화합니다.
-- 지구/우주 수송대는 임시 Orbital cinematic 아래, 로봇은 지상 전환 전 대표 루트로 되돌려 배치합니다. 카메라 far clip·안개·배경 복원 후 임시 우주 오브젝트 제거.
-- ShatterRobotAndEject는 로봇을 world로 분리해 잔해로 남기고 조종사는 통째로 분리해 착지시킵니다. 이후 unit.visual은 온전한 CEO pilot을 가리킵니다. 기존 모델을 자르거나 교체하지 않습니다.
-- 일반 무기로 로봇을 쓰러뜨려도 같은 분리/탈출 엔딩이 적용됩니다. 위성 공격은 그 앞에 2배 핵폭발을 추가합니다.
-- Ending의 2페이즈 분기는 대표를 다시 옆으로 회전시키지 않고 엎어진 자세를 유지합니다. 기존 엔딩 버튼/대사·새 게임 초기화 유지.
-
-
-## 2026-11-16 4층 구성과 시간 제한 폐지
-
-- `OfficeProgressRules.ExitReady`는 적 전원 처치만 검사합니다. 가구 수를 진행 조건에 다시 연결하지 마세요. `TimerRuns`는 항상 false, 게임 루프의 제한시간 감소/패배와 콤보 시간 보너스는 제거했습니다.
-- `OfficeCompanySettings.Rooms` = 1,2,2,2,2,2,3,3,3,3,4. 기존 이름/성별 저장 형식과 고정 총원 43명 유지.
-- 마지막 층 번호는 4입니다. 정상 플레이에서 floor5는 사용하지 않습니다.
-- `OfficeRampageGame.FloorIdentity.cs`의 두 내부 미닫이 문은 경비견/보디가드 전멸 시 각각 열립니다. `CheckFinalRoster`와 `RevealSecurity`가 진행을 연결합니다.
-- 구역별 이동 제한은 `OfficeDefender.patrolStart/patrolEnd`로 적용합니다. roomStart는 길찾기 좌표 원점이므로 구역 제한 용도로 바꾸지 마세요. 로봇 전환 때 구역 제한을 해제합니다.
-- BFG 지급 임계값은 `OfficeCombatRules.Gift`의 50%. 기다리는 비서를 재사용하며 전달 동안 떨림을 끄고 비서실 문으로 왕복합니다.
-- 검사: Codex 격리 프로젝트의 FourFloorValidation은 네 층 길찾기, 100% 처치 문, 이동/충돌, 엘리베이터 정리, 구역별 호위와 비서, BFG 이후 엔딩까지 실행합니다. 기존 5층/60%/시간제 가정의 검사 스크립트는 이번 규칙의 기준이 아닙니다.
-
-
-## 그래픽 층 편집 연결 파일
-- `World/OfficeFloorPrefab.cs`: 저장된 실제 가구와 충돌체에서 배치/길찾기 정보 추출. 활성 Collider를 사용하므로 새 벽 복제도 반영. 시간별 이동 장애물인 미닫이 문은 길찾기 장애물에서 제외하고 실제 Collider로 잠금.
-- `World/OfficeRampageGame.PrefabFloors.cs`: 프리팹 인스턴스와 파괴 가구/포션/문/인물 연결. 편집용 인물 미리보기는 숨기고 회사 설정으로 실제 인물을 생성.
-- `Editor/OfficeFloorEditor.cs`: 층별 Prefab Mode 메뉴, 편집 화면 천장/외벽 숨김, 길찾기 검사.
-- `Resources/OfficeFloors`, `Art/FloorMaterials`: 저장된 실제 배치와 공유 재질. 프리팹 이름/경로와 .meta GUID 보존.
-- `OfficeFixedFloor.Load`는 프리팹을 우선 읽고 프리팹이 없을 때에만 이전 JSON으로 복구합니다. 실제 프리팹 수정에는 JSON 캐시가 사용되지 않습니다.
-- 생성용 기존 `BuildRoom`은 복구 경로입니다. 신규 수정은 편집 가능한 프리팹에서 시작하세요.
-
-
-## 2026-11-16 지구 분리 피니시와 배치/밸런스 보정
-- 대표의 분노는 50%, 비서의 BFG 18 전달은 20%입니다. 로봇 20%에서 받는 빨간 버튼과 구분합니다.
-- 마지막 위성 공격은 우주 화면에서 지구가 세로로 갈라지고 두 반구와 주황색 단면이 드러나는 연출입니다. 기존 마지막 2배 핵폭발을 대체하며 BFG 18의 건물 붕괴/버섯구름은 유지합니다. 이후 로봇 분리·대표 탈출·엔딩으로 이어집니다.
-- 대표층의 각 호위 전투가 끝나면 해당 가로 구역 벽과 문이 사라집니다. 경비견 전멸 뒤 보디가드는 첫 방으로도 이동하며, 대표전에서는 이전 구역까지 이동합니다. 벽 제거 후 길찾기를 새로 만듭니다.
-- 3층 Floor3.prefab의 파티션만 제거하고 책상·직원·배경은 유지합니다. 로비 직원은 100 HP이며 무기 수치는 유지합니다. 권총 4회, 방망이 3회, 망치 2회가 필요하며 로켓 직격은 여전히 강력합니다.
-- 관련 코드: Effects/OfficeEarthSplit.cs, Story/OfficeRampageGame.EarthFinale.cs, World/OfficeRampageGame.StageBarriers.cs. 프리팹을 편집할 때 대표층 구역 경계 벽은 문의 z 위치와 일치하도록 유지합니다.
+이번 재배치의 전체 이전/이후 경로는 [이동 목록](REORGANIZATION_2026-11-24.md)에 있습니다. 문제 시 기존 GUID를 유지한 채 이동 목록을 역순으로 적용하고, 경로를 갱신한 코드·문서·빌드 설정도 함께 복원하세요.
