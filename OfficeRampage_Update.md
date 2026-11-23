@@ -318,3 +318,12 @@ OS 폰트 생성 3곳을 OfficeGameFont 공통 로더로 교체했습니다. Res
 - 가변 폰트의 미표시 문제는 Editor에서 재현되지 않았습니다. 기본 굵기 100은 얇게 보일 수 있으나 고정 TTF로 강제 교체하지 않았습니다.
 
 Unity 확인: GameFont.asset의 Font 참조 및 TTF Dynamic/Include Font Data 확인 → Web 재빌드 → HTTP(S) 실행 → 메뉴/버튼/이름표/체력/장비/랭킹 및 실제 한글 조합 입력 확인. 상세 원인·파일 목록·고정 TTF 변환법은 Docs/WEB_FONT_FIX.md 참고. 게임 로직·전투·AI·맵·입력 코드·씬·프리팹·설정은 유지했습니다. README 전면 재작성은 보류했습니다.
+
+
+## 2026-11-23 — 빈 자산 폴더 정리
+
+- Art/Materials, Art/Models, Art/Prefabs, Art/Textures 4개 빈 폴더 및 해당 폴더 메타만 백업 후 제거했습니다. 코드/설정/프리팹 등의 폴더 GUID·경로 참조가 없음을 확인했습니다.
+- Resources 아래의 음악·효과음·캐릭터 목록·층 프리팹·폰트·아이콘·배치 자료는 유지했습니다.
+- 검증: 남은 Assets 파일과 메타 540개의 SHA-256이 정리 전과 모두 일치합니다. 실행 코드와 에셋 내용이 바뀌지 않아 Unity 컴파일/Play/Web 빌드는 재실행하지 않았습니다.
+- Unity 확인: Project 창에서 새로고침하거나 프로젝트를 다시 열어 Art 아래 빈 폴더 4개가 사라졌는지 확인하세요.
+- 복구용 폴더와 원본 GUID 메타는 Codex 작업 폴더 outputs/EmptyFolderCleanup/Backup에 보관했습니다.
