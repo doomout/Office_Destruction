@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 namespace OfficeRampage
 {
@@ -9,10 +9,11 @@ namespace OfficeRampage
         private sealed class SupportBomb{public Transform root;public Vector3 from,to;public float age;public bool ultimate;}
         private readonly List<SupportBomb> supportBombs=new List<SupportBomb>();
         private float droneLeft,droneClock,droneAge,jetLeft,jetClock,jetAge;
-        private bool EndlessUltimateActive=>jetLeft>0||blackHoleLeft>0;
+        private bool EndlessUltimateActive=>jetLeft>0||blackHoleLeft>0||ufoLeft>0;
         private void EnsureAirSupportRoot(){if(airSupportRoot==null){airSupportRoot=new GameObject("Endless air support").transform;airSupportRoot.SetParent(world,false);}}
         private void ResetAirSupport()
         {
+            ResetUFO();
             if(airSupportRoot!=null){airSupportRoot.gameObject.SetActive(false);Destroy(airSupportRoot.gameObject);}
             airSupportRoot=null;supportDrones.Clear();supportJets.Clear();supportBombs.Clear();droneLeft=droneClock=droneAge=jetLeft=jetClock=jetAge=0;ResetBlackHole();
         }
@@ -73,7 +74,7 @@ namespace OfficeRampage
                 CreateBlast(bomb.to,false);SkillDamage(()=>EndlessArea(bomb.to,bomb.ultimate?12:6,bomb.ultimate?100000:100,false));audioBus.Play("explosion",bomb.ultimate?.3f:.18f);
                 Destroy(bomb.root.gameObject);supportBombs.RemoveAt(i);
             }
-            TickBlackHole(dt);
+            TickBlackHole(dt);TickUFO(dt);
         }
         private void WipeEndlessEnemiesAndProps()
         {

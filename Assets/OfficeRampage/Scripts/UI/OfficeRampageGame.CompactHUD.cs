@@ -3,7 +3,7 @@ namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
     {
-        private enum HudSymbol { Whirlwind, Thunder, Ice, Heart, Shield, Run, Skull, Door, Ammo, Weapon, Double, Demon, Car, Robot, Oil, Alert, Clock, Drone, Jet, BlackHole }
+        private enum HudSymbol { Whirlwind, Thunder, Ice, Heart, Shield, Run, Skull, Door, Ammo, Weapon, Double, Demon, Car, Robot, Oil, Alert, Clock, Drone, Jet, BlackHole, UFO }
         private GUIStyle hudNumber,hudKey;
         private HudSymbol hudNoticeSymbol;
         private string hudNoticeNumber="";
@@ -31,6 +31,7 @@ namespace OfficeRampage
             {
                 case HudSymbol.Drone:Ring(.2f,.2f,.15f);Ring(.8f,.2f,.15f);Ring(.2f,.8f,.15f);Ring(.8f,.8f,.15f);L(.2f,.2f,.8f,.8f);L(.2f,.8f,.8f,.2f);break;
                 case HudSymbol.Jet:L(.5f,.05f,.6f,.45f);L(.6f,.45f,.95f,.7f);L(.95f,.7f,.6f,.65f);L(.6f,.65f,.65f,.95f);L(.65f,.95f,.5f,.85f);L(.5f,.85f,.35f,.95f);L(.35f,.95f,.4f,.65f);L(.4f,.65f,.05f,.7f);L(.05f,.7f,.4f,.45f);L(.4f,.45f,.5f,.05f);break;
+                case HudSymbol.UFO:L(.12f,.5f,.32f,.25f);L(.32f,.25f,.68f,.25f);L(.68f,.25f,.88f,.5f);L(.05f,.5f,.95f,.5f);L(.05f,.5f,.25f,.65f);L(.25f,.65f,.75f,.65f);L(.75f,.65f,.95f,.5f);L(.35f,.7f,.2f,.95f);L(.65f,.7f,.8f,.95f);break;
                 case HudSymbol.BlackHole:Ring(.5f,.5f,.2f);Ring(.5f,.5f,.4f);L(.05f,.7f,.95f,.3f);break;
                 case HudSymbol.Whirlwind:
                     for(int i=1;i<=30;i++){float a=(i-1)*.36f,b=i*.36f,r=.05f+(i-1)*.012f,s=.05f+i*.012f;L(.5f+Mathf.Cos(a)*r,.5f+Mathf.Sin(a)*r,.5f+Mathf.Cos(b)*s,.5f+Mathf.Sin(b)*s);}break;
@@ -85,7 +86,7 @@ namespace OfficeRampage
                 Buff(HudSymbol.Demon,endlessDemonLeft,10,Orange);Buff(HudSymbol.Car,endlessTrafficLeft,10,Color.yellow);
                 Buff(HudSymbol.Robot,endlessMechLeft,20,Cyan);
                 if(EndlessMechActive){HudTile(x,y,HudSymbol.Run,endlessMechDashCooldown>0?endlessMechDashCooldown.ToString("0.0"):"0",1-endlessMechDashCooldown/3,Color.green,"우클릭");x+=64;}
-                Buff(HudSymbol.Drone,droneLeft,10,Cyan);Buff(HudSymbol.Jet,jetLeft,5,Orange);Buff(HudSymbol.BlackHole,blackHoleLeft,5,Color.magenta);
+                Buff(HudSymbol.UFO,ufoLeft,12,Color.green);Buff(HudSymbol.Drone,droneLeft,10,Cyan);Buff(HudSymbol.Jet,jetLeft,5,Orange);Buff(HudSymbol.BlackHole,blackHoleLeft,5,Color.magenta);
             }
         }
         private void DrawFocusedStatus()
@@ -135,6 +136,7 @@ namespace OfficeRampage
         {
             if(nearbySupply==null||ended)return;
             var p=nearbySupply;HudSymbol icon=p.kind==1?HudSymbol.Shield:p.kind==2?HudSymbol.Heart:p.kind==3?HudSymbol.Double:HudSymbol.Weapon;
+            if(p.kind==0&&p.weaponId==11)icon=HudSymbol.UFO;
             int previous=hudNoticeWeapon;hudNoticeWeapon=p.kind==0?EndlessBases[p.weaponId]:0;
             HudTile(1194,490,icon,p.kind==1?"60":p.kind==2?"30":p.kind==3?"2":"1",1,Cyan,"E");hudNoticeWeapon=previous;
         }

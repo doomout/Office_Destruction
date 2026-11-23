@@ -17,7 +17,7 @@ namespace OfficeRampage
         private readonly List<OfficeProp> endlessProps=new List<OfficeProp>();
         private OfficeEndlessPickup nearbySupply;
         private OfficeDefender endlessTarget;
-        private static readonly string[] EndlessWeapons={"야구빠따","망치","권총","기관총","미인계 더미","화염 샷건","로켓런처","BFG 18","번개 스테이플러","레이저 프린터","용암 커피포트","초강력 청소기","퇴근 종","위성 호출기","지옥문","교통사고","헐크버스터","드론 조종기","전투기 폭격 지원","블랙홀 생성기"};
+        private static readonly string[] EndlessWeapons={"야구빠따","망치","권총","기관총","미인계 더미","화염 샷건","로켓런처","BFG 18","번개 스테이플러","레이저 프린터","용암 커피포트","UFO 소환기","퇴근 종","위성 호출기","지옥문","교통사고","헐크버스터","드론 조종기","전투기 폭격 지원","블랙홀 생성기"};
         private static readonly int[] EndlessBases={0,1,2,3,4,5,6,7,2,3,5,6,1,7,7,7,7,7,7,7};
         private void BeginEndless(){endlessMode=true;ResetRun();}
         private void ResetEndlessState()

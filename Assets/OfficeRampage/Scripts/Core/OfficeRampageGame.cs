@@ -456,6 +456,7 @@ namespace OfficeRampage
                 view.transform.LookAt(mushroomCenter + Vector3.up * 9.5f);
                 return;
             }
+            if(endlessMode&&ufoLeft>0){UpdateUFOCamera();return;}
             bool airView=endlessMode&&(droneLeft>0||jetLeft>0);
             view.fieldOfView = airView?80:72;
             Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);

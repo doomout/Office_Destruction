@@ -11,10 +11,11 @@ namespace OfficeRampage
             EnsureEndlessSaber();if(endlessSaber){AttackEndlessSaber();return;}
             if(endlessWeapon<7)
             {endlessAttackDelegate=true;try{AttackExpanded();}finally{endlessAttackDelegate=false;}return;}
-            if(EndlessUltimateActive&&(endlessWeapon==7||endlessWeapon==13||endlessWeapon==16||endlessWeapon>=18)){cooldown=.3f;return;}
+            if(EndlessUltimateActive&&(endlessWeapon==7||endlessWeapon==11||endlessWeapon==13||endlessWeapon==16||endlessWeapon>=18)){cooldown=.3f;return;}
             if(endlessSpecialAmmo<=0){Notify("탄약 소진 · 바닥의 새 장비를 주우세요",1);cooldown=.4f;return;}
             endlessSpecialAmmo--;swing=1;cooldown=endlessWeapon==7||endlessWeapon==13?2:endlessWeapon==12?1.1f:endlessWeapon==10?.28f:.45f;
             var origin=player.position+Vector3.up*1.2f;Vector3 forward=avatar.forward;
+            if(endlessWeapon==11){StartUFO();return;}
             if(endlessWeapon==17){SummonSupportDrones();return;}
             if(endlessWeapon==18){StartJetStrike();return;}
             if(endlessWeapon==19){StartBlackHole();return;}
@@ -51,14 +52,14 @@ namespace OfficeRampage
             }
             if(endlessWeapon==12)
             {SkillDamage(()=>EndlessArea(player.position,11,75,true));for(int i=0;i<20;i++){float angle=i*Mathf.PI/10;Fx("Bell wave",origin,Vector3.one*.2f,Color.yellow,.5f,new Vector3(Mathf.Cos(angle),0,Mathf.Sin(angle))*22);}audioBus.Play("thunder",.45f);return;}
-            float range=endlessWeapon==10?9:14;
+            float range=9;
             foreach(var enemy in defenders.ToArray())if(enemy!=null&&enemy.Alive&&Vector3.Distance(origin,enemy.AimPoint)<range&&Vector3.Dot(forward,(enemy.AimPoint-origin).normalized)>.55f&&ClearDefenseSight(origin,enemy.AimPoint,player,enemy.transform))
             {
-                enemy.Hit(endlessWeapon==10?22:28);
-                if(enemy.Alive){if(endlessWeapon==10)Ignite(enemy.gameObject);else{enemy.Stun(.4f);var pull=(player.position-enemy.transform.position).normalized*1.8f;enemy.GetComponent<CharacterController>().Move(pull);}}
+                enemy.Hit(22);
+                if(enemy.Alive)Ignite(enemy.gameObject);
             }
-            var touched=new HashSet<OfficeProp>();foreach(var col in Physics.OverlapSphere(origin,range)){var prop=col.GetComponentInParent<OfficeProp>();if(prop!=null&&prop.health>0&&touched.Add(prop)&&Vector3.Dot(forward,(prop.transform.position-origin).normalized)>.55f){if(endlessWeapon==10)Ignite(prop.gameObject);else prop.Hit(28,forward);}}
-            for(int i=-3;i<=3;i++){var ray=Quaternion.Euler(0,i*10,0)*forward;Fx("Special stream",endlessWeapon==10?origin:origin+ray*range,Vector3.one*.2f,endlessWeapon==10?Orange:Cyan,.35f,ray*(endlessWeapon==10?range/.35f:-range/.35f));}
+            var touched=new HashSet<OfficeProp>();foreach(var col in Physics.OverlapSphere(origin,range)){var prop=col.GetComponentInParent<OfficeProp>();if(prop!=null&&prop.health>0&&touched.Add(prop)&&Vector3.Dot(forward,(prop.transform.position-origin).normalized)>.55f){Ignite(prop.gameObject);}}
+            for(int i=-3;i<=3;i++){var ray=Quaternion.Euler(0,i*10,0)*forward;Fx("Special stream",origin,Vector3.one*.2f,Orange,.35f,ray*(range/.35f));}
             audioBus.Play("swing",.3f);
         }
         private void EndlessArea(Vector3 center,float radius,float damage,bool stun)

@@ -38,7 +38,7 @@ namespace OfficeRampage
                 endlessSaber=false;ResetElements();whirlwindLeft=whirlwindReady=0;ClearDecoy();endlessWeapon=pickup.weaponId;
                 int index=EndlessBases[endlessWeapon];if(index==2)ammunition[2]=200;if(index==5)ammunition[5]=100;if(index==6)ammunition[6]=20;
                 if(endlessWeapon==4)decoysUsed[1]=0;
-                endlessSpecialAmmo=endlessWeapon==7||endlessWeapon>=13?1:endlessWeapon>=8?40:0;
+                endlessSpecialAmmo=endlessWeapon==7||endlessWeapon==11||endlessWeapon>=13?1:endlessWeapon>=8?40:0;
                 bfgReady=index==7;bfgUsed=false;endlessEquipAllowed=true;
                 try{SetWeapon(index);}finally{endlessEquipAllowed=false;}
                 cooldown=.25f;
@@ -56,7 +56,7 @@ namespace OfficeRampage
             if(endlessWeapon==8){Shape(weapon,"Stapler jaws",new Vector3(0,.15f,.6f),new Vector3(.3f,.2f,.8f),color,false);Shape(weapon,"Electric coil",new Vector3(0,.38f,.5f),new Vector3(.2f,.3f,.2f),color,false,PrimitiveType.Cylinder);}
             if(endlessWeapon==9){Shape(weapon,"Printer body",new Vector3(0,.2f,.5f),new Vector3(.7f,.4f,.7f),Color.white,false);Shape(weapon,"Printer feed roller",new Vector3(0,.23f,.9f),new Vector3(.12f,.3f,.12f),Navy,false,PrimitiveType.Cylinder).transform.localRotation=Quaternion.Euler(0,0,90);Shape(weapon,"Laser slot",new Vector3(0,.2f,.87f),new Vector3(.55f,.1f,.05f),color,false);}
             if(endlessWeapon==10){Shape(weapon,"Coffee pot",new Vector3(0,.2f,.5f),new Vector3(.5f,.5f,.5f),color,false,PrimitiveType.Cylinder);Shape(weapon,"Spout",new Vector3(0,.2f,.85f),new Vector3(.15f,.15f,.5f),Navy,false);}
-            if(endlessWeapon==11){Shape(weapon,"Vacuum tank",new Vector3(0,.2f,.4f),new Vector3(.55f,.6f,.5f),color,false,PrimitiveType.Capsule);Shape(weapon,"Vacuum nozzle",new Vector3(0,.1f,.9f),new Vector3(.8f,.18f,.4f),Color.gray,false);}
+            if(endlessWeapon==11)BuildUFORemote(weapon);
             if(endlessWeapon==12)Shape(weapon,"Clock-out bell",new Vector3(0,.15f,.55f),new Vector3(.7f,.6f,.7f),color,false,PrimitiveType.Sphere);
             return true;
         }
