@@ -347,3 +347,12 @@ Unity 확인: GameFont.asset의 Font 참조 및 TTF Dynamic/Include Font Data �
 - 등장 2초 후 일괄 포획, 약 4초간 상승 후 처치·점수 반영. 총 12초 소환, 1회용 및 스킬 콤보 미증가는 유지합니다.
 - 경비견·보스·플레이어·가구·보급은 납치 대상에서 제외합니다. 광선 메시·재질은 종료 시 정리합니다.
 - 격리 Unity Editor에서 컴파일 및 Play 이동·점프·바닥/벽 충돌, 전체 사람 동시 포획, 경비견 제외, 단일 광선, 점수·콤보, 중복 사용 방지, 일시정지, 종료 및 중단 시 AI/충돌체 복원, 스토리 모드 분리 테스트 통과.
+
+
+## 2026-11-24 — 미사용 필드 경고 정리
+- OfficeRampageGame.remaining 및 endlessOrbitalStage는 읽는 곳 없이 대입만 하는 필드임을 확인해 선언 2개와 대입문 5개를 제거했습니다.
+- 변경 코드: Core/OfficeRampageGame.cs, Endless/OfficeRampageGame.EndlessOrbital.cs, Endless/OfficeRampageGame.EndlessExtras.cs.
+- 화상·대쉬·무기 회전에서 실제 사용하는 동명의 remaining 변수는 보존했습니다. 입력 시스템 설정, 씬, 프리팹 및 메타 파일은 변경하지 않았습니다.
+- 격리 Unity Editor 재컴파일에서 CS0414 및 C# 컴파일 오류 없음. 기존 Play 테스트의 이동·점프·바닥/벽 충돌 및 UFO 테스트 통과.
+- Unity에서 재컴파일 후 Console의 기존 메시지를 Clear하고 경고가 다시 발생하는지 확인하세요. Input Manager 사용 중단 예정 경고는 별개이므로 유지됩니다.
+- Web 빌드와 브라우저 검증, 위성 연출 전체 재생 검증은 이번 정리에서 실행하지 않았습니다.

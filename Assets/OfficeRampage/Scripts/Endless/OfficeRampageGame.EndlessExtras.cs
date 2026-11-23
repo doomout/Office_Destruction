@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
@@ -15,7 +15,7 @@ namespace OfficeRampage
         private void ResetEndlessExtras()
         {
             ResetAirSupport();ClearDoubleDamageVisual();ResetEndlessDemon();ResetEndlessSupply();endlessGunKick=0;ResetEndlessMech();endlessSaber=endlessMode;endlessDoubleDamageLeft=endlessDemonLeft=endlessTrafficLeft=endlessCarClock=endlessDemonAttack=0;
-            endlessDemon=null;endlessCars.Clear();endlessOrbitalStage=0;
+            endlessDemon=null;endlessCars.Clear();
         }
         private void SeedEndlessEquipment()
         {

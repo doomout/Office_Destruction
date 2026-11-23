@@ -1,13 +1,12 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
     {
-        private int endlessOrbitalStage;
         private IEnumerator EndlessOrbitalStrike()
         {
-            combatLocked=true;finaleCamera=true;endlessOrbitalStage=1;ResetElements();whirlwindLeft=whirlwindReady=0;ClearDecoy();
+            combatLocked=true;finaleCamera=true;ResetElements();whirlwindLeft=whirlwindReady=0;ClearDecoy();
             float oldFar=view.farClipPlane;bool fog=RenderSettings.fog;Color sky=view.backgroundColor;Transform space=null;
             Vector3 impact=new Vector3(0,0,32);
             try
@@ -30,9 +29,9 @@ namespace OfficeRampage
                 space.gameObject.SetActive(false);Destroy(space.gameObject);space=null;
                 ClearEndlessBattle();endlessRoot.gameObject.SetActive(true);
                 RenderSettings.fog=fog;view.backgroundColor=sky;view.farClipPlane=oldFar;finaleCamera=false;UpdateCamera();ChangeEndlessEnvironment();
-                endlessOrbitalStage=2;Notify("전장 정리 완료 · 3초 후 다시 시작",3);
+                Notify("전장 정리 완료 · 3초 후 다시 시작",3);
                 yield return SceneWait(3);
-                RestoreEndlessBattle();endlessOrbitalStage=3;Notify("적과 장비가 다시 등장했습니다!",3);
+                RestoreEndlessBattle();Notify("적과 장비가 다시 등장했습니다!",3);
             }
             finally
             {

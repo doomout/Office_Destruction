@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -27,7 +27,7 @@ namespace OfficeRampage
         private CharacterController controller;
         private Camera view;
         private Room current;
-        private float remaining, hp, yaw, pitch, vertical, cooldown, comboLeft, noticeLeft;
+        private float hp, yaw, pitch, vertical, cooldown, comboLeft, noticeLeft;
         private float invulnerability, swing, shake;
         private int weaponIndex, combo, score;
         private bool ended, won, paused, bossFight;
@@ -67,7 +67,7 @@ namespace OfficeRampage
             debris.Clear();
             world = new GameObject("Generated Office Rampage").transform;
             world.SetParent(transform);
-            remaining = 0; hp = 100; yaw = 0; pitch = 13; vertical = 0;
+            hp = 100; yaw = 0; pitch = 13; vertical = 0;
             score = combo = weaponIndex = 0;
             cooldown = comboLeft = invulnerability = swing = shake = 0;
             ended = won = paused = bossFight = false;
