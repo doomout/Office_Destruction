@@ -22,7 +22,7 @@ namespace OfficeRampage
             else if(kind==1){Shape(visual,"Armor vest",Vector3.zero,new Vector3(.7f,.8f,.25f),Cyan,false);Shape(visual,"Armor plate",new Vector3(0,0,-.16f),new Vector3(.5f,.5f,.08f),Color.white,false);}
             else if(kind==3){Shape(visual,"Double damage crystal",Vector3.zero,Vector3.one*.7f,Color.magenta,false).transform.localRotation=Quaternion.Euler(25,45,25);}
             else {Shape(visual,"Health bottle",Vector3.zero,new Vector3(.4f,.6f,.4f),Color.green,false,PrimitiveType.Capsule);}
-            var label=new GameObject("Equipment name").AddComponent<TextMesh>();label.transform.SetParent(pickup.transform,false);label.transform.localPosition=Vector3.up*1.7f;label.anchor=TextAnchor.MiddleCenter;label.fontSize=36;label.characterSize=.08f;label.text=pickup.DisplayName;label.color=color;
+            var label=new GameObject("Equipment name").AddComponent<TextMesh>(); OfficeGameFont.Apply(label);label.transform.SetParent(pickup.transform,false);label.transform.localPosition=Vector3.up*1.7f;label.anchor=TextAnchor.MiddleCenter;label.fontSize=36;label.characterSize=.08f;label.text=pickup.DisplayName;label.color=color;
             ApplyKoreanWorldFont(pickup.transform);StyleEndlessEnvironmentPickup(pickup.transform);endlessPickups.Add(pickup);
         }
         private void CollectEndless(OfficeEndlessPickup pickup)

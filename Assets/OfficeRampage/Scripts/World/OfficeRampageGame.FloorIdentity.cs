@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
@@ -7,7 +7,7 @@ namespace OfficeRampage
         private Transform waitingSecretary;
         private void FloorSign(Transform parent,string text,Vector3 at,float size=.18f)
         {
-            var sign=new GameObject(text).AddComponent<TextMesh>();sign.transform.SetParent(parent,false);
+            var sign=new GameObject(text).AddComponent<TextMesh>(); OfficeGameFont.Apply(sign);sign.transform.SetParent(parent,false);
             sign.transform.localPosition=at;sign.anchor=TextAnchor.MiddleCenter;sign.characterSize=size;sign.fontSize=48;sign.color=Cyan;sign.text=text;
         }
         private OfficeSlidingDoor SuiteDoor(Transform root,float z,string title)

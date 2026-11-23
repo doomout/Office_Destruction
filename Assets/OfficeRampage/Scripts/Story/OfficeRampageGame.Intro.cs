@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 namespace OfficeRampage
 {
@@ -50,7 +50,7 @@ namespace OfficeRampage
                 BuildPerson(model,rank==OfficeCompanySettings.RepresentativeRank);
                 // Reuse the saved per-person appearance without enabling combat AI during this scripted ending.
                 var unit=actor.gameObject.AddComponent<OfficeDefender>(); unit.enabled=false; unit.game=this; unit.visual=model;
-                unit.label=new GameObject("Supervisor identity").AddComponent<TextMesh>(); unit.label.transform.SetParent(actor,false);
+                unit.label=new GameObject("Supervisor identity").AddComponent<TextMesh>(); OfficeGameFont.Apply(unit.label); unit.label.transform.SetParent(actor,false);
                 ApplyCompanyIdentity(unit,rank,person); unit.label.gameObject.SetActive(false);
                 Shape(model,rank==OfficeCompanySettings.RepresentativeRank?"Baton":"A4 hand",new Vector3(.48f,1,.5f),rank==OfficeCompanySettings.RepresentativeRank?new Vector3(.1f,.1f,1):new Vector3(.4f,.03f,.55f),rank==OfficeCompanySettings.RepresentativeRank?Orange:Color.white,false);
             }

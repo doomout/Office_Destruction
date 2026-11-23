@@ -49,7 +49,7 @@ namespace OfficeRampage
         private void EnsureMenuStyles()
         {
             if (menuTitle != null) return;
-            menuFont = Font.CreateDynamicFontFromOSFont(new[] { "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans CJK KR", "Arial" }, 24);
+            menuFont = OfficeGameFont.Shared;
             menuText = new GUIStyle(GUI.skin.label) { font = menuFont, fontSize = 21, wordWrap = true };
             menuText.normal.textColor = new Color(.84f, .89f, .93f);
             menuTitle = new GUIStyle(menuText) { fontSize = 52, fontStyle = FontStyle.Bold };

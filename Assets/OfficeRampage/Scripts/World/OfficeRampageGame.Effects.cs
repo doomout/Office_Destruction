@@ -27,7 +27,7 @@ namespace OfficeRampage
             var top = Shape(room.gate.transform, "Door status light", new Vector3(0, 3.32f, -.05f), new Vector3(3.9f, .2f, .5f), Orange, false);
             door.indicators = new[] { top.GetComponent<Renderer>(), a.GetComponent<Renderer>(), b.GetComponent<Renderer>() };
             door.openMaterial = Mat(Cyan);
-            var sign = new GameObject("Door status").AddComponent<TextMesh>(); sign.transform.SetParent(room.gate.transform, false);
+            var sign = new GameObject("Door status").AddComponent<TextMesh>(); OfficeGameFont.Apply(sign); sign.transform.SetParent(room.gate.transform, false);
             sign.transform.localPosition = new Vector3(0, 2.6f, -.25f); sign.anchor = TextAnchor.MiddleCenter;
             sign.characterSize = .12f; sign.fontSize = 44; sign.color = Color.white; sign.text = "잠김"; door.sign = sign;
             room.gateRenderer = top.GetComponent<Renderer>();

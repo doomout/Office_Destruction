@@ -76,9 +76,9 @@ namespace OfficeRampage
         }
         private void ApplyKoreanWorldFont(Transform root)
         {
-            if(defenderFont==null) defenderFont=Font.CreateDynamicFontFromOSFont(new[]{"Malgun Gothic","Apple SD Gothic Neo","Noto Sans CJK KR","Arial"},36);
+            if(defenderFont==null) defenderFont=OfficeGameFont.Shared;
             foreach(var text in root.GetComponentsInChildren<TextMesh>(true))
-            { text.font=defenderFont; text.GetComponent<Renderer>().sharedMaterial=defenderFont.material; }
+            { OfficeGameFont.Apply(text); }
         }
     }
 }

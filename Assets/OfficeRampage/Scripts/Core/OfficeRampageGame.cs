@@ -202,7 +202,7 @@ namespace OfficeRampage
                 room.gate = Shape(root, "Boardroom wall", new Vector3(0, 1.55f, room.end), new Vector3(3.3f, 3.1f, .3f), Orange);
                 room.gateRenderer = room.gate.GetComponent<Renderer>();
             }
-            var sign = new GameObject("Office sign").AddComponent<TextMesh>();
+            var sign = new GameObject("Office sign").AddComponent<TextMesh>(); OfficeGameFont.Apply(sign);
             sign.transform.SetParent(root);
             sign.transform.position = new Vector3(0, 3.57f, room.end - .26f);
             sign.transform.rotation = Quaternion.identity;
@@ -236,7 +236,7 @@ namespace OfficeRampage
                         new Vector3(1.3f, .012f, 1.5f), new Color(.025f, .025f, .04f), false, PrimitiveType.Cylinder);
                     Shape(root, "Oil surface sheen", center + new Vector3(.1f, .03f, .08f),
                         new Vector3(.85f, .003f, .85f), new Color(.14f, .1f, .22f), false, PrimitiveType.Cylinder);
-                    var warning = new GameObject("Oil warning").AddComponent<TextMesh>();
+                    var warning = new GameObject("Oil warning").AddComponent<TextMesh>(); OfficeGameFont.Apply(warning);
                     warning.transform.SetParent(root);
                     warning.transform.position = center + new Vector3(0, .04f, 0);
                     warning.transform.rotation = Quaternion.Euler(90, 0, 0);
@@ -329,7 +329,7 @@ namespace OfficeRampage
             }
             if (OfficeRules.IsElectronic(kind) || kind == OfficeRules.WaterCooler)
             {
-                var label = new GameObject("Break effect label").AddComponent<TextMesh>();
+                var label = new GameObject("Break effect label").AddComponent<TextMesh>(); OfficeGameFont.Apply(label);
                 label.transform.SetParent(t, false);
                 label.transform.localPosition = new Vector3(0, kind == OfficeRules.WaterCooler ? 2.1f : 1.95f, 0);
                 label.text = kind == OfficeRules.WaterCooler ? "체력 +5" : endlessMode?"폭발 · 적 피해":"체력 -5";
@@ -573,11 +573,11 @@ namespace OfficeRampage
         private void OnDestroy()
         {
             SaveMenuSettings();
-            if (menuFont != null) Destroy(menuFont);
+            // menuFont is a shared project asset; do not destroy it.
             Time.timeScale = originalTimeScale;
             LockCursor(false);
             foreach (var material in materials.Values) if (material != null) Destroy(material);
-            if (defenderFont != null) Destroy(defenderFont);
+            // defenderFont is the same shared project asset.
             if(endlessEnergyMaterial!=null)Destroy(endlessEnergyMaterial);
             foreach(var mat in endlessGlowMaterials.Values)if(mat!=null)Destroy(mat);endlessGlowMaterials.Clear();
         }

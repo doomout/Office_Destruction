@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
@@ -51,7 +51,7 @@ namespace OfficeRampage
                 float y=i*62; var person=people[i];
                 Box(new Rect(0,y,840,57),i%2==0?new Color(.05f,.09f,.13f):Navy);
                 GUI.Label(new Rect(10,y+12,100,32),(i+1)+"번",menuText);
-                if(GUI.Button(new Rect(100,y+8,490,42),person.name+"  ✎",companyInput)) OpenNameEditor(selectedCompanyRank,i);
+                if(GUI.Button(new Rect(100,y+8,490,42),person.name+"  [편집]",companyInput)) OpenNameEditor(selectedCompanyRank,i);
                 if(MenuButton(new Rect(620,y+8,90,42),"남",!person.female)) person.female=false;
                 if(MenuButton(new Rect(720,y+8,90,42),"여",person.female)) person.female=true;
             }

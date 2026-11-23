@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 namespace OfficeRampage
 {
@@ -19,7 +19,7 @@ namespace OfficeRampage
             Shape(cab,"Elevator ceiling",new Vector3(0,3.4f,z),new Vector3(4,.2f,3.6f),metal);
             Shape(cab,"Elevator light",new Vector3(0,3.25f,z),new Vector3(2,.08f,1),Color.white,false);
             Shape(cab,"Elevator buttons",new Vector3(1.25f,1.3f,z+1.67f),new Vector3(.25f,.5f,.04f),Cyan,false);
-            var sign=new GameObject("Elevator floor indicator").AddComponent<TextMesh>(); sign.transform.SetParent(cab,false);
+            var sign=new GameObject("Elevator floor indicator").AddComponent<TextMesh>(); OfficeGameFont.Apply(sign); sign.transform.SetParent(cab,false);
             sign.transform.localPosition=new Vector3(0,2.5f,z+1.65f); sign.anchor=TextAnchor.MiddleCenter;
             sign.characterSize=.16f; sign.fontSize=48; sign.color=Cyan; sign.text=room.number+"층 → "+(room.number+1)+"층";
         }
