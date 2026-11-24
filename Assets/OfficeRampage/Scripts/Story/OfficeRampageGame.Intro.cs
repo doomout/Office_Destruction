@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 namespace OfficeRampage
 {
@@ -9,15 +9,16 @@ namespace OfficeRampage
         private static readonly string[] OvertimeLines={"감히 어제 퇴근을 해?", "라떼는 말이야~ 사무실에서 살았어!", "주말이 왜 네 시간이야?", "이 정도는 열정으로 해야지!", "우린 가족 같은 회사잖아!", "야근 수당? 좋은 경험이잖아!", "그래도 내일은 정상 출근이야!", "월급은 동결인 거 알지?"};
         private void BeginIntro()
         {
-            endlessMode=false;
+            endlessMode=false; prologueAge=0;
             menuPage=MenuPage.Intro; paused=true; Time.timeScale=0; LockCursor(false);
             audioBus.SetPaused(true);
         }
         private void DrawIntro()
         {
-            GUI.Label(new Rect(110,235,1060,180),"어제도 빡치게 야근했다.\n심지어 오늘은 주말인데 출근하라고 한다.\n도저히 참을 수 없다.",menuHeading);
+            if(DrawPrologue()) return;
+            GUI.Label(new Rect(110,235,1060,180),"출근이 확인되었습니다. 퇴근 권한은 없습니다.\n\n이번에도 참으시겠습니까?",menuHeading);
             if(MenuButton(new Rect(110,480,480,75),"닥치고 출근하기")) BeginSubmission();
-            if(MenuButton(new Rect(650,480,520,75),"사무실 파괴하기",true)) ResetRun();
+            if(MenuButton(new Rect(650,480,520,75),"사무실 파괴하기",true)) BeginStoryDestruction();
             if(MenuButton(new Rect(460,590,360,48),"뒤로")) ReturnToMainMenu();
         }
         private void BeginSubmission()
@@ -98,7 +99,7 @@ namespace OfficeRampage
             if(submissionEnded)
             {
                 if(MenuButton(new Rect(250,590,340,55),"첫 메뉴로")) ReturnToMainMenu();
-                if(MenuButton(new Rect(660,590,350,55),"다시 선택하기",true)) BeginIntro();
+                if(MenuButton(new Rect(660,590,350,55),"이번에는 참지 않기",true)) BeginStoryDestruction();
             }
         }
     }

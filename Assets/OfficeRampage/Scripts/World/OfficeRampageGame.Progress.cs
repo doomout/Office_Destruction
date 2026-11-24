@@ -9,10 +9,11 @@ namespace OfficeRampage
             if (room == null || room.number >= 4 || room.unlocked) return;
             int totalEnemies = EnemyTotal(room.number);
             int defeated = totalEnemies - LivingDefenders(room.number);
-            if (!OfficeProgressRules.ExitReady(room.destroyed, room.total, defeated, totalEnemies)) return;
+            if(room.number==2) { if(!StoryFloorReady) return; }
+            else if (!OfficeProgressRules.ExitReady(room.destroyed, room.total, defeated, totalEnemies)) return;
             room.unlocked = true;
             room.door.Open();
-            Notify("직원 전원 처치! 엘리베이터가 열립니다.", 3);
+            Notify(room.number==2?"서버와 방어 인원 정리 완료 · 3층으로 이동하세요.":"직원 전원 처치! 엘리베이터가 열립니다.", 3);
             audioBus.Play("door", .45f);
         }
         private void SpawnHealingPotions(Room room, OfficeLayout layout)

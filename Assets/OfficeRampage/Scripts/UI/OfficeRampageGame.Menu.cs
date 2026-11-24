@@ -115,7 +115,7 @@ namespace OfficeRampage
             Box(new Rect(535, 215, 665, 410), new Color(.055f, .1f, .15f));
             Box(new Rect(535, 215, 665, 5), Cyan);
             GUI.Label(new Rect(567, 240, 600, 45), "처음 오셨나요?", menuHeading);
-            GUI.Label(new Rect(567, 302, 590, 105), "스토리: 직원을 모두 처치하고 대표에게 도전!\n무한 파괴: 장비를 주우며 끝없이 버티세요.", menuText);
+            GUI.Label(new Rect(567, 302, 590, 105), "스토리: 퇴근을 막은 원인을 추적하고 대표에게 도전!\n무한 파괴: 장비를 주우며 끝없이 버티세요.", menuText);
             GUI.Label(new Rect(567, 422, 590, 150), "WASD 이동 · 마우스 조준 · 왼쪽 클릭 공격\n스토리: 숫자키 무기 선택 / 무한 파괴: E로 줍기\nEsc 일시정지 · M 음소거", menuText);
             GUI.Label(new Rect(567, 572, 590, 36), "음량과 직원 이름·성별은 ‘설정’에서 바꿀 수 있어요.", menuSmall);
         }
@@ -153,7 +153,7 @@ namespace OfficeRampage
             if (MenuButton(new Rect(80, 470, 485, 55), audioBus.Muted ? "전체 소리: 꺼짐 (눌러서 켜기)" : "전체 소리: 켜짐 (눌러서 끄기)"))
             { audioBus.Muted = !audioBus.Muted; changed = true; }
             GUI.Label(new Rect(650,270,550,60),"진행 방식",menuHeading);
-            GUI.Label(new Rect(650,340,550,170),"시간 제한 없음\n직원 전원 처치 → 엘리베이터 개방\n가구 파괴는 진행 조건에서 제외\n대표층: 경비견 → 보디가드 → 대표",menuText);
+            GUI.Label(new Rect(650,340,550,170),"시간 제한 없음\n1·3층: 직원 처치 / 2층: 서버와 방어 인원\n가구 파괴는 진행 조건에서 제외\n대표층: 경비견 → 보디가드 → 대표",menuText);
             if(changed) SaveMenuSettings();
             if (MenuButton(new Rect(80, 535, 485, 45), "유닛 설정")) OpenCompanySettings();
             if (MenuButton(new Rect(80, 590, 300, 55), "뒤로")) { SaveMenuSettings(); menuPage = MenuPage.Main; }
@@ -165,7 +165,7 @@ namespace OfficeRampage
             if (menuPage == MenuPage.Story)
             {
                 heading = "스토리";
-                body = "끝없는 야근, 쌓이는 업무, 그리고 또 내려온 추가 지시.\n오늘만큼은 참지 않기로 했습니다.\n\n책상과 집기를 부수며 사무실을 돌파하세요.\n마지막 사무실에서 경비견을 이기고 대표에게 도전하세요!\n\n전자제품은 폭발해 체력을 깎고, 정수기는 체력을 회복시킵니다.\n로비부터 임원층까지 돌파하고 마지막 승부를 끝내세요.";
+                body = "금요일 밤의 야근이 끝나자 토요일 출근 지시가 왔다.\n주말 근무 신청은 하지 말고, 보고서는 처음부터 다시 쓰란다.\n\n출근은 확인됐는데 퇴근 권한은 없다고?\n퇴근을 막은 시스템과 그 뒤의 승인권자를 찾아 올라가자.\n\n2층의 서버 3개를 파괴하고 지정 방어 인원을 처치하세요.\n갇힌 동료를 구할지는 당신의 선택입니다.";
             }
             else
             {

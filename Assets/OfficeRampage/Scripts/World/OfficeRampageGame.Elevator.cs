@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 namespace OfficeRampage
 {
@@ -54,7 +54,7 @@ namespace OfficeRampage
             player.position=new Vector3(0,.08f,3); yaw=0; pitch=13; avatar.rotation=Quaternion.identity;
             controller.enabled=true; ApplyFloorEntry(); Physics.SyncTransforms(); invulnerability=2;
             audioBus.ChangeRoom(next); cinematicText=""; combatLocked=false;
-            Notify(next==4?"대표층 · 경비견을 모두 처치하세요. 시간 제한은 없습니다.":next+"층 도착 · 직원을 모두 처치하면 엘리베이터가 열립니다.",4);
+            Notify(next==2?"2층 · 서버 3개와 지정 방어 인원을 정리하세요. 동료 구출은 선택입니다.":next==4?"대표층 · 경비견을 모두 처치하세요. 시간 제한은 없습니다.":next+"층 도착 · 직원을 모두 처치하면 엘리베이터가 열립니다.",4);
             UpdateCamera();
         }
     }

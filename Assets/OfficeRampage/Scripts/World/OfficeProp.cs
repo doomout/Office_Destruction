@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace OfficeRampage
 {
@@ -27,6 +27,8 @@ namespace OfficeRampage
             broken = true;
             // Disable colliders immediately so a second pellet cannot score this object twice.
             gameObject.SetActive(false);
+            var objective=GetComponent<OfficeStoryServer>();
+            if(objective!=null) game.StoryServerDestroyed(objective.index);
             game.PropDestroyed(room, kind, transform.position + Vector3.up);
             Destroy(gameObject);
         }

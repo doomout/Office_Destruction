@@ -24,9 +24,10 @@ namespace OfficeRampage
         }
         private void ApplyFloorEntry()
         {
-            if(activeFloor==null || activeFloor.playerSpawn==null)return;
+            if(activeFloor==null || activeFloor.playerSpawn==null){SetupStoryFloor();return;}
             controller.enabled=false;player.position=activeFloor.playerSpawn.position;controller.enabled=true;
             yaw=activeFloor.playerSpawn.eulerAngles.y;avatar.rotation=Quaternion.Euler(0,yaw,0);vertical=0;
+            SetupStoryFloor();
         }
         private bool InsideElevator()
         {
