@@ -176,6 +176,7 @@ namespace OfficeRampage
         }
         public void DefenderDefeated(OfficeDefender unit)
         {
+            ExecutiveDefeated(unit);
             RegisterDefeatCombo(unit);
             if(endlessMode){EndlessDefeated(unit);return;}
             if(unit.room==1)RequestLobbyLeave();

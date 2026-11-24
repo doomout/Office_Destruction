@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 namespace OfficeRampage
 {
     public sealed partial class OfficeDefender
@@ -7,7 +7,7 @@ namespace OfficeRampage
         public float StunLeft { get; private set; }
         public void Stun(float seconds)
         {
-            if(!Alive || Dormant || dog) return;
+            if(!Alive || Dormant || dog || (storyRole>0&&!gameObject.activeInHierarchy)) return;
             StunLeft=Mathf.Max(StunLeft,seconds); pendingAttack=-1; recovery=0;
             if(warning!=null) warning.gameObject.SetActive(false);
         }
@@ -23,7 +23,7 @@ namespace OfficeRampage
         private Material iceMaterial;
         public void Freeze(float seconds)
         {
-            if(!Alive || Dormant) return;
+            if(!Alive || Dormant || (storyRole>0&&!gameObject.activeInHierarchy)) return;
             FrozenLeft=seconds; pendingAttack=-1; recovery=0;
             if(warning!=null) warning.gameObject.SetActive(false);
             if(iceShell!=null) return;

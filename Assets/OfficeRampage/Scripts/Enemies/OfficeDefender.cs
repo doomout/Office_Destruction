@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 namespace OfficeRampage
 {
@@ -47,6 +47,7 @@ namespace OfficeRampage
         public void Hit(float amount)
         {
             if (!Alive || Dormant || !game.RunActive || game.CombatLocked || !game.IsCurrentRoom(room)) return;
+            if(storyRole>0&&(!gameObject.activeInHierarchy||game.ExecutiveShielded(this)))return;
             amount=game.PlayerDamage(amount);
             Health = boss ? OfficeCombatRules.DamageResult(Health, amount, MaxHealth, PhaseTwo) : Mathf.Max(0, Health - amount);
             // Preserve a lethal hit for the reward, but never pin ongoing combat at 20%.
@@ -92,7 +93,7 @@ namespace OfficeRampage
             if (TickDistraction(dt)) return;
             Vector3 toward = game.PlayerPosition - transform.position; toward.y = 0;
             if(PhaseTwo) { TickRobot(dt,toward); return; }
-            if (recovery > 0) { recovery -= dt; game.AnimateDefenderAttack(this, 1 - recovery / .35f); return; }
+            if (recovery > 0) { recovery -= dt; game.AnimateDefenderAttack(this, 1 - recovery / (storyRole==2?1.4f:.35f)); return; }
             if (pendingAttack >= 0)
             {
                 windup -= dt; game.AnimateDefenderAttack(this, Mathf.Clamp01(1 - windup / .8f));
@@ -100,16 +101,17 @@ namespace OfficeRampage
                 {
                     if (warning != null) warning.gameObject.SetActive(false);
                     game.ReleaseDefenderAttack(this, pendingAttack, lockedDirection);
-                    pendingAttack = -1; recovery = .35f; attackClock = boss ? 1.1f : dog ? .9f : 1.8f + (float)random.NextDouble();
+                    pendingAttack = -1; recovery = storyRole==2?1.4f:.35f; attackClock = storyRole>0?2.6f:boss ? 1.1f : dog ? .9f : 1.8f + (float)random.NextDouble();
                 }
                 return;
             }
             game.AnimateDefenderAttack(this, 0); attackClock -= dt;
             int kind = guard ? securityWeapon : dog ? 0 : (boss || companyRank == OfficeCompanySettings.RepresentativeRank) ? attackNumber % 3 : companyRank <= 2 ? 1 : companyRank <= 5 ? 2 : 1 + attackNumber % 2;
-            float range = (kind == 3 ? 12f : kind == 4 ? 22f : kind == 0 ? 2.4f : kind == 1 ? 6f : 16f) * RangeScale;
+            if(storyRole>0)kind=storyRole==1||storyRole==5||storyRole==6?2:storyRole==2?6:storyRole==4?0:1+attackNumber%2;
+            float range = (kind==6?8:kind == 3 ? 12f : kind == 4 ? 22f : kind == 0 ? 2.4f : kind == 1 ? 6f : 16f) * RangeScale;
             if (attackClock <= 0 && toward.magnitude <= range && game.ClearDefenseSight(AimPoint, game.PlayerPosition + Vector3.up, transform, null))
             {
-                pendingAttack = kind; attackNumber++; windup = kind == 2 ? .9f : .8f;
+                pendingAttack = kind; attackNumber++; windup = kind==6?1.1f:kind == 2 ? .9f : .8f;
                 lockedDirection = toward.sqrMagnitude > .01f ? toward.normalized : transform.forward;
                 transform.rotation = Quaternion.LookRotation(lockedDirection);
                 game.ShowDefenderWarning(this, kind, range, lockedDirection); return;
@@ -118,7 +120,7 @@ namespace OfficeRampage
         }
         private void Patrol(float dt, Vector3 toward)
         {
-            float speed = (dog ? 6f : boss ? 3.6f : guard ? 2.8f : 2.4f) * (Enraged ? 1.5f : 1);
+            float speed = (storyRole==4?3.6f:dog ? 6f : boss ? 3.6f : guard ? 2.8f : 2.4f) * (Enraged ? 1.5f : 1);
             if(guard && securityWeapon>=3 && toward.magnitude<(securityWeapon==3?9:17) && game.ClearDefenseSight(AimPoint,game.PlayerPosition+Vector3.up,transform,null)) return;
             if (toward.magnitude > 1.3f && game.ClearDefenseSight(AimPoint, game.PlayerPosition + Vector3.up, transform, null))
             { Move(toward.normalized * speed, dt); return; }

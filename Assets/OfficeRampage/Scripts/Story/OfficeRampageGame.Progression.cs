@@ -20,6 +20,7 @@ namespace OfficeRampage
         { get { int n=0;foreach(var unit in requiredStoryEnemies)if(unit!=null&&unit.Alive)n++;return n; } }
         private void ResetStoryProgression()
         {
+            ResetExecutiveEncounter();
             lobbyTerminal=null;lobbyRequested=lobbyTerminalBroken=storyRewardOpen=false;
             storyEncounterFloor=storyRewardFloor=storySprintStacks=0;storyMaxHealth=100;
             requiredStoryEnemies.Clear();System.Array.Clear(storyRewardClaimed,0,storyRewardClaimed.Length);
@@ -57,7 +58,7 @@ namespace OfficeRampage
                     requiredStoryEnemies.Add(unit);unit.displayName="[지정 임원] "+unit.displayName;
                     unit.label.text=unit.displayName+"  "+Mathf.CeilToInt(unit.Health);unit.label.color=Orange;
                 }
-                StoryLine("결의서에 서명한 임원들을 찾아 책임을 묻자.",6);
+                SetupExecutiveEncounter();
             }
         }
         public void RequestLobbyLeave()
@@ -81,7 +82,7 @@ namespace OfficeRampage
             if(endlessMode||storyEncounterFloor!=floor)return false;
             if(floor==1)return lobbyRequested&&lobbyTerminalBroken&&RequiredStoryEnemiesLeft==0;
             if(floor==2)return StoryFloorReady;
-            if(floor==3)return RequiredStoryEnemiesLeft==0;
+            if(floor==3)return executiveAccessGranted&&RequiredStoryEnemiesLeft==0;
             return false;
         }
         private void TickStoryProgression()
@@ -91,6 +92,7 @@ namespace OfficeRampage
                 foreach(var label in lobbyTerminal.GetComponentsInChildren<TextMesh>())label.transform.rotation=view.transform.rotation;
                 if(!lobbyRequested&&Vector3.Distance(player.position,lobbyTerminal.position)<3&&Keyboard.current!=null&&Keyboard.current.eKey.wasPressedThisFrame)RequestLobbyLeave();
             }
+            TickExecutiveEncounter(Time.deltaTime);
             if(current.number<4)RefreshExit(current);
         }
         private void OpenElevatorReward(int floor)

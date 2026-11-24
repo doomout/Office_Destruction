@@ -158,6 +158,8 @@ namespace OfficeRampage
             unit.warning.position = unit.transform.position + Vector3.up * .045f;
             unit.warning.rotation = Quaternion.LookRotation(forward);
             Color color = kind == 1 ? Cyan : kind == 2 ? new Color(1, .85f, .25f) : Orange;
+            if(kind==6){DrawExecutiveRing(unit.warning,range,Cyan);return;}
+            if(kind==2&&unit.storyRole>0){DrawPaperFanWarning(unit.warning,range,unit.storyRole==1?70:60);return;}
             if(kind==5) Shape(unit.warning,"Robot charge warning",new Vector3(0,0,range/2),new Vector3(6.4f,.025f,range),Orange,false);
             else if (kind == 2 || kind==3) Shape(unit.warning, "Paper trajectory", new Vector3(0, 0, range / 2), new Vector3(.12f, .025f, range), color, false);
             else
@@ -181,19 +183,25 @@ namespace OfficeRampage
         }
         public void ReleaseDefenderAttack(OfficeDefender unit, int kind, Vector3 direction)
         {
+            if(kind==6){StartCoroutine(ExecutiveSonicWave(unit));return;}
             unit.visual.GetComponent<OfficeCharacterVisual>()?.PlayAction(kind>=2?"holding-right-shoot":"attack-melee-right");
             if(kind==3 || kind==4) { FireSecurityGun(unit,kind,direction); return; }
             float range = (kind == 0 ? 2.4f : kind == 1 ? 6 : 16) * unit.RangeScale;
             if (kind == 2)
             {
                 Vector3 origin = unit.AimPoint + direction * .5f;
+                if(unit.storyRole>0){ReleasePaperFan(unit,direction,range);return;}
                 SpawnProjectile(origin, unit.PhaseTwo ? (PlayerPosition+Vector3.up*1.1f-origin).normalized : direction, unit.transform, false, false, 10, range, unit.boss ? 18 : 10, unit.RangeScale);
                 audioBus.EnemyAttack("paper", origin, .25f); return;
             }
             Vector3 delta = player.position - unit.transform.position;
             float height = Mathf.Abs(delta.y); delta.y = 0;
             if (delta.magnitude <= range && height < 1.5f * unit.RangeScale && Vector3.Dot(direction, delta.normalized) >= Mathf.Cos(35 * Mathf.Deg2Rad) && ClearDefenseSight(unit.AimPoint, player.position + Vector3.up, unit.transform, null))
+            {
+                bool canPush=invulnerability<=0;
                 DefenderContact(unit.boss ? 20 : unit.dog ? 12 : 10);
+                if(unit.storyRole==4&&canPush&&!ended&&controller.enabled)controller.Move(direction*1.4f);
+            }
             audioBus.EnemyAttack(kind == 0 ? "swing" : "sonic", unit.AimPoint);
             for (int i = 0; i <= 12; i++)
             {
