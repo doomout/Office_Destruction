@@ -4,6 +4,15 @@
 
 이 문서는 **2026-11-23 현재 구현**을 기준으로 작성했습니다. 과거 변경 사항은 [업데이트 기록](OfficeRampage_Update.md), 기능별 상세 설명은 아래 안내 문서를 참고하세요.
 
+## 게임 플레이 영상
+
+이미지를 클릭하면 해당 모드의 유튜브 플레이 영상으로 이동합니다.
+
+| 스토리 모드 | 무한 파괴 모드 |
+| :---: | :---: |
+| [![스토리 모드 플레이 영상](https://img.youtube.com/vi/XTVZ-H5IeBE/hqdefault.jpg)](https://youtu.be/XTVZ-H5IeBE) | [![무한 파괴 모드 플레이 영상](https://img.youtube.com/vi/n_-WwJiiI9Q/hqdefault.jpg)](https://youtu.be/n_-WwJiiI9Q) |
+| [▶ 스토리 모드 영상 보기](https://youtu.be/XTVZ-H5IeBE) | [▶ 무한 파괴 모드 영상 보기](https://youtu.be/n_-WwJiiI9Q) |
+
 ## 1. 실행 환경과 시작 방법
 
 | 항목 | 현재 설정 |
