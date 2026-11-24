@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -188,13 +188,13 @@ namespace OfficeRampage
             {
                 Vector3 origin = unit.AimPoint + direction * .5f;
                 SpawnProjectile(origin, unit.PhaseTwo ? (PlayerPosition+Vector3.up*1.1f-origin).normalized : direction, unit.transform, false, false, 10, range, unit.boss ? 18 : 10, unit.RangeScale);
-                audioBus.Play("swing", .25f, 1.5f, origin); return;
+                audioBus.EnemyAttack("paper", origin, .25f); return;
             }
             Vector3 delta = player.position - unit.transform.position;
             float height = Mathf.Abs(delta.y); delta.y = 0;
             if (delta.magnitude <= range && height < 1.5f * unit.RangeScale && Vector3.Dot(direction, delta.normalized) >= Mathf.Cos(35 * Mathf.Deg2Rad) && ClearDefenseSight(unit.AimPoint, player.position + Vector3.up, unit.transform, null))
                 DefenderContact(unit.boss ? 20 : unit.dog ? 12 : 10);
-            audioBus.Play(kind == 0 ? "swing" : "wall", .3f, kind == 0 ? 1 : 1.8f, unit.AimPoint);
+            audioBus.EnemyAttack(kind == 0 ? "swing" : "sonic", unit.AimPoint);
             for (int i = 0; i <= 12; i++)
             {
                 Vector3 ray = Quaternion.Euler(0, Mathf.Lerp(-35, 35, i / 12f), 0) * direction;

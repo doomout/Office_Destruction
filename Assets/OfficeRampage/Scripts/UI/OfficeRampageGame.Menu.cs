@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace OfficeRampage
 {
@@ -18,8 +18,8 @@ namespace OfficeRampage
             difficulty = OfficeMenuRules.Normalize(PlayerPrefs.GetInt(SettingsPrefix + "Difficulty", 1));
             audioBus = GetComponent<OfficeAudio>();
             if (audioBus == null) audioBus = gameObject.AddComponent<OfficeAudio>();
-            audioBus.MusicVolume = Mathf.Clamp(PlayerPrefs.GetFloat(SettingsPrefix + "Music", .26f), 0, .6f);
-            audioBus.EffectsVolume = Mathf.Clamp01(PlayerPrefs.GetFloat(SettingsPrefix + "Effects", .75f));
+            audioBus.MusicVolume = Mathf.Clamp(PlayerPrefs.GetFloat(SettingsPrefix + "Music", .38f), 0, .6f);
+            audioBus.EffectsVolume = Mathf.Clamp01(PlayerPrefs.GetFloat(SettingsPrefix + "Effects", .6f));
             audioBus.Muted = PlayerPrefs.GetInt(SettingsPrefix + "Muted", 0) == 1;
             ResetRun();
             ReturnToMainMenu();

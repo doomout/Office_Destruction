@@ -1,0 +1,47 @@
+[
+  {
+    "file": "heavy_battle.ogg",
+    "author": "MintoDog",
+    "page": "https://opengameart.org/content/heavy-battle-1",
+    "original": "heavy_battle_1_bpm190_0.ogg",
+    "license": "CC0-1.0",
+    "sha256": "86b3328dbf87f68f2529191f9edb97bd9d4879fb62f01db232f6b791f085b924",
+    "modification": "Renamed only; source audio unchanged"
+  },
+  {
+    "file": "once_more.wav",
+    "author": "nene",
+    "page": "https://opengameart.org/content/once-more-metal",
+    "original": "once_more_metal.wav",
+    "license": "CC0-1.0",
+    "sha256": "ae26bbdf270f0dccb75409a5f3552e43fad64a28b05c30111a74cfa73ced0d02",
+    "modification": "Renamed only; source audio unchanged"
+  },
+  {
+    "file": "swing.ogg",
+    "author": "Kenney",
+    "page": "https://lpc.opengameart.org/content/50-rpg-sound-effects",
+    "original": "OGG/knifeSlice.ogg",
+    "license": "CC0-1.0",
+    "sha256": "4cd96dc630bed9840c15f1dd2306da2cc56a4da26a5d3f1a03c5a7265ac5e54f",
+    "modification": "Renamed only; source audio unchanged"
+  },
+  {
+    "file": "sonic.ogg",
+    "author": "Kenney",
+    "page": "https://lpc.opengameart.org/content/50-rpg-sound-effects",
+    "original": "OGG/cloth1.ogg",
+    "license": "CC0-1.0",
+    "sha256": "ddb93a3671233f95da0e0b10367f082f7eb42fa6caaddcf776410aa8833c747d",
+    "modification": "Renamed only; source audio unchanged"
+  },
+  {
+    "file": "paper.ogg",
+    "author": "Kenney",
+    "page": "https://lpc.opengameart.org/content/50-rpg-sound-effects",
+    "original": "OGG/bookFlip1.ogg",
+    "license": "CC0-1.0",
+    "sha256": "fa81ac2fedc8c641661b87e349630a36c9800e795e0c800e029214efdbe26a7d",
+    "modification": "Renamed only; source audio unchanged"
+  }
+]

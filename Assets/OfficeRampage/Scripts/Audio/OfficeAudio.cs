@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,8 +6,8 @@ namespace OfficeRampage
 {
     public sealed class OfficeAudio : MonoBehaviour
     {
-        public float MusicVolume { get; set; } = .26f;
-        public float EffectsVolume { get; set; } = .75f;
+        public float MusicVolume { get; set; } = .38f;
+        public float EffectsVolume { get; set; } = .6f;
         public bool Muted { get; set; }
         private readonly Dictionary<string, AudioClip> clips = new Dictionary<string, AudioClip>();
         private readonly AudioSource[] music = new AudioSource[2];
@@ -16,7 +16,7 @@ namespace OfficeRampage
         private readonly float[] trackGain = { 1, 1 };
         private Coroutine transition;
         private int activeMusic, voice, impactFrame = -1, impactsThisFrame;
-        private float duckUntil;
+        private float nextEnemySound, nextImpactSound;
         private bool paused;
         private AudioClip orbitalLaser;
 
@@ -56,6 +56,19 @@ namespace OfficeRampage
                 if(orbitalLaser==null) orbitalLaser=BuildOrbitalLaser();
                 clips[key]=orbitalLaser;return orbitalLaser;
             }
+            if(key.StartsWith("Music/"))
+            {
+                bool heavy=key=="Music/boss"||key=="Music/office2"||key=="Music/office4";
+                var track=Resources.Load<AudioClip>("OfficeAudio/CombatMix/"+(heavy?"heavy_battle":"once_more"));
+                if(track==null)Debug.LogError("Office Rampage music missing: "+key);
+                clips[key]=track;return track;
+            }
+            if(key=="Sfx/swing"||key=="Sfx/sonic"||key=="Sfx/paper")
+            {
+                var foley=Resources.Load<AudioClip>("OfficeAudio/CombatMix/"+key.Substring(4));
+                if(foley==null)Debug.LogError("Office Rampage foley missing: "+key);
+                clips[key]=foley;return foley;
+            }
             string replacement=null;
             switch(key)
             {
@@ -65,13 +78,6 @@ namespace OfficeRampage
                 case "Sfx/rocket": replacement="rocket"; break;
                 case "Sfx/explosion": replacement="explosion"; break;
                 case "Sfx/thunder": replacement="thunder"; break;
-                case "Sfx/thud": replacement="impact7"; break;
-                case "Sfx/wood0": replacement="impact1"; break;
-                case "Sfx/wood1": replacement="impact2"; break;
-                case "Sfx/wood2": replacement="impact3"; break;
-                case "Sfx/metal0": replacement="impact4"; break;
-                case "Sfx/metal1": replacement="impact5"; break;
-                case "Sfx/metal2": replacement="impact6"; break;
             }
             var clip = Resources.Load<AudioClip>(replacement==null ? "OfficeAudio/"+key : "OfficeAudio/CombatRefresh/"+replacement);
             if (clip == null) Debug.LogError("Office Rampage audio missing: " + key);
@@ -87,7 +93,7 @@ namespace OfficeRampage
             foreach (var source in music) source.Stop();
             foreach (var source in effects) source.Stop();
             weights[0] = weights[1] = 0;
-            activeMusic = 0; duckUntil = 0;
+            activeMusic = 0; nextEnemySound = nextImpactSound = 0;
             ChangeRoom(1);
         }
 
@@ -99,8 +105,8 @@ namespace OfficeRampage
             int next = 1 - activeMusic;
             music[next].Stop();
             music[next].clip = clip;
-            // Match the measured RMS levels of the original tracks without modifying the assets.
-            float[] gains = { 1f, .56f, .47f, .75f, .95f, 1.1f };
+            // New metal tracks use their own mix gain; old ambient-track attenuation does not apply.
+            float[] gains = { 1f, 1f, 1f, 1f, 1f, 1f };
             trackGain[next] = gains[Mathf.Clamp(room, 1, 6) - 1];
             music[next].volume = 0;
             weights[next] = 0;
@@ -130,11 +136,10 @@ namespace OfficeRampage
 
         private void Update()
         {
-            float duck = Time.unscaledTime < duckUntil ? .65f : 1;
             for (int i = 0; i < music.Length; i++)
             {
                 music[i].mute = Muted;
-                music[i].volume = Mathf.MoveTowards(music[i].volume, weights[i] * trackGain[i] * MusicVolume * duck, Time.unscaledDeltaTime * 1.5f);
+                music[i].volume = Mathf.MoveTowards(music[i].volume, weights[i] * trackGain[i] * Mathf.Clamp01(MusicVolume * 1.2f), Time.unscaledDeltaTime * 1.5f);
             }
             foreach (var source in effects) source.mute = Muted;
         }
@@ -159,27 +164,36 @@ namespace OfficeRampage
             source.spatialBlend = position.HasValue ? .75f : 0;
             if (position.HasValue) source.transform.position = position.Value;
             source.pitch = pitch;
-            source.volume = EffectsVolume * volume;
+            source.volume = Mathf.Clamp01(EffectsVolume * volume * .75f * (key=="thud"?.55f:1f));
             source.mute = Muted;
             source.Play();
+        }
+
+        // A crowd may attack together, but it must not become a wall of repeated audio.
+        // This gate affects sound only; attacks, damage and timing are unchanged.
+        public void EnemyAttack(string key, Vector3 position, float volume = .3f, float pitch = 1)
+        {
+            if(paused||Time.unscaledTime<nextEnemySound)return;
+            nextEnemySound=Time.unscaledTime+.12f;
+            Play(key,volume*.55f,Mathf.Clamp(pitch,.8f,1.1f),position);
         }
 
         public void Weapon(int index)
         {
             string key=index<=1 || index==4 ? "swing" : index==3 ? "machinegun" : index==5 ? "shotgun" : index>=6 ? "rocket" : "shot";
             Play(key,index<=1?.35f:.65f,Random.Range(.93f,1.04f));
-            duckUntil = Time.unscaledTime + .18f;
         }
 
         public void Impact(int material, bool broken, Vector3 position)
         {
+            if(paused||Time.unscaledTime<nextImpactSound)return;
+            nextImpactSound=Time.unscaledTime+.055f;
             if (impactFrame != Time.frameCount) { impactFrame = Time.frameCount; impactsThisFrame = 0; }
             if (++impactsThisFrame > 2) return;
             string key = material == 0 ? "wood" + Random.Range(0, 3) : "metal" + Random.Range(0, 3);
             Play(key, broken ? .65f : .4f, Random.Range(.88f, 1.1f), position);
             if (broken && (material == 1 || material == 2))
                 Play("glass" + Random.Range(0, 2), .32f, Random.Range(.9f, 1.08f), position);
-            duckUntil = Time.unscaledTime + .12f;
         }
 
         private AudioClip BuildOrbitalLaser()

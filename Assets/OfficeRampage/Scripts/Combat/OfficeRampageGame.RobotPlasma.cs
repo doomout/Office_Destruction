@@ -17,7 +17,7 @@ namespace OfficeRampage
                 var light=obj.AddComponent<Light>();light.color=Cyan;light.intensity=2;light.range=4;
                 var shot=obj.AddComponent<OfficeProjectile>();shot.game=this;shot.owner=unit.transform;shot.direction=ray;shot.speed=36;shot.range=70;shot.damage=24;shot.radius=.3f;
             }
-            audioBus.Play("orbitalLaser",.35f,1.5f,origin);
+            audioBus.EnemyAttack("orbitalLaser",origin,.35f,1.1f);
         }
     }
 }

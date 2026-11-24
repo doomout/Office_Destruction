@@ -51,7 +51,7 @@ namespace OfficeRampage
                 var bullet=obj.AddComponent<OfficeProjectile>();bullet.game=this;bullet.owner=unit.transform;
                 bullet.direction=ray;bullet.speed=shotgun?23:20;bullet.range=range;bullet.damage=shotgun?5:10;bullet.radius=.045f;
             }
-            audioBus.Play(shotgun?"shotgun":"shot",.45f,1,unit.AimPoint);
+            audioBus.EnemyAttack(shotgun?"shotgun":"shot",unit.AimPoint,.45f);
         }
     }
 }

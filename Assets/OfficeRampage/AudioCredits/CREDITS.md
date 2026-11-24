@@ -1,3 +1,5 @@
+> 현재 음악·타격음 매핑(2026-11-24)은 [전투 사운드 교체](COMBAT_MIX_2026-11-24.md)를 참고하세요. 아래는 기존 음원들의 출처 기록이며 자산은 보존되어 있습니다.
+
 # Office Rampage audio credits
 
 All 24 audio files were downloaded from the original asset pages below.
