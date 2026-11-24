@@ -48,6 +48,7 @@ namespace OfficeRampage
         private bool BuildEndlessSpecialModel()
         {
             if(!endlessMode||endlessWeapon<8)return false;
+            if(endlessWeapon==MeteorWeaponId){BuildMeteorRemote();return true;}
             if(endlessWeapon==EarthquakeWeaponId){BuildEarthquakeRemote();return true;}
             if(endlessWeapon>=17){BuildAirSupportRemote();return true;}
             if(endlessWeapon>=14){BuildEndlessSummonWeapon();return true;}

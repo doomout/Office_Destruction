@@ -379,6 +379,7 @@ namespace OfficeRampage
             }
             if (ended || paused) return;
             float dt = Time.deltaTime;
+            if(meteorActive){TickMeteor(dt);UpdateCamera();return;}
             if(endlessMode)TickEndless(dt);else TickOrbitalReward(dt);
             if (CombatLocked) { UpdateCamera(); return; }
             cooldown -= dt; comboLeft -= dt; noticeLeft -= dt; invulnerability -= dt;

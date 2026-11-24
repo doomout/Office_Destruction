@@ -20,6 +20,7 @@ namespace OfficeRampage
             if(endlessWeapon==18){StartJetStrike();return;}
             if(endlessWeapon==19){StartBlackHole();return;}
             if(endlessWeapon==EarthquakeWeaponId){StartEarthquake();return;}
+            if(endlessWeapon==MeteorWeaponId){StartMeteor();return;}
             if(endlessWeapon==16){ActivateEndlessMech();return;}
             if(endlessWeapon==13){StartCoroutine(EndlessOrbitalStrike());return;}
             if(endlessWeapon==14){SummonEndlessDemon();return;}

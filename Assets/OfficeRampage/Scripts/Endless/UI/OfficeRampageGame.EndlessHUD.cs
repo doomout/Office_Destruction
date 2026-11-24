@@ -16,6 +16,7 @@ namespace OfficeRampage
             Box(new Rect(1050,590,208,107),Navy);
             if(!endlessSaber&&endlessWeapon==11)HudIcon(new Rect(1008,600,32,32),HudSymbol.UFO,Color.green);
             if(!endlessSaber&&endlessWeapon==EarthquakeWeaponId)HudIcon(new Rect(1008,600,32,32),HudSymbol.Volcano,Orange);
+            if(!endlessSaber&&endlessWeapon==MeteorWeaponId)HudIcon(new Rect(1008,600,32,32),HudSymbol.Meteor,Orange);
             var weaponLabel=new GUIStyle(labelStyle){fontSize=16,wordWrap=false,padding=new RectOffset(0,0,0,0),alignment=TextAnchor.MiddleLeft};
             var ammoLabel=new GUIStyle(weaponLabel){fontSize=18};
             GUI.Label(new Rect(1060,596,188,26),endlessSaber?"광선검":EndlessWeapons[endlessWeapon],weaponLabel);

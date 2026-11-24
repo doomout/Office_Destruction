@@ -5,15 +5,15 @@ namespace OfficeRampage
     public sealed partial class OfficeRampageGame
     {
         private const float EndlessWeaponInterval=3;
-        private float endlessSupportClock,earthquakeSupplyClock;
+        private float endlessSupportClock,earthquakeSupplyClock,meteorSupplyClock;
         private readonly List<int> endlessWeaponBag=new List<int>();
         private int lastEndlessDrop=-1;
-        private void ResetEndlessSupply(){endlessSupportClock=8;earthquakeSupplyClock=30;endlessWeaponBag.Clear();lastEndlessDrop=-1;}
+        private void ResetEndlessSupply(){endlessSupportClock=8;earthquakeSupplyClock=meteorSupplyClock=30;endlessWeaponBag.Clear();lastEndlessDrop=-1;}
         private int NextEndlessWeapon()
         {
             if(endlessWeaponBag.Count==0)
             {
-                for(int id=0;id<EndlessWeapons.Length;id++)if(id!=4&&id!=EarthquakeWeaponId)endlessWeaponBag.Add(id);
+                for(int id=0;id<EndlessWeapons.Length;id++)if(id!=4&&id!=EarthquakeWeaponId&&id!=MeteorWeaponId)endlessWeaponBag.Add(id);
                 for(int i=endlessWeaponBag.Count-1;i>0;i--){int j=Random.Range(0,i+1);int temp=endlessWeaponBag[i];endlessWeaponBag[i]=endlessWeaponBag[j];endlessWeaponBag[j]=temp;}
             }
             // Keep late-game blasts out of the opening 30 seconds without consuming their bag entries.
@@ -24,7 +24,7 @@ namespace OfficeRampage
         }
         private void TickEndlessSupply(float dt)
         {
-            TickEarthquakeSupply(dt);
+            TickEarthquakeSupply(dt);TickMeteorSupply(dt);
             endlessSupplyClock-=dt;
             if(endlessSupplyClock<=0){SpawnEndlessPickup(0,NextEndlessWeapon(),NearbyEndlessDrop());endlessSupplyClock=EndlessWeaponInterval;}
             endlessSupportClock-=dt;
