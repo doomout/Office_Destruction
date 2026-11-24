@@ -37,6 +37,7 @@ namespace OfficeRampage
 
         private void ReturnToMainMenu()
         {
+            CancelElevatorReward();
             if(meteorActive)ResetMeteor();
             if (nameEditor != null) nameEditor.Close();
             SaveMenuSettings();
@@ -153,7 +154,7 @@ namespace OfficeRampage
             if (MenuButton(new Rect(80, 470, 485, 55), audioBus.Muted ? "전체 소리: 꺼짐 (눌러서 켜기)" : "전체 소리: 켜짐 (눌러서 끄기)"))
             { audioBus.Muted = !audioBus.Muted; changed = true; }
             GUI.Label(new Rect(650,270,550,60),"진행 방식",menuHeading);
-            GUI.Label(new Rect(650,340,550,170),"시간 제한 없음\n1·3층: 직원 처치 / 2층: 서버와 방어 인원\n가구 파괴는 진행 조건에서 제외\n대표층: 경비견 → 보디가드 → 대표",menuText);
+            GUI.Label(new Rect(650,340,550,170),"시간 제한 없음\n1층: 단말기·방어 / 2층: 서버·방어 / 3층: 임원\n가구 파괴는 진행 조건에서 제외\n대표층: 경비견 → 보디가드 → 대표",menuText);
             if(changed) SaveMenuSettings();
             if (MenuButton(new Rect(80, 535, 485, 45), "유닛 설정")) OpenCompanySettings();
             if (MenuButton(new Rect(80, 590, 300, 55), "뒤로")) { SaveMenuSettings(); menuPage = MenuPage.Main; }

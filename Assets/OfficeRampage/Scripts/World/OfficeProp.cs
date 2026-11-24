@@ -16,6 +16,8 @@ namespace OfficeRampage
         public void Hit(float damage, Vector3 direction)
         {
             if (broken || !game.RunActive) return;
+            var terminal=GetComponent<OfficeStoryServer>();
+            if(terminal!=null&&terminal.index==3)game.RequestLobbyLeave();
             health -= game.PlayerDamage(damage);
             if (health <= 0 || Time.time >= nextImpactSound)
             {

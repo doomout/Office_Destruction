@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
@@ -18,7 +18,7 @@ namespace OfficeRampage
             }
             else
             {
-                sprintEnergy=Mathf.Min(10,sprintEnergy+dt*2);
+                sprintEnergy=Mathf.Min(10,sprintEnergy+dt*2*StorySprintRecovery);
                 if(!held && sprintEnergy>=2) sprintExhausted=false;
             }
             // A partial final frame cannot grant more than ten seconds of boosted movement.

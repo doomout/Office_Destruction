@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace OfficeRampage
@@ -170,6 +170,7 @@ namespace OfficeRampage
         public void DefenderContact(float damage) { if (RunActive) Hurt(damage); }
         public void DefenderImpact(OfficeDefender unit)
         {
+            if(unit.room==1&&!endlessMode)RequestLobbyLeave();
             audioBus.Impact(3, false, unit.AimPoint);
             Impact(unit.AimPoint, unit.boss ? Orange : Cyan, -unit.transform.forward, 2);
         }
@@ -177,6 +178,7 @@ namespace OfficeRampage
         {
             RegisterDefeatCombo(unit);
             if(endlessMode){EndlessDefeated(unit);return;}
+            if(unit.room==1)RequestLobbyLeave();
             score += unit.boss ? 5000 : unit.dog ? 300 : 200;
             if (unit.boss) { BeginBossEnding(unit); return; }
             RefreshExit(rooms.Find(r => r.number == unit.room));

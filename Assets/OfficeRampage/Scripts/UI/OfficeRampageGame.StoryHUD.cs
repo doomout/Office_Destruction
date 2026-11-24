@@ -6,6 +6,8 @@ namespace OfficeRampage
         private GUIStyle storyTopStyle,storyWeaponStyle;
         private string StoryProgressText()
         {
+            if(current.number==1)return "퇴근 "+(lobbyRequested?"거부":"요청 대기")+" · 단말기 "+(lobbyTerminalBroken?"1/1":"0/1")+" · 방어 "+RequiredStoryEnemiesLeft+(current.unlocked?" · 출구 열림":"");
+            if(current.number==3)return "지정 임원 "+RequiredStoryEnemiesLeft+(current.unlocked?" · 출구 열림":"");
             if(current.number==2)return "서버 "+StoryServerCount+"/3 · 방어 "+StoryGuardsLeft+" · 구출 "+(storyRescued?"1/1":"0/1")+(current.unlocked?" · 출구 열림":"");
             if(current.number==4)return bossFight?"대표전"+(bossUnit!=null&&bossUnit.PhaseTwo?" · 로봇":""):(securityWaveStarted?"보디가드 ":"경비견 ")+LivingDefenders(4);
             return "남은 직원 "+LivingDefenders(current.number)+(current.unlocked?" · 출구 열림":"");

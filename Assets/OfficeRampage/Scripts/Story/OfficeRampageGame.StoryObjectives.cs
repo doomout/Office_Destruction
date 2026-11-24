@@ -27,6 +27,7 @@ namespace OfficeRampage
         private void SetupStoryFloor()
         {
             if(endlessMode||current==null)return;
+            SetupStoryProgressionFloor();
             if(current.number==3&&storyRescued&&!storyNextReward)
             {
                 storyNextReward=true;SpawnStoryHealing(player.position+Vector3.forward*2);
@@ -81,6 +82,7 @@ namespace OfficeRampage
         }
         public void StoryServerDestroyed(int index)
         {
+            if(index==3){DestroyLobbyTerminal();return;}
             if(endlessMode||!storyFloorBuilt||current==null||current.number!=2||index<0||index>=3||storyServers[index])return;
             storyServers[index]=true;
             if(index==0)StoryLine("업무 배정 중단 · 더 이상 증원되지 않는다.");
@@ -101,9 +103,10 @@ namespace OfficeRampage
         private void TickStoryObjectives(float dt)
         {
             if(endlessMode||!RunActive||CombatLocked)return;
+            TickStoryProgression();
             storyLineLeft=Mathf.Max(0,storyLineLeft-dt);
             if(storyRescued&&current.number==4&&bossFight&&!storyFinalReward&&hp<=70)
-            {storyFinalReward=true;hp=Mathf.Min(100,hp+30);StoryLine("구출한 동료: 이번엔 내가 도울게! · 체력 +30");audioBus.Play("combo",.45f);}
+            {storyFinalReward=true;hp=Mathf.Min(StoryMaxHealth,hp+30);StoryLine("구출한 동료: 이번엔 내가 도울게! · 체력 +30");audioBus.Play("combo",.45f);}
             if(current.number!=2||!storyFloorBuilt)return;
             if(storyRoot!=null)foreach(var label in storyRoot.GetComponentsInChildren<TextMesh>())label.transform.rotation=view.transform.rotation;
             if(!storyServers[0])
@@ -160,6 +163,8 @@ namespace OfficeRampage
                 Box(new Rect(22,y,1150,30),new Color(.025f,.045f,.07f,.78f));
                 GUI.Label(new Rect(34,y,1126,30),content,style);
             }
+            if(current.number==1&&lobbyTerminal!=null&&!lobbyRequested&&Vector3.Distance(player.position,lobbyTerminal.position)<3)
+                GUI.Label(new Rect(470,550,340,35),"E · 퇴근 요청",centeredStyle);
             if(current.number!=2||!storyFloorBuilt)return;
             if(storyServers[2]&&!storyRescued&&storyCoworker!=null&&Vector3.Distance(player.position,storyCoworker.position)<3)
                 GUI.Label(new Rect(470,550,340,35),"E · 동료 구출",centeredStyle);

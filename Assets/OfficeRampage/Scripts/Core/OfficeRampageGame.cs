@@ -52,7 +52,7 @@ namespace OfficeRampage
 
         private void ResetRun()
         {
-            ResetStoryObjectives(); ResetEndlessState(); StopAllCoroutines(); submissionPlaying=submissionEnded=false; ResetExpansion(); ResetSprint();
+            ResetStoryProgression(); ResetStoryObjectives(); ResetEndlessState(); StopAllCoroutines(); submissionPlaying=submissionEnded=false; ResetExpansion(); ResetSprint();
             if (nameEditor != null) nameEditor.Close();
             runCompany = (companySettings ?? OfficeCompanySettings.CreateDefault()).Copy();
             System.Array.Clear(spawnedEnemies, 0, spawnedEnemies.Length);
@@ -108,7 +108,7 @@ namespace OfficeRampage
             view.backgroundColor = Navy;
             view.clearFlags = CameraClearFlags.SolidColor;
             current = endlessMode?BuildEndlessArena():BuildRoom(1, 0); ApplyFloorEntry();
-            Notify(endlessMode?"무한 파괴 시작! 바닥 장비 앞에서 E로 줍기":"1층 로비 · 직원을 모두 처치하면 엘리베이터가 열립니다.", 5);
+            Notify(endlessMode?"무한 파괴 시작! 바닥 장비 앞에서 E로 줍기":"1층 로비 · 보안 단말기에서 E로 퇴근을 요청하세요.", 5);
             LockCursor(true);
             UpdateCamera();
         }
@@ -375,8 +375,7 @@ namespace OfficeRampage
             if (keys != null && keys.mKey.wasPressedThisFrame) { audioBus.Muted = !audioBus.Muted; SaveMenuSettings(); }
             if (keys != null && keys.escapeKey.wasPressedThisFrame && !ended)
             {
-                paused = !paused; Time.timeScale = paused ? 0 : 1; LockCursor(!paused);
-                audioBus.SetPaused(paused);
+                paused = !paused; SyncStoryPause();
             }
             if (ended || paused) return;
             float dt = Time.deltaTime;
@@ -526,7 +525,7 @@ namespace OfficeRampage
             }
             RefreshExit(room);
             float previousHealth = hp;
-            hp = OfficeRules.HealthAfterBreak(hp, kind);
+            hp = kind==OfficeRules.WaterCooler?Mathf.Min(StoryMaxHealth,hp+5):OfficeRules.HealthAfterBreak(hp, kind);
             if (OfficeRules.IsElectronic(kind))
             {
                 // Per-object cost, independent of range and the boss-contact invulnerability timer.
@@ -609,6 +608,7 @@ namespace OfficeRampage
             Matrix4x4 previous = GUI.matrix;
             float scale = Mathf.Min(Screen.width / 1280f, Screen.height / 720f);
             GUI.matrix = Matrix4x4.TRS(new Vector3((Screen.width - 1280 * scale) / 2, (Screen.height - 720 * scale) / 2), Quaternion.identity, Vector3.one * scale);
+            if(storyRewardOpen&&!paused){DrawElevatorReward();GUI.matrix=previous;return;}
             if(endlessMode){DrawEndlessHUD();GUI.matrix=previous;return;}
             if (submissionPlaying || submissionEnded) { DrawSubmission(); GUI.matrix=previous; return; }
             if (endingPlaying || (ended && won)) { DrawEndingScreen(); GUI.matrix = previous; return; }
@@ -616,9 +616,9 @@ namespace OfficeRampage
             DrawCompactNotice(); DrawStoryObjectives();
             GUI.Label(new Rect(627, 342, 30, 32), "+", titleStyle);
             Box(new Rect(22, 617, 320, 80), Navy);
-            GUI.Label(new Rect(38, 627, 290, 28), "체력  " + Mathf.CeilToInt(hp), labelStyle);
+            GUI.Label(new Rect(38, 627, 290, 28), "체력  " + Mathf.CeilToInt(hp)+" / "+StoryMaxHealth, labelStyle);
             Box(new Rect(38, 667, 285, 10), new Color(.2f, .25f, .3f));
-            Box(new Rect(38, 667, 285 * hp / 100, 10), invulnerability > 0 ? Orange : Cyan);
+            Box(new Rect(38, 667, 285 * Mathf.Clamp01(hp / StoryMaxHealth), 10), invulnerability > 0 ? Orange : Cyan);
             DrawStoryWeaponCard(); DrawSprintHUD();
             DrawExpansionOverlay();
             if (ended || paused)
@@ -629,7 +629,7 @@ namespace OfficeRampage
                 GUI.Label(new Rect(340, 380, 600, 40), paused ? "계속하기 또는 시작 메뉴로 이동할 수 있습니다." : "재게임 버튼으로 첫 사무실부터 시작합니다.", centeredStyle);
                 if (MenuButton(new Rect(510, 450, 260, 48), paused ? "계속하기" : "재게임"))
                 {
-                    if (paused) { paused = false; Time.timeScale = 1; LockCursor(true); audioBus.SetPaused(false); }
+                    if (paused) { paused = false; SyncStoryPause(); }
                     else ResetRun();
                 }
                 DrawReturnToMenu();
