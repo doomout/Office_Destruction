@@ -612,29 +612,14 @@ namespace OfficeRampage
             if(endlessMode){DrawEndlessHUD();GUI.matrix=previous;return;}
             if (submissionPlaying || submissionEnded) { DrawSubmission(); GUI.matrix=previous; return; }
             if (endingPlaying || (ended && won)) { DrawEndingScreen(); GUI.matrix = previous; return; }
-            Box(new Rect(22, 20, 350, 182), new Color(.02f, .04f, .07f, .92f));
-            GUI.Label(new Rect(38, 28, 300, 40), "사무실 파괴", titleStyle);
-            GUI.Label(new Rect(38, 74, 300, 28), bossFight ? "대표 사무실" : current.number + "층 / 4층", labelStyle);
-            string objective = current.number == 2 ? "서버 " + StoryServerCount + "/3 · 방어 인원 " + StoryGuardsLeft + (current.unlocked?" · 출구 열림":"") : current.number == 4 ? (bossFight ? "대표 체력 " + Mathf.CeilToInt(bossUnit.Health) : (securityWaveStarted ? "남은 보디가드: " : "남은 경비견: ") + LivingDefenders(4)) : "남은 직원 " + LivingDefenders(current.number) + (current.unlocked ? " · 출구 열림" : " · 전원 처치 필요");
-            GUI.Label(new Rect(38, 108, 300, 24), objective, smallStyle);
-            GUI.Label(new Rect(38, 144, 340, 24), current.layoutName + " / " + current.width + " x " + (current.end - current.start) + " 미터", smallStyle);
-            if (current.number < 4 && current.number != 2) GUI.Label(new Rect(38, 177, 320, 24), "처치 " + (EnemyTotal(current.number) - LivingDefenders(current.number)) + " / " + OfficeProgressRules.Required(EnemyTotal(current.number)) + " 필요", smallStyle);
-            Box(new Rect(1018, 20, 240, 86), Navy);
-            GUI.Label(new Rect(1034, 29, 215, 30), "점수  " + score.ToString("N0"), labelStyle);
-            GUI.Label(new Rect(1034, 65, 215, 26), "콤보 " + combo + " / 3회 스킬 충전", smallStyle);
-            Box(new Rect(1034, 94, 208 * Mathf.Clamp01(comboLeft / 4), 4), Orange);
+            DrawStoryTopStrip();
             DrawCompactNotice(); DrawStoryObjectives();
-            if (bossFight && !ended)
-            {
-                Box(new Rect(390, 119, 500, 18), Navy);
-                Box(new Rect(390, 119, 500 * Mathf.Clamp01(bossUnit != null ? bossUnit.Health / bossUnit.MaxHealth : 0), 18), Orange);
-            }
             GUI.Label(new Rect(627, 342, 30, 32), "+", titleStyle);
             Box(new Rect(22, 617, 320, 80), Navy);
             GUI.Label(new Rect(38, 627, 290, 28), "체력  " + Mathf.CeilToInt(hp), labelStyle);
             Box(new Rect(38, 667, 285, 10), new Color(.2f, .25f, .3f));
             Box(new Rect(38, 667, 285 * hp / 100, 10), invulnerability > 0 ? Orange : Cyan);
-            DrawWeaponSlots(); DrawSprintHUD();
+            DrawStoryWeaponCard(); DrawSprintHUD();
             DrawExpansionOverlay();
             if (ended || paused)
             {

@@ -1,4 +1,4 @@
-# Office Rampage — 사무실 파괴
+﻿# Office Rampage — 사무실 파괴
 
 직원들과 싸우고 사무집기를 부수는 **3D 3인칭 액션 게임**입니다. 대표에게 도전하는 **스토리 모드**와 바닥 장비를 주워 끝없이 버티는 **무한 파괴 모드**를 제공합니다.
 
@@ -12,8 +12,8 @@
 
 | 스토리 모드 | 무한 파괴 모드 |
 | :---: | :---: |
-| [![스토리 모드 플레이 영상](https://img.youtube.com/vi/XTVZ-H5IeBE/hqdefault.jpg)](https://youtu.be/XTVZ-H5IeBE) | [![무한 파괴 모드 플레이 영상](https://img.youtube.com/vi/n_-WwJiiI9Q/hqdefault.jpg)](https://youtu.be/n_-WwJiiI9Q) |
-| [▶ 스토리 모드 영상 보기](https://youtu.be/XTVZ-H5IeBE) | [▶ 무한 파괴 모드 영상 보기](https://youtu.be/n_-WwJiiI9Q) |
+| [![스토리 모드 플레이 영상](https://img.youtube.com/vi/XTVZ-H5IeBE/hqdefault.jpg)](https://youtu.be/zEjCfwPt0rI) | [![무한 파괴 모드 플레이 영상](https://img.youtube.com/vi/n_-WwJiiI9Q/hqdefault.jpg)](https://youtu.be/bJ07V904Bd4) |
+| [▶ 스토리 모드 영상 보기](https://youtu.be/zEjCfwPt0rI) | [▶ 무한 파괴 모드 영상 보기](https://youtu.be/bJ07V904Bd4) |
 
 ## 1. 실행 환경과 시작 방법
 
@@ -89,6 +89,8 @@
 대표층에서는 경비견 5마리, 보디가드 5명을 순서대로 처치합니다. 보디가드는 몽둥이 2명·권총 2명·장거리 샷건 1명입니다. 각 구역을 끝내면 경계 벽과 문이 사라져 다음 구역으로 이동하며, 호위를 모두 처치해야 대표를 공격할 수 있습니다.
 
 체력은 최대 100, 층별 기본 회복 포션은 2개이며 하나당 30을 회복합니다. 정수기는 파괴 시 체력 +5, 전자기기는 폭발 위험이 있는 집기입니다. 가구를 부수지 않아도 층을 진행할 수 있습니다.
+
+스토리 전투 HUD는 무한 모드와 같은 배치입니다. 상단 한 줄에 층·진행 목표·점수·콤보를 표시하고, 좌하단에 체력, 우하단에 현재 무기 아이콘·이름·잔탄을 표시합니다. 1~8 숫자키 전환과 스킬·달리기 아이콘은 유지합니다. 2층 서버·방어 담당·구출 상태는 상단에 합쳐 표시하며, 짧은 이야기 자막은 상단 바로 아래에 나옵니다. 대표전은 작은 체력 타일과 얇은 체력 막대를 사용합니다.
 
 ### 기본 무기와 콤보
 

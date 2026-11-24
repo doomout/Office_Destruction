@@ -153,19 +153,14 @@ namespace OfficeRampage
             if(endlessMode||paused||ended||submissionPlaying||submissionEnded)return;
             if(storyLineLeft>0)
             {
-                Box(new Rect(300,213,950,39),new Color(.025f,.045f,.07f,.9f));
-                GUI.Label(new Rect(315,219,920,28),storyLine,new GUIStyle(smallStyle){fontSize=17,alignment=TextAnchor.MiddleCenter});
+                float y=bossFight?86:54;
+                var style=new GUIStyle(smallStyle){fontSize=17,alignment=TextAnchor.MiddleCenter,wordWrap=false};
+                var content=new GUIContent(storyLine);
+                while(style.fontSize>11&&style.CalcSize(content).x>1100)style.fontSize--;
+                Box(new Rect(22,y,1150,30),new Color(.025f,.045f,.07f,.78f));
+                GUI.Label(new Rect(34,y,1126,30),content,style);
             }
             if(current.number!=2||!storyFloorBuilt)return;
-            Box(new Rect(22,213,258,52),Navy);
-            for(int i=0;i<3;i++)
-            {
-                Color color=storyServers[i]?Cyan:Orange;float x=34+i*40;
-                Box(new Rect(x,224,22,27),color);for(int j=0;j<3;j++)Box(new Rect(x+3,228+j*7,16,2),Navy);
-            }
-            GUI.Label(new Rect(154,224,45,30),StoryServerCount+"/3",smallStyle);
-            HudIcon(new Rect(204,225,24,24),HudSymbol.Heart,storyRescued?Cyan:Color.gray);
-            GUI.Label(new Rect(234,225,35,28),storyRescued?"1/1":"0/1",smallStyle);
             if(storyServers[2]&&!storyRescued&&storyCoworker!=null&&Vector3.Distance(player.position,storyCoworker.position)<3)
                 GUI.Label(new Rect(470,550,340,35),"E · 동료 구출",centeredStyle);
         }
