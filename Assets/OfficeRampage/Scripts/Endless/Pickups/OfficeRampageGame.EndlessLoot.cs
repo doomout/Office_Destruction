@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
@@ -48,6 +48,7 @@ namespace OfficeRampage
         private bool BuildEndlessSpecialModel()
         {
             if(!endlessMode||endlessWeapon<8)return false;
+            if(endlessWeapon==EarthquakeWeaponId){BuildEarthquakeRemote();return true;}
             if(endlessWeapon>=17){BuildAirSupportRemote();return true;}
             if(endlessWeapon>=14){BuildEndlessSummonWeapon();return true;}
             if(endlessWeapon==13){BuildRedButton(weapon);return true;}
