@@ -11,7 +11,8 @@ namespace OfficeRampage
         {
             endlessMode=false; prologueAge=0;
             menuPage=MenuPage.Intro; paused=true; Time.timeScale=0; LockCursor(false);
-            audioBus.SetPaused(true);
+            // Keep the game frozen while starting fresh music and clearing old combat sounds.
+            audioBus.ResetRun();
         }
         private void DrawIntro()
         {

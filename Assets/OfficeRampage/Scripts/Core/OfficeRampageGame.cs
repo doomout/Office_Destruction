@@ -367,7 +367,7 @@ namespace OfficeRampage
             {
                 if(menuPage==MenuPage.Intro) TickPrologue(Time.unscaledDeltaTime);
                 if (nameEditor != null && nameEditor.Active) { if (keys != null && keys.escapeKey.wasPressedThisFrame) nameEditor.Close(); return; }
-                if (keys != null && keys.escapeKey.wasPressedThisFrame) menuPage = MenuPage.Main;
+                if (keys != null && keys.escapeKey.wasPressedThisFrame) { if(menuPage==MenuPage.Intro) ReturnToMainMenu(); else menuPage = MenuPage.Main; }
                 return;
             }
             if(endlessMode&&ended&&nameEditor!=null&&nameEditor.Active)return;
