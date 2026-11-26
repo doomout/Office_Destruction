@@ -66,7 +66,7 @@ namespace OfficeRampage
             if (weaponIndex == 7)
             {
                 if(orbitalReady && !orbitalUsed) { ActivateOrbital(); return; }
-                if (!bfgReady || bfgUsed || current.number != 4 || bossUnit == null || bossUnit.PhaseTwo) return;
+                if (!bfgReady || bfgUsed || current.number != OfficeStoryFloors.Boss || bossUnit == null || bossUnit.PhaseTwo) return;
                 bfgUsed = true; bfgReady = false; StartCoroutine(NuclearTransition()); return;
             }
             if(!SpendAmmo(weaponIndex)) return;

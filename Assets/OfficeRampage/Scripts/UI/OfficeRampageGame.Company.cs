@@ -4,7 +4,7 @@ namespace OfficeRampage
     public sealed partial class OfficeRampageGame
     {
         private OfficeCompanySettings companySettings, companyDraft, runCompany;
-        private readonly int[] spawnedEnemies = new int[6];
+        private readonly int[] spawnedEnemies = new int[OfficeStoryFloors.Boss+1];
         private Vector2 companyScroll;
         private int selectedCompanyRank;
         private string companyError="";
@@ -99,7 +99,7 @@ namespace OfficeRampage
         }
         private void CheckFinalRoster()
         {
-            if(current==null || current.number!=4 || bossFight || ended || LivingDefenders(4)>0) return;
+            if(current==null || current.number!=OfficeStoryFloors.Boss || bossFight || ended || LivingDefenders(OfficeStoryFloors.Boss)>0) return;
             if(securityWavePending) return;
             if(!securityWaveStarted) { securityWavePending=true; RemoveStageBarrier(dogRoomDoor); StartCoroutine(RevealSecurity()); return; }
             bossFight=true; RemoveStageBarrier(guardRoomDoor);

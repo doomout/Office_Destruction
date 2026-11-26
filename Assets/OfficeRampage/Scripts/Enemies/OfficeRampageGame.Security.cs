@@ -10,11 +10,11 @@ namespace OfficeRampage
             // Leave the hit/area-damage iteration before adding members to defenders.
             yield return null;
             while(!RunActive) yield return null;
-            if(current==null || current.number!=4 || ended || bossUnit==null) { securityWavePending=false; yield break; }
+            if(current==null || current.number!=OfficeStoryFloors.Boss || ended || bossUnit==null) { securityWavePending=false; yield break; }
             securityWaveStarted=true;
-            var layout=activeFloor!=null?activeFloor.ReadLayout().CreateLayout():OfficeFixedFloor.Load(4).CreateLayout();
+            var layout=activeFloor!=null?activeFloor.ReadLayout().CreateLayout():OfficeFixedFloor.Load(OfficeStoryFloors.Boss).CreateLayout();
             var navigation=new OfficeNavigation(layout);
-            var points=OfficeFixedFloor.Load(4).EnemyPoints();
+            var points=OfficeFixedFloor.Load(OfficeStoryFloors.Boss).EnemyPoints();
             for(int i=0;i<5;i++)
             {
                 int kind=i<2?0:i<4?3:4;
@@ -36,7 +36,7 @@ namespace OfficeRampage
                 }
                 Impact(unit.AimPoint,Cyan,Vector3.up,8);
             }
-            spawnedEnemies[4]+=5;securityWavePending=false;
+            spawnedEnemies[OfficeStoryFloors.Boss]+=5;securityWavePending=false;
             StoryLine("대표: 일단 진정하고, 방망이부터 내려놓게.",7);
             Notify("보디가드실 개방 · 5명을 모두 처치하면 대표실이 열립니다.",5);
         }

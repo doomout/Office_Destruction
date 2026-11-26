@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
@@ -41,7 +41,7 @@ namespace OfficeRampage
                     foreach(float z in new[]{7f,21f,36f})foreach(int side in new[]{-1,1})
                         FloorSign(root,"임원실",new Vector3(side*8,2.8f,z+3.6f),.11f);
             }
-            if(room.number==4)
+            if(room.number==OfficeStoryFloors.Boss)
             {
                 dogRoomDoor=SuiteDoor(root,room.start+18,"보디가드실");
                 guardRoomDoor=SuiteDoor(root,room.start+36,"대표실");

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 namespace OfficeRampage
@@ -6,7 +6,7 @@ namespace OfficeRampage
     public sealed partial class OfficeRampageGame
     {
         private const int DecoysPerOffice=3;
-        private readonly int[] decoysUsed = new int[6];
+        private readonly int[] decoysUsed = new int[OfficeStoryFloors.Boss+1];
         private Transform decoy, decoyPreview;
         private Vector3 decoyTarget, lureCenter;
         private bool decoyAiming, decoyValid, decoyFlying;

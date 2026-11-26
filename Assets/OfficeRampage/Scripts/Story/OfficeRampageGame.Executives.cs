@@ -8,25 +8,26 @@ namespace OfficeRampage
         private readonly List<OfficeDefender> executiveActors=new List<OfficeDefender>();
         private readonly Dictionary<OfficeDefender,Transform> executiveShields=new Dictionary<OfficeDefender,Transform>();
         private int executiveWave;
-        private bool executiveEncounterBuilt,executiveAccessGranted;
+        private bool executiveEncounterBuilt,executiveAccessGranted,executiveFloorCleared;
         private float executiveIntermission;
         private int ExecutiveWaveLiving { get {int n=0;foreach(var u in executiveActors)if(u!=null&&u.Alive&&u.storyWave==executiveWave)n++;return n;} }
         private void ResetExecutiveEncounter()
         {
             executiveActors.Clear();executiveShields.Clear();executiveWave=0;executiveIntermission=0;
-            executiveEncounterBuilt=executiveAccessGranted=false;
+            executiveEncounterBuilt=executiveAccessGranted=executiveFloorCleared=false;
         }
         private void SetupExecutiveEncounter()
         {
-            if(endlessMode||executiveEncounterBuilt||current.number!=3)return;
+            if(endlessMode||!OfficeStoryFloors.IsExecutive(current.number))return;
+            executiveActors.Clear();executiveShields.Clear();executiveFloorCleared=false;executiveWave=current.number-3;
             executiveEncounterBuilt=true;
-            var root=new GameObject("Executive encounter waves").transform;root.SetParent(world,false);
-            var navigation=new OfficeNavigation(OfficeFixedFloor.Load(3).CreateLayout());
-            for(int wave=0;wave<3;wave++)
+            var root=new GameObject("Executive floor encounter").transform;root.SetParent(world,false);
+            var navigation=new OfficeNavigation(OfficeFixedFloor.Load(current.number).CreateLayout());
+            for(int wave=executiveWave;wave<=executiveWave;wave++)
             {
                 for(int i=0;i<2;i++)
                 {
-                    var unit=requiredStoryEnemies[wave*2+i];unit.ConfigureExecutive(wave+1,wave,180+wave*40);
+                    var unit=requiredStoryEnemies[i];unit.ConfigureExecutive(wave+1,wave,180+wave*40);
                     executiveActors.Add(unit);
                     var shield=new GameObject("Approval shield").transform;shield.SetParent(unit.transform,false);shield.localPosition=Vector3.up*.8f;
                     DrawExecutiveRing(shield,1.05f,Cyan);executiveShields.Add(unit,shield);
@@ -50,15 +51,12 @@ namespace OfficeRampage
         private void ActivateExecutiveWave()
         {
             int index=0;
-            float center=Mathf.Clamp(player.position.z+11,current.start+9,current.end-7);
-            if(center<player.position.z+5)center=Mathf.Max(current.start+8,player.position.z-10);
+            var points=activeFloor!=null?activeFloor.enemySpawns:null;
             foreach(var unit in executiveActors)
             {
                 if(unit==null||!unit.Alive||unit.storyWave!=executiveWave)continue;
-                Vector3 at=new Vector3((index%3-1)*5,.08f,center+(index/3)*3);
-                at.x=Mathf.Clamp(at.x,-current.width*.5f+2,current.width*.5f-2);
-                at.z=Mathf.Clamp(at.z,current.start+3,current.end-3);
-                ClearStorySpace(at,1.5f);unit.Teleport(at);unit.gameObject.SetActive(true);index++;
+                Vector3 at=points!=null&&index<points.Length?points[index].position:new Vector3((index%3-1)*5,.08f,current.start+14+(index/3)*5);
+                unit.Teleport(at);unit.gameObject.SetActive(true);index++;
             }
             string[] lines={"보고서 담당: ‘양식이 바뀌었네. 다시 해.’ · 결재 담당부터 처치하자.","정신력 담당: ‘힘들다는 건 마음가짐 문제야.’ · 원형 음파를 피하자.","책임 회피 담당: ‘내가 결정한 건 아니고…’ · 결재 보호막을 해제하자."};
             StoryLine(lines[executiveWave],7);executiveIntermission=2;
@@ -72,7 +70,7 @@ namespace OfficeRampage
         }
         private void TickExecutiveEncounter(float dt)
         {
-            if(endlessMode||!RunActive||CombatLocked||current.number!=3||!executiveEncounterBuilt||executiveAccessGranted)return;
+            if(endlessMode||!RunActive||CombatLocked||!OfficeStoryFloors.IsExecutive(current.number)||!executiveEncounterBuilt||executiveFloorCleared)return;
             foreach(var pair in executiveShields)
             {
                 if(pair.Key==null||pair.Value==null)continue;
@@ -85,7 +83,8 @@ namespace OfficeRampage
             // Do not carry a defeated wave's paper projectiles into the next encounter.
             foreach(var projectile in world.GetComponentsInChildren<OfficeProjectile>())
                 if(projectile.owner!=null&&projectile.owner.GetComponent<OfficeDefender>()!=null){projectile.gameObject.SetActive(false);Destroy(projectile.gameObject);}
-            if(executiveWave<2){executiveWave++;ActivateExecutiveWave();return;}
+            executiveFloorCleared=true;
+            if(current.number<5){StoryLine("이 층의 임원과 수행원을 정리했다. 위층으로 올라가자.",7);RefreshExit(current);return;}
             executiveAccessGranted=true;
             StoryLine("‘주말 수당 지급 불가. 임원 골프는 근무 인정.’ · 대표실 결재 권한 획득!",10);
             RefreshExit(current);
@@ -136,7 +135,7 @@ namespace OfficeRampage
             var ring=new GameObject("Expanding executive sonic wave").transform;ring.SetParent(world,false);ring.position=center+Vector3.up*.35f;
             DrawExecutiveRing(ring,1,Cyan);float radius=.5f;bool hit=false;
             audioBus.EnemyAttack("sonic",center,.3f);
-            while(radius<8&&unit!=null&&unit.Alive&&current.number==3)
+            while(radius<8&&unit!=null&&unit.Alive&&OfficeStoryFloors.IsExecutive(current.number)&&unit.room==current.number)
             {
                 if(RunActive&&!CombatLocked)
                 {

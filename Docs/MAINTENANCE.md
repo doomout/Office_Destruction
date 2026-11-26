@@ -50,7 +50,7 @@
 
 | 자산 | 위치 |
 | --- | --- |
-| 실제 1~4층 배치 | `Resources/OfficeFloors/Floor1~4.prefab` |
+| 실제 1~6층 배치 | `Resources/OfficeFloors/Floor1~6.prefab` |
 | 이전 배치·복구용 JSON | `Resources/OfficeLayouts/` (정상 플레이는 프리팹 우선) |
 | 직원 원본 모델·재질·프리팹 | `Art/KenneyMiniCharacters/` |
 | 층 재질 | `Art/FloorMaterials/` |
@@ -82,7 +82,7 @@
 
 1. Unity 재임포트/컴파일 후 Console 오류 및 Missing Script 확인.
 2. 시작 씬 Play → 이동·점프·바닥/벽 충돌 확인.
-3. 층 편집 메뉴로 Floor1~4 열기, 프리팹·재질·캐릭터·폰트·오디오 연결 확인.
+3. 층 편집 메뉴로 Floor1~6 열기, 프리팹·재질·캐릭터·폰트·오디오 연결 확인.
 4. 변경 기능, 메뉴 복귀·재시작·일시정지 확인.
 5. Web 배포 시 별도로 빌드하고 브라우저에서 한글 표시와 입력을 확인.
 

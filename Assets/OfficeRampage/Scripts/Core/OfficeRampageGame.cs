@@ -167,7 +167,7 @@ namespace OfficeRampage
             var prefab=Resources.Load<OfficeFloorPrefab>("OfficeFloors/Floor"+number);
             if(prefab!=null)return BuildPrefabRoom(number,start,prefab);
             activeFloor=null;
-            bool arena = number == 4;
+            bool arena = number == OfficeStoryFloors.Boss;
             var layout = OfficeFixedFloor.Load(number).CreateLayout();
             var room = new Room { number = number, start = start,
                 width = layout.width, end = start + layout.length, layoutName = layout.name };
@@ -436,7 +436,7 @@ namespace OfficeRampage
             }
             TickStoryObjectives(dt);
             SealFinalRoom();
-            if (current.number < 4 && current.unlocked && current.door.IsOpen && InsideElevator())
+            if (current.number < OfficeStoryFloors.Boss && current.unlocked && current.door.IsOpen && InsideElevator())
                 StartCoroutine(RideElevator());
             if (player.position.y < -8)
             {

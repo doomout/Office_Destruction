@@ -28,7 +28,7 @@ namespace OfficeRampage
         {
             if(endlessMode||current==null)return;
             SetupStoryProgressionFloor();
-            if(current.number==4)StoryLine("대표 방송: 우리 회사는 가족 같은 분위기라니까?",7);
+            if(current.number==OfficeStoryFloors.Boss)StoryLine("대표 방송: 우리 회사는 가족 같은 분위기라니까?",7);
             if(current.number==3&&storyRescued&&!storyNextReward)
             {
                 storyNextReward=true;SpawnStoryHealing(player.position+Vector3.forward*2);
@@ -106,7 +106,7 @@ namespace OfficeRampage
             if(endlessMode||!RunActive||CombatLocked)return;
             TickStoryProgression();
             storyLineLeft=Mathf.Max(0,storyLineLeft-dt);
-            if(storyRescued&&current.number==4&&bossFight&&!storyFinalReward&&hp<=70)
+            if(storyRescued&&current.number==OfficeStoryFloors.Boss&&bossFight&&!storyFinalReward&&hp<=70)
             {storyFinalReward=true;hp=Mathf.Min(StoryMaxHealth,hp+30);StoryLine("구출한 동료: 이번엔 내가 도울게! · 체력 +30");audioBus.Play("combo",.45f);}
             if(current.number!=2||!storyFloorBuilt)return;
             if(storyRoot!=null)foreach(var label in storyRoot.GetComponentsInChildren<TextMesh>())label.transform.rotation=view.transform.rotation;

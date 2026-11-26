@@ -6,7 +6,7 @@ namespace OfficeRampage
         private void RefreshExit(Room room)
         {
             if(endlessMode)return;
-            if (room == null || room.number >= 4 || room.unlocked) return;
+            if (room == null || room.number >= OfficeStoryFloors.Boss || room.unlocked) return;
             if(!StoryExitReady(room.number))return;
             room.unlocked = true;
             room.door.Open();

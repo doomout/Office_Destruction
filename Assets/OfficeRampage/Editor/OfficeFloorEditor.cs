@@ -7,8 +7,10 @@ public static class OfficeFloorEditor
 {
     [MenuItem("Tools/Office Rampage/Floors/1층 로비 편집")]public static void One()=>Open(1);
     [MenuItem("Tools/Office Rampage/Floors/2층 사무실 편집")]public static void Two()=>Open(2);
-    [MenuItem("Tools/Office Rampage/Floors/3층 임원층 편집")]public static void Three()=>Open(3);
-    [MenuItem("Tools/Office Rampage/Floors/4층 대표층 편집")]public static void Four()=>Open(4);
+    [MenuItem("Tools/Office Rampage/Floors/3층 회의실 편집")]public static void Three()=>Open(3);
+    [MenuItem("Tools/Office Rampage/Floors/4층 임원 집무실 편집")]public static void Four()=>Open(4);
+    [MenuItem("Tools/Office Rampage/Floors/5층 이사회실 편집")]public static void Five()=>Open(5);
+    [MenuItem("Tools/Office Rampage/Floors/6층 대표층 편집")]public static void Six()=>Open(6);
     static void Open(int floor)
     {
         if(EditorApplication.isPlaying){EditorUtility.DisplayDialog("층 편집","Play를 종료한 뒤 편집해 주세요.","확인");return;}

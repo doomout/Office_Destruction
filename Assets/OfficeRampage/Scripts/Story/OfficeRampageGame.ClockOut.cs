@@ -10,7 +10,7 @@ namespace OfficeRampage
         private Transform clockOutRoot,clockOutSecretary,clockOutCoworker,clockOutPhone,clockOutLeft,clockOutRight;
         private TextMesh clockOutSign;
         private const float ClockOutDuration=11;
-        private bool StoryCinematicActive { get {return !endlessMode&&RunActive&&current!=null&&current.number==4&&combatLocked;} }
+        private bool StoryCinematicActive { get {return !endlessMode&&RunActive&&current!=null&&current.number==OfficeStoryFloors.Boss&&combatLocked;} }
         private float StoryCinematicDelta { get {return StoryCinematicActive&&storySkipRequested?100:Time.deltaTime;} }
         private string ClockOutCaption { get {return clockOutAge<2?"마지막으로, 퇴근 버튼을 누른다.":clockOutAge<4?"퇴근이 승인되었습니다.":clockOutAge<7?"…월요일 오전 9시 긴급회의?":"오늘은 여기까지. 전화는 뒤집어 두자.";} }
         private void ResetClockOut()

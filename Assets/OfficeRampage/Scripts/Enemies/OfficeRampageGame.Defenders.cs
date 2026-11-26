@@ -34,7 +34,7 @@ namespace OfficeRampage
             spawnedEnemies[room.number]=count;
             var spawnPositions=OfficeFixedFloor.Load(room.number).EnemyPoints();
             int cursor=0;
-            int fixedCount=room.number==1?OfficeCompanySettings.GuardCount:room.number==4?OfficeCompanySettings.DogCount:0;
+            int fixedCount=room.number==1?OfficeCompanySettings.GuardCount:room.number==OfficeStoryFloors.Boss?OfficeCompanySettings.DogCount:0;
             for(int i=0;i<fixedCount;i++)
             {
                 var p=spawnPositions[cursor++];
@@ -53,7 +53,7 @@ namespace OfficeRampage
                     ApplyCompanyIdentity(unit,rank,i);
                 }
             }
-            if (room.number != 4) return;
+            if (room.number != OfficeStoryFloors.Boss) return;
             bossChair = new GameObject("CEO chair");
             bossChair.transform.SetParent(root, false);
             bossChair.transform.position = activeFloor!=null?activeFloor.bossSpawn.position-Vector3.up*.08f:new Vector3(-3, 0, room.end - 5);
@@ -183,12 +183,12 @@ namespace OfficeRampage
             score += unit.boss ? 5000 : unit.dog ? 300 : 200;
             if (unit.boss) { BeginBossEnding(unit); return; }
             RefreshExit(rooms.Find(r => r.number == unit.room));
-            if (unit.room == 4) CheckFinalRoster();
+            if (unit.room == OfficeStoryFloors.Boss) CheckFinalRoster();
         }
 
         private void SealFinalRoom()
         {
-            if (current.number != 4 || finalRoomSealed || player.position.z <= current.start + 2) return;
+            if (current.number != OfficeStoryFloors.Boss || finalRoomSealed || player.position.z <= current.start + 2) return;
             finalRoomSealed = true;
             var seal = Shape(world, "Final room entry seal", new Vector3(0, 2.5f, current.start), new Vector3(current.width, 5f, .35f), Orange);
             seal.GetComponent<Renderer>().enabled = false;

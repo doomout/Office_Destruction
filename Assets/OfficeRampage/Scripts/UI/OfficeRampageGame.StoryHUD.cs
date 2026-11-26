@@ -7,15 +7,15 @@ namespace OfficeRampage
         private string StoryProgressText()
         {
             if(current.number==1)return "퇴근 "+(lobbyRequested?"거부":"요청 대기")+" · 단말기 "+(lobbyTerminalBroken?"1/1":"0/1")+" · 방어 "+RequiredStoryEnemiesLeft+(current.unlocked?" · 출구 열림":"");
-            if(current.number==3)return "임원 전투 "+Mathf.Min(3,executiveWave+1)+"/3 · 남은 인원 "+ExecutiveWaveLiving+(executiveAccessGranted?" · 대표실 권한 획득":"");
+            if(OfficeStoryFloors.IsExecutive(current.number))return current.layoutName+" · 남은 인원 "+ExecutiveWaveLiving+(current.unlocked?" · 출구 열림":"");
             if(current.number==2)return "서버 "+StoryServerCount+"/3 · 방어 "+StoryGuardsLeft+" · 구출 "+(storyRescued?"1/1":"0/1")+(current.unlocked?" · 출구 열림":"");
-            if(current.number==4)return bossFight?"대표전"+(bossUnit!=null&&bossUnit.PhaseTwo?" · 로봇":""):(securityWaveStarted?"보디가드 ":"경비견 ")+LivingDefenders(4);
+            if(current.number==OfficeStoryFloors.Boss)return bossFight?"대표전"+(bossUnit!=null&&bossUnit.PhaseTwo?" · 로봇":""):(securityWaveStarted?"보디가드 ":"경비견 ")+LivingDefenders(OfficeStoryFloors.Boss);
             return "남은 직원 "+LivingDefenders(current.number)+(current.unlocked?" · 출구 열림":"");
         }
         private void DrawStoryTopStrip()
         {
             if(storyTopStyle==null)storyTopStyle=new GUIStyle(smallStyle){wordWrap=false,alignment=TextAnchor.MiddleCenter,padding=new RectOffset(0,0,0,0),richText=false};
-            string text="스토리  ·  "+current.number+"층 / 4층  |  "+StoryProgressText()+"  |  점수 "+score.ToString("N0")+"  |  콤보 "+combo.ToString("N0");
+            string text="스토리  ·  "+current.number+"층 / 6층  |  "+StoryProgressText()+"  |  점수 "+score.ToString("N0")+"  |  콤보 "+combo.ToString("N0");
             var content=new GUIContent(text);storyTopStyle.fontSize=18;
             while(storyTopStyle.fontSize>10&&storyTopStyle.CalcSize(content).x>1126)storyTopStyle.fontSize--;
             Box(new Rect(22,12,1150,34),new Color(.015f,.025f,.045f,.78f));

@@ -1,11 +1,11 @@
 # 층 디자인을 눈으로 편집하기
 
-이제 정상 게임은 **Floor1~4.prefab에 저장된 실제 가구·벽·재질과 시작 위치**를 사용합니다. JSON을 고치거나 Play 중에 배치를 수정할 필요가 없습니다.
+이제 정상 게임은 **Floor1~6.prefab에 저장된 실제 가구·벽·재질과 시작 위치**를 사용합니다. JSON을 고치거나 Play 중에 배치를 수정할 필요가 없습니다.
 
 ## 열기와 저장
 
 1. Unity에서 Play를 종료합니다.
-2. 상단 **Tools → Office Rampage → Floors → 1층 로비 편집**을 선택합니다. 2·3·4층도 같은 메뉴에 있습니다.
+2. 상단 **Tools → Office Rampage → Floors → 1층 로비 편집**을 선택합니다. 2~6층도 같은 메뉴에 있습니다.
 3. Prefab Mode에서 해당 층 전체가 열립니다. 처음에는 천장·외벽을 편집 화면에서만 가립니다. `천장·외벽 표시 전환` 메뉴로 다시 표시할 수 있습니다. 이 숨김은 게임에 저장되지 않습니다.
 4. Hierarchy에서 물체를 선택하고 Scene 창 위에 마우스를 놓은 뒤 **F**로 해당 물체를 확대합니다.
 5. **W 이동 / E 회전 / R 크기**, **Ctrl+D 복제**, Delete 삭제를 사용합니다. Scene 창에서 오른쪽 마우스를 누른 채 WASD로 돌아볼 수 있습니다.
@@ -18,8 +18,10 @@ Project 창에서 아래 파일을 더블클릭해도 됩니다.
 | --- | --- |
 | `Assets/OfficeRampage/Resources/OfficeFloors/Floor1.prefab` | 로비 |
 | `Assets/OfficeRampage/Resources/OfficeFloors/Floor2.prefab` | 사무실 |
-| `Assets/OfficeRampage/Resources/OfficeFloors/Floor3.prefab` | 임원층 |
-| `Assets/OfficeRampage/Resources/OfficeFloors/Floor4.prefab` | 대표층 |
+| `Assets/OfficeRampage/Resources/OfficeFloors/Floor3.prefab` | 보고서 회의실 |
+| `Assets/OfficeRampage/Resources/OfficeFloors/Floor4.prefab` | 임원 집무실 |
+| `Assets/OfficeRampage/Resources/OfficeFloors/Floor5.prefab` | 이사회실 |
+| `Assets/OfficeRampage/Resources/OfficeFloors/Floor6.prefab` | 대표층 |
 
 ## 어떤 것을 선택할까?
 
@@ -35,17 +37,18 @@ Project 창에서 아래 파일을 더블클릭해도 됩니다.
 
 ## 진행을 유지하는 편집
 
-- 직원/경비견 시작점은 층별 **10 / 26 / 6 / 5개**, 보디가드는 **5개**를 유지합니다. 고정 인원과 연결되어 있으므로 시작점 삭제·추가가 아니라 위치를 편집하세요.
-- 4층의 경비견 → 보디가드 → 대표 구역 순서와 두 문은 유지합니다. 두 문은 앞뒤 순서를 유지한 채 배치하고, 구역 사이를 돌아서 우회할 틈을 만들지 마세요. 두 구역의 AI 이동 제한은 문의 앞뒤 z 위치를 기준으로 합니다.
+- 직원/경비견 시작점은 층별 **10 / 26 / 6 / 6 / 6 / 5개**, 보디가드는 **5개**를 유지합니다. 고정 인원과 연결되어 있으므로 시작점 삭제·추가가 아니라 위치를 편집하세요.
+- 6층의 경비견 → 보디가드 → 대표 구역 순서와 두 문은 유지합니다. 두 문은 앞뒤 순서를 유지한 채 배치하고, 구역 사이를 돌아서 우회할 틈을 만들지 마세요. 두 구역의 AI 이동 제한은 문의 앞뒤 z 위치를 기준으로 합니다.
 - 층 루트는 원점·회전 0·크기 1을 유지합니다. 입구는 z=0, 출구는 양의 z 방향입니다. 외곽 크기를 바꾸는 경우 Floor와 외벽·천장·캐빈도 함께 조정해야 합니다. 일반 가구 배치 편집에는 필요 없습니다.
 - 프리팹 루트를 선택하고 Inspector의 **배치 / 길찾기 검사**를 누르세요. 이동/회전/스케일과 충돌은 이후 실제 Play에서도 확인합니다. 이 검사는 전투 난이도나 문 우회 가능성까지 자동 보장하지 않습니다.
-- 시간 제한 없음, 직원 전원 처치, 가구 폭발, 보스/비서/로봇/엔딩 규칙은 그대로입니다.
+- 3~5층의 Enemy Spawns 0~1은 임원, 2~3은 운전기사, 4는 수행 비서, 5는 결재 담당 위치입니다. 여섯 명을 정리해야 다음 층으로 이동합니다. 이 층들은 인물 미리보기 대신 시작점 Transform을 선택해 이동하세요.
+- 1층 단말기·보안 대응, 2층 서버·방어 담당 목표와 대표전·엔딩 규칙은 유지합니다.
 
 ## 보관된 JSON과 복구
 
-`Resources/OfficeLayouts/floor1~4.json`은 이전 배치와 복구용으로 보관합니다. 정상 게임은 `Resources/OfficeFloors/Floor1~4.prefab`을 우선 읽습니다. JSON만 수정하면 프리팹이 있는 게임에는 반영되지 않습니다.
+정상 게임은 `Resources/OfficeFloors/Floor1~6.prefab`을 읽습니다. 새 4·5층은 프리팹으로 제작했으므로 예전 JSON으로 복원하지 마세요. 가구와 시작점 편집은 프리팹에서 수행합니다.
 
-기존 게임 씬을 새 층 프리팹으로 바꾸거나 덮어쓸 필요가 없습니다. 프리팹과 `.meta` 파일을 함께 백업하고, Unity 안에서 이름 변경·이동하세요. 현재 Resources 경로의 Floor1~4 파일명은 로딩에 사용하므로 유지해야 합니다.
+기존 게임 씬을 새 층 프리팹으로 바꾸거나 덮어쓸 필요가 없습니다. 프리팹과 `.meta` 파일을 함께 백업하고, Unity 안에서 이름 변경·이동하세요. 현재 Resources 경로의 Floor1~6 파일명은 로딩에 사용하므로 유지해야 합니다.
 
 
 ## 2026-11-16 지구 분리 피니시와 배치/밸런스 보정

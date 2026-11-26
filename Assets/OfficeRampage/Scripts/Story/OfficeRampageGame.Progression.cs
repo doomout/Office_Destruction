@@ -13,7 +13,7 @@ namespace OfficeRampage
         private int storySprintStacks;
         private bool storyRewardOpen;
         private int storyRewardFloor;
-        private readonly bool[] storyRewardClaimed=new bool[4];
+        private readonly bool[] storyRewardClaimed=new bool[OfficeStoryFloors.Boss];
         private float StoryMaxHealth { get { return endlessMode?100:storyMaxHealth; } }
         private float StorySprintRecovery { get { return endlessMode?1:1+.25f*storySprintStacks; } }
         private int RequiredStoryEnemiesLeft
@@ -51,9 +51,9 @@ namespace OfficeRampage
                 StoryLabel(poster,"직원이 행복한 회사\n자유로운 퇴근은 사전 승인 후 가능합니다.",Vector3.zero,Cyan,.06f);
                 StoryLine("퇴근 버튼부터 눌러 보자. 단말기에 다가가 E.",7);
             }
-            if(current.number==3)
+            if(OfficeStoryFloors.IsExecutive(current.number))
             {
-                foreach(var unit in defenders)if(unit!=null&&unit.room==3&&!unit.dog&&!unit.guard)
+                foreach(var unit in defenders)if(unit!=null&&unit.room==current.number&&!unit.dog&&!unit.guard)
                 {
                     requiredStoryEnemies.Add(unit);unit.displayName="[지정 임원] "+unit.displayName;
                     unit.label.text=unit.displayName+"  "+Mathf.CeilToInt(unit.Health);unit.label.color=Orange;
@@ -82,7 +82,7 @@ namespace OfficeRampage
             if(endlessMode||storyEncounterFloor!=floor)return false;
             if(floor==1)return lobbyRequested&&lobbyTerminalBroken&&RequiredStoryEnemiesLeft==0;
             if(floor==2)return StoryFloorReady;
-            if(floor==3)return executiveAccessGranted&&RequiredStoryEnemiesLeft==0;
+            if(OfficeStoryFloors.IsExecutive(floor))return executiveFloorCleared&&ExecutiveWaveLiving==0;
             return false;
         }
         private void TickStoryProgression()
@@ -93,11 +93,11 @@ namespace OfficeRampage
                 if(!lobbyRequested&&Vector3.Distance(player.position,lobbyTerminal.position)<3&&Keyboard.current!=null&&Keyboard.current.eKey.wasPressedThisFrame)RequestLobbyLeave();
             }
             TickExecutiveEncounter(Time.deltaTime);
-            if(current.number<4)RefreshExit(current);
+            if(current.number<OfficeStoryFloors.Boss)RefreshExit(current);
         }
         private void OpenElevatorReward(int floor)
         {
-            if(endlessMode||floor<1||floor>3||storyRewardClaimed[floor])return;
+            if(endlessMode||floor<1||floor>=OfficeStoryFloors.Boss||storyRewardClaimed[floor])return;
             storyRewardFloor=floor;storyRewardOpen=true;Time.timeScale=0;LockCursor(false);audioBus.SetPaused(true);
         }
         private void SyncStoryPause()

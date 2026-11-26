@@ -6,7 +6,7 @@ namespace OfficeRampage
         private OfficeFloorPrefab activeFloor;
         private Room BuildPrefabRoom(int number,float start,OfficeFloorPrefab asset)
         {
-            activeFloor=Instantiate(asset,world);activeFloor.name=number==4?"CEO arena":"Office "+number;
+            activeFloor=Instantiate(asset,world);activeFloor.name=number==OfficeStoryFloors.Boss?"CEO arena":"Office "+number;
             activeFloor.transform.localPosition=Vector3.forward*start;
             var root=activeFloor.transform;var data=activeFloor.ReadLayout();var layout=data.CreateLayout();
             var room=new Room{number=number,start=start,end=start+data.length,width=data.width,layoutName=data.name};rooms.Add(room);
@@ -15,7 +15,7 @@ namespace OfficeRampage
             room.required=room.total;
             foreach(var potion in root.GetComponentsInChildren<OfficeHealingPotion>()){potion.game=this;potion.room=number;}
             foreach(var door in root.GetComponentsInChildren<OfficeSlidingDoor>())door.game=this;
-            if(number<4){room.door=activeFloor.elevator;room.gate=room.door.gameObject;room.gateRenderer=room.door.indicators[0];}
+            if(number<OfficeStoryFloors.Boss){room.door=activeFloor.elevator;room.gate=room.door.gameObject;room.gateRenderer=room.door.indicators[0];}
             else {dogRoomDoor=activeFloor.dogDoor;guardRoomDoor=activeFloor.guardDoor;}
             SetupDefenders(room,layout,root);
             int index=0;
