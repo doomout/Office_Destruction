@@ -209,7 +209,7 @@ namespace OfficeRampage
                 Fx(kind == 0 ? "Baton arc" : "Sonic wave", unit.AimPoint + ray * .5f, Vector3.one * .14f, kind == 0 ? Orange : Cyan, .4f, ray * range / .4f, .3f, PrimitiveType.Sphere);
             }
         }
-        public void BossRaged() { Notify("대표 분노! 이동속도와 공격 범위 50% 증가", 4); audioBus.Play("explosion", .5f); }
+        public void BossRaged() { StoryLine("대표: 감히 내 말을 거역해? 내가 누군지 몰라?",6); Notify("대표 분노! 이동속도와 공격 범위 50% 증가", 4); audioBus.Play("explosion", .5f); }
         public void RequestSecretWeapon()
         {
             if (giftRequested || bfgUsed) return;
@@ -217,10 +217,12 @@ namespace OfficeRampage
         }
         private IEnumerator SceneWait(float seconds)
         {
-            while (seconds > 0) { if (RunActive) seconds -= Time.deltaTime; yield return null; }
+            while (seconds > 0) { if (RunActive) seconds -= StoryCinematicDelta; yield return null; }
         }
         private IEnumerator SecretaryGift()
         {
+            storySkipRequested=false;
+            StoryLine("비서: 저도… 이번 주에 집에 못 갔어요.",5);
             whirlwindLeft = whirlwindReady = 0;
             combatLocked = true; cinematicText = "비서: 이걸 쓰세요! 비에프지 18, 딱 한 발이에요!";
             var secretary=waitingSecretary;
@@ -232,23 +234,24 @@ namespace OfficeRampage
             var gift = Shape(secretary, "BFG 18 case", new Vector3(0, 1, .5f), new Vector3(.8f, .35f, .6f), Color.green, false);
             float t = 0;
             while (t < 1.5f)
-            { if (RunActive) { t += Time.deltaTime; float k=t/1.5f; secretary.position = k<.4f?Vector3.Lerp(start,doorway,k/.4f):Vector3.Lerp(doorway,destination,(k-.4f)/.6f); secretary.LookAt(new Vector3(player.position.x, secretary.position.y, player.position.z)); } yield return null; }
+            { if (RunActive) { t += StoryCinematicDelta; float k=t/1.5f; secretary.position = k<.4f?Vector3.Lerp(start,doorway,k/.4f):Vector3.Lerp(doorway,destination,(k-.4f)/.6f); secretary.LookAt(new Vector3(player.position.x, secretary.position.y, player.position.z)); } yield return null; }
             gift.SetActive(false); bfgReady = true; SetWeapon(7); audioBus.Play("combo", .7f);
+            StoryLine("비서: 이거 쓰세요. 퇴근 처리는 제가 할게요.",6);
             cinematicText = "비에프지 18 획득! 왼쪽 클릭으로 발사 · 1회 사용";
             t = 0;
             while (t < 1.3f)
-            { if (RunActive) { t += Time.deltaTime; float k=t/1.3f; secretary.position=k<.6f?Vector3.Lerp(destination,doorway,k/.6f):Vector3.Lerp(doorway,start,(k-.6f)/.4f); secretary.LookAt(start + Vector3.forward); } yield return null; }
+            { if (RunActive) { t += StoryCinematicDelta; float k=t/1.3f; secretary.position=k<.6f?Vector3.Lerp(destination,doorway,k/.6f):Vector3.Lerp(doorway,start,(k-.6f)/.4f); secretary.LookAt(start + Vector3.forward); } yield return null; }
             Destroy(secretary.gameObject); waitingSecretary=null; combatLocked = false; cinematicText = "";
             cooldown = .5f; Notify("비에프지 18 준비 완료 · 왼쪽 클릭 발사 · 한 발만 사용 가능", 6);
         }
         private IEnumerator NuclearTransition()
         {
-            ClearDecoy();
+            storySkipRequested=false;ClearDecoy();
             combatLocked = true; cinematicText = "";
             audioBus.Play("rocket", .8f); shake = 3;
             var core = Fx("BFG energy", player.position + Vector3.up * 1.4f, Vector3.one * .7f, Color.green, 2, Vector3.zero, 2, PrimitiveType.Sphere);
             Vector3 origin = core.transform.position, target = bossUnit.AimPoint; float t = 0;
-            while (t < .8f) { if (RunActive) { t += Time.deltaTime; core.transform.position = Vector3.Lerp(origin, target, t / .8f); } yield return null; }
+            while (t < .8f) { if (RunActive) { t += StoryCinematicDelta; core.transform.position = Vector3.Lerp(origin, target, t / .8f); } yield return null; }
             flash = .45f; audioBus.Play("explosion", 1f); shake = 8;
             mushroomCenter = new Vector3(target.x, .08f, target.z);
             mushroomCamera = true;
@@ -297,6 +300,7 @@ namespace OfficeRampage
                 var bill = Fx("Flying money", bossUnit.AimPoint, new Vector3(.38f, .02f, .18f), new Color(.3f, .75f, .38f), 4, v);
                 bill.GetComponent<OfficeVisualEffect>().spin = Random.onUnitSphere * 240;
             }
+            StoryLine("대표: 직원 복지 예산으로 만든 경영 효율화 장비다!",10);
             yield return DeployBossRobot();
             bossUnit.EnterPhaseTwo(new OfficeNavigation(new OfficeLayout { width = current.width, length = length }), current.width, current.end);
             cinematicText = ""; audioBus.Play("thud", .8f);

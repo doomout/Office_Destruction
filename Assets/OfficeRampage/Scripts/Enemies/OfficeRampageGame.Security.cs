@@ -37,6 +37,7 @@ namespace OfficeRampage
                 Impact(unit.AimPoint,Cyan,Vector3.up,8);
             }
             spawnedEnemies[4]+=5;securityWavePending=false;
+            StoryLine("대표: 일단 진정하고, 방망이부터 내려놓게.",7);
             Notify("보디가드실 개방 · 5명을 모두 처치하면 대표실이 열립니다.",5);
         }
         private void FireSecurityGun(OfficeDefender unit,int kind,Vector3 direction)

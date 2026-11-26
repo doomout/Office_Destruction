@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 namespace OfficeRampage
 {
@@ -16,11 +16,12 @@ namespace OfficeRampage
             "야근 수당은 마음으로 지급하겠네.",
             "자네, 연차는 승인 안 했는데?"
         };
-        private void ResetEnding() { endingPlaying = false; endingLine = ""; }
+        private void ResetEnding() { endingPlaying = false; endingLine = ""; ResetClockOut(); }
         private void BeginBossEnding(OfficeDefender unit)
         {
             if(endingPlaying || ended) return;
             ClearDecoy(); whirlwindLeft=whirlwindReady=0;
+            storySkipRequested=false;
             endingPlaying=true; combatLocked=true;
             endingLine=EndingLines[Random.Range(0,EndingLines.Length)];
             if(unit.label!=null) unit.label.gameObject.SetActive(false);
@@ -35,24 +36,25 @@ namespace OfficeRampage
             {
                 if(!bossEjected) { finaleCamera=true;yield return ShatterRobotAndEject(unit);finaleCamera=false; }
                 UpdateEndingCamera();yield return SceneWait(1);
-                endingPlaying=false;combatLocked=false;End(true);yield break;
+                yield return ClockOutScene();yield break;
             }
             Quaternion initial=unit.visual.localRotation; float elapsed=0;
             while(elapsed<1.6f)
             {
                 if(RunActive)
                 {
-                    elapsed+=Time.deltaTime;
+                    elapsed+=StoryCinematicDelta;
                     float t=Mathf.SmoothStep(0,1,Mathf.Clamp01(elapsed/1.6f));
                     unit.visual.localRotation=Quaternion.Slerp(initial,Quaternion.Euler(0,0,88),t);
                     UpdateEndingCamera();
                 }
                 yield return null;
             }
-            endingPlaying=false; combatLocked=false; End(true);
+            yield return ClockOutScene();
         }
         private void UpdateEndingCamera()
         {
+            if(clockOutRoot!=null){UpdateClockOutCamera();return;}
             if(bossUnit==null) return;
             Vector3 target=bossUnit.transform.position+Vector3.up*.7f;
             if(bossEjected) { view.fieldOfView=55;view.transform.position=target+new Vector3(-5,5,-7);view.transform.LookAt(target);return; }
@@ -64,15 +66,23 @@ namespace OfficeRampage
         private void DrawEndingScreen()
         {
             EnsureMenuStyles();
-            Box(new Rect(180,380,920,270),new Color(.015f,.025f,.045f,.94f));
-            GUI.Label(new Rect(220,398,840,45),paused?"일시정지 · Esc를 누르면 계속합니다.":endingPlaying?"대표의 마지막 한마디…":(bossUnit==null?"사무실 정리 완료!":"대표를 쓰러뜨렸습니다!"),menuHeading);
-            GUI.Label(new Rect(220,458,840,55),(bossUnit==null?endingLine:bossUnit.displayName+": “"+endingLine+"”"),menuText);
-            GUI.Label(new Rect(220,521,840,32),"최종 점수  "+score.ToString("N0"),menuText);
-            if(!endingPlaying)
+            if(endingPlaying)
             {
-                if(MenuButton(new Rect(355,572,250,55),"확인")) ConfirmEnding();
-                if(MenuButton(new Rect(675,572,250,55),"재게임",true)) ReplayEnding();
+                Box(new Rect(100,26,1080,62),new Color(.015f,.025f,.045f,.9f));
+                GUI.Label(new Rect(120,34,1040,48),paused?"일시정지 · Esc로 계속":clockOutPlaying?ClockOutCaption:"대표: “"+endingLine+"”",menuText);
+                if(clockOutPlaying&&clockOutAge>=4&&clockOutAge<7)
+                {
+                    Box(new Rect(820,155,360,150),Navy);
+                    GUI.Label(new Rect(845,175,310,105),"업무 메시지\n월요일 오전 9시 긴급회의.",menuText);
+                }
+                DrawStorySkipButton();return;
             }
+            Box(new Rect(120,420,1040,245),new Color(.015f,.025f,.045f,.92f));
+            GUI.Label(new Rect(150,435,980,48),"퇴근이 승인되었습니다.",menuHeading);
+            GUI.Label(new Rect(150,493,980,50),"점수 "+score.ToString("N0")+(storyRescued?"  ·  동료와 비서도 함께 퇴근했습니다.":"  ·  비서와 함께 회사를 떠납니다."),menuText);
+            if(MenuButton(new Rect(150,575,260,55),"확인"))ConfirmEnding();
+            if(MenuButton(new Rect(440,575,260,55),"재게임",true))ReplayEnding();
+            if(MenuButton(new Rect(730,575,400,55),"무한 파괴로 스트레스 더 풀기"))BeginEndless();
         }
         private void ApplyKoreanWorldFont(Transform root)
         {

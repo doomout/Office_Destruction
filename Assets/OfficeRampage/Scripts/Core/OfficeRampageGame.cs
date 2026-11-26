@@ -379,6 +379,7 @@ namespace OfficeRampage
             }
             if (ended || paused) return;
             float dt = Time.deltaTime;
+            TickStoryCinematicInput(dt);
             if(meteorActive){TickMeteor(dt);UpdateCamera();return;}
             if(endlessMode)TickEndless(dt);else TickOrbitalReward(dt);
             if (CombatLocked) { UpdateCamera(); return; }
@@ -595,7 +596,7 @@ namespace OfficeRampage
         {
             if (menuPage != MenuPage.Game) { DrawFrontEnd(); return; }
             if (world == null) return;
-            if(finaleCamera && !paused) return;
+            if(finaleCamera && !paused) {DrawStoryCinematicScreen();return;}
             EnsureMenuStyles();
             if (titleStyle == null)
             {
@@ -613,7 +614,7 @@ namespace OfficeRampage
             if (submissionPlaying || submissionEnded) { DrawSubmission(); GUI.matrix=previous; return; }
             if (endingPlaying || (ended && won)) { DrawEndingScreen(); GUI.matrix = previous; return; }
             DrawStoryTopStrip();
-            DrawCompactNotice(); DrawStoryObjectives();
+            DrawCompactNotice(); DrawStoryObjectives(); DrawStorySkipButton();
             GUI.Label(new Rect(627, 342, 30, 32), "+", titleStyle);
             Box(new Rect(22, 617, 320, 80), Navy);
             GUI.Label(new Rect(38, 627, 290, 28), "체력  " + Mathf.CeilToInt(hp)+" / "+StoryMaxHealth, labelStyle);

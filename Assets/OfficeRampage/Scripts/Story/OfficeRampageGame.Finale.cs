@@ -66,14 +66,14 @@ namespace OfficeRampage
             float t=0;
             while(t<2.5f)
             {
-                if(RunActive) { t+=Time.deltaTime;robot.localPosition=Vector3.up*Mathf.Lerp(35,0,Mathf.SmoothStep(0,1,t/2.5f)); }
+                if(RunActive) { t+=StoryCinematicDelta;robot.localPosition=Vector3.up*Mathf.Lerp(35,0,Mathf.SmoothStep(0,1,t/2.5f)); }
                 yield return null;
             }
             robot.localPosition=Vector3.zero;audioBus.Play("explosion",.65f);shake=3;
             var pilot=bossUnit.visual;pilot.name="CEO pilot";pilot.SetParent(robot,false);
             Vector3 from=new Vector3(0,0,2),seat=new Vector3(0,3.2f,.85f);pilot.localPosition=from;
             t=0;while(t<1.5f)
-            { if(RunActive) { t+=Time.deltaTime;pilot.localPosition=Vector3.Lerp(from,seat,Mathf.SmoothStep(0,1,t/1.5f));pilot.localScale=Vector3.one*Mathf.Lerp(1,.7f,t/1.5f); } yield return null; }
+            { if(RunActive) { t+=StoryCinematicDelta;pilot.localPosition=Vector3.Lerp(from,seat,Mathf.SmoothStep(0,1,t/1.5f));pilot.localScale=Vector3.one*Mathf.Lerp(1,.7f,t/1.5f); } yield return null; }
             RobotPart(robot,"Cockpit frame",new Vector3(0,3.1f,1.05f),new Vector3(1.5f,.25f,.35f),steel);
             bossUnit.visual=robot;robot.gameObject.AddComponent<OfficeBossRobot>().Initialize(this,bossUnit);
             ResetAmmo();Notify("탄약 보급 완료 · 권총 200 / 샷건 100 / 로켓 20",4);
@@ -82,6 +82,8 @@ namespace OfficeRampage
         public void RequestOrbitalWeapon()
         {
             if(orbitalRequested || bossUnit==null || !bossUnit.PhaseTwo || ended) return;
+            storySkipRequested=false;
+            StoryLine(executiveAccessGranted?"결재 권한 인증 · 대표의 위성 장비를 사용할 수 있다.":"위성 장비 비상 권한 인증 · 마지막 기회다.",7);
             orbitalRequested=true;orbitalDropElapsed=0;combatLocked=true;
             ResetElements();whirlwindLeft=whirlwindReady=0;ClearDecoy();
             orbitalDropRoutine=StartCoroutine(DropOrbitalButton());
@@ -113,7 +115,7 @@ namespace OfficeRampage
             Vector3 landing=player.position+avatar.forward*1.7f;landing.y=.3f;landing.x=Mathf.Clamp(landing.x,-current.width/2+1,current.width/2-1);landing.z=Mathf.Clamp(landing.z,current.start+1,current.end-1);
             float t=0;
             while(t<.8f)
-            { if(RunActive) { t+=Time.deltaTime;drop.position=landing+Vector3.up*Mathf.Lerp(35,0,t/.8f); } yield return null; }
+            { if(RunActive) { t+=StoryCinematicDelta;drop.position=landing+Vector3.up*Mathf.Lerp(35,0,t/.8f); } yield return null; }
             for(int i=0;i<3;i++) Trail(landing+Vector3.up*30+Random.insideUnitSphere,landing,Cyan);
             audioBus.Play("thunder",.75f);Impact(landing,Cyan,Vector3.up,18);
             yield return SceneWait(.7f);
@@ -130,7 +132,7 @@ namespace OfficeRampage
             Vector3 from=view.transform.position;Quaternion rotation=view.transform.rotation;Quaternion to=Quaternion.LookRotation(target-destination);
             float t=0;while(t<duration)
             {
-                if(RunActive) { t+=Time.deltaTime;float k=Mathf.SmoothStep(0,1,t/duration);view.transform.position=Vector3.Lerp(from,destination,k);view.transform.rotation=Quaternion.Slerp(rotation,to,k); }
+                if(RunActive) { t+=StoryCinematicDelta;float k=Mathf.SmoothStep(0,1,t/duration);view.transform.position=Vector3.Lerp(from,destination,k);view.transform.rotation=Quaternion.Slerp(rotation,to,k); }
                 yield return null;
             }
         }
@@ -157,6 +159,8 @@ namespace OfficeRampage
         }
         private IEnumerator OrbitalStrike()
         {
+            storySkipRequested=false;
+            StoryLine("승인권자 변경 완료. 이제 당신이 결재할 차례다.",6);
             finaleCamera=true;orbitalZoomStage=1;float oldFar=view.farClipPlane;bool fog=RenderSettings.fog;Color sky=view.backgroundColor;
             view.farClipPlane=2500;view.fieldOfView=58;
             Vector3 impact=bossUnit.transform.position;impact.y=0;

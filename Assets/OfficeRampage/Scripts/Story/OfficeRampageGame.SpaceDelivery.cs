@@ -33,7 +33,7 @@ namespace OfficeRampage
             {
                 if(RunActive)
                 {
-                    t+=Time.deltaTime;float k=Mathf.Clamp01(t/2.4f);
+                    t+=StoryCinematicDelta;float k=Mathf.Clamp01(t/2.4f);
                     robot.position=Vector3.Lerp(launch,impact+Vector3.up*35,k*k);robot.localScale=Vector3.one*Mathf.Lerp(5,1,k);
                     view.transform.position=Vector3.Lerp(cameraStart,impact+new Vector3(-20,35,-45),Mathf.SmoothStep(0,1,k));
                     view.transform.rotation=Quaternion.Slerp(cameraRotation,Quaternion.LookRotation(robot.position-view.transform.position),Mathf.SmoothStep(0,1,k));
@@ -65,7 +65,7 @@ namespace OfficeRampage
             {
                 if(RunActive)
                 {
-                    t+=Time.deltaTime;float k=Mathf.Clamp01(t/1.1f);
+                    t+=StoryCinematicDelta;float k=Mathf.Clamp01(t/1.1f);
                     upper.localPosition=upperStart+new Vector3(-4*k,Mathf.Sin(k*Mathf.PI)*3,-k*2);
                     upper.localRotation=Quaternion.Euler(0,0,65*k);lower.localRotation=Quaternion.Euler(0,0,-20*k);
                 }
@@ -75,7 +75,7 @@ namespace OfficeRampage
             {
                 if(RunActive)
                 {
-                    t+=Time.deltaTime;float k=Mathf.Clamp01(t/1.8f);
+                    t+=StoryCinematicDelta;float k=Mathf.Clamp01(t/1.8f);
                     pilot.position=Vector3.Lerp(pilotStart,landing,k)+Vector3.up*(4*k*(1-k)*18);
                     pilot.rotation=Quaternion.Slerp(pilotRotation,Quaternion.Euler(90,0,0),k);pilot.localScale=Vector3.one*Mathf.Lerp(.7f,1,k);
                     view.transform.position=pilot.position+new Vector3(-7,6,-10);view.transform.LookAt(pilot.position);

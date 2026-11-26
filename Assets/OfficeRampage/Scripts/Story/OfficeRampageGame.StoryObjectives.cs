@@ -28,6 +28,7 @@ namespace OfficeRampage
         {
             if(endlessMode||current==null)return;
             SetupStoryProgressionFloor();
+            if(current.number==4)StoryLine("대표 방송: 우리 회사는 가족 같은 분위기라니까?",7);
             if(current.number==3&&storyRescued&&!storyNextReward)
             {
                 storyNextReward=true;SpawnStoryHealing(player.position+Vector3.forward*2);

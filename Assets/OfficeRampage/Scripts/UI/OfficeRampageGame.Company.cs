@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
@@ -111,6 +111,7 @@ namespace OfficeRampage
             bossUnit.patrolStart=-1;
             if(activeFloor!=null)bossUnit.navigation=new OfficeNavigation(activeFloor.ReadLayout().CreateLayout());
             bossUnit.Wake(); audioBus.ChangeRoom(6);
+            StoryLine("대표: 그래, 원하는 게 뭔가? 피자 파티?",7);
             Notify("경비까지 모두 처치했습니다! 대표전 시작!",4);
         }
     }

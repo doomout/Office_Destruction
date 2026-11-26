@@ -12,7 +12,7 @@ namespace OfficeRampage
             var rim=globe.Find("Blue atmospheric rim");if(rim!=null)rim.gameObject.SetActive(false);
             var split=new GameObject("Earth split finale").AddComponent<OfficeEarthSplit>();split.transform.SetParent(space,false);split.transform.position=center;
             split.Initialize(globe.GetComponent<Renderer>().sharedMaterial);audioBus.Play("explosion",1);
-            float t=0;while(t<4.5f){if(RunActive){t+=Time.deltaTime;split.SetProgress(t/4.5f);}yield return null;}
+            float t=0;while(t<4.5f){if(RunActive){t+=StoryCinematicDelta;split.SetProgress(t/4.5f);}yield return null;}
             yield return SceneWait(1.3f);
         }
     }
