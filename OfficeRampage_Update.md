@@ -475,3 +475,14 @@ OS 폰트 생성 3곳을 OfficeGameFont 공통 로더로 교체했습니다. Res
 - 수정: `Assets/OfficeRampage/Scripts/UI/OfficeRampageGame.Menu.cs`, `Assets/OfficeRampage/Scripts/Endless/UI/OfficeRampageGame.EndlessHUD.cs`, `Assets/OfficeRampage/Scripts/Endless/UI/OfficeRampageGame.EndlessRanking.cs`. 씬·프리팹·meta 변경 없음.
 - 검증: 격리된 Unity에서 컴파일, Play 이동/상승 이동/바닥·벽 충돌, 중도 종료 기록 스냅샷과 시간 정지, 한글 이름 데이터 등록 및 재로드, 중복 등록 방지, 메뉴 복귀/새 게임 상태 초기화, 사망 후 기존 등록, 명시적 등록 건너뛰기를 확인했습니다. 검사 전 랭킹/이름 저장값은 복구했습니다.
 - 범위: 게임 내 종료 버튼에 적용합니다. 브라우저 탭 강제 종료·새로고침 자동 등록은 추가하지 않았으며 Web 빌드/실제 키보드 IME 입력은 이번에 검증하지 않았습니다. 랭킹은 기존처럼 해당 PC·브라우저의 로컬 Top 10입니다.
+
+
+## 2026-11-27 — 단발 A4 공격을 직선 5연사로 변경
+
+- 일반 직원/인간형 대표의 단발 종이 공격을 같은 방향으로 0.3초 간격, 총 5장 발사하도록 변경했습니다. 종이는 속도 14로 날아가며 장당 기존 피해(일반 10, 대표 18), 사거리 및 분노 범위 배율을 유지합니다.
+- 방향은 공격 예고 때 정한 방향으로 고정되어 옆으로 피할 수 있습니다. 총 1.2초 동안 발사하므로 기존 피격 무적 1초가 지난 후 후속 종이에 다시 맞을 수 있습니다. 전역 무적 규칙은 변경하지 않았습니다.
+- 연사 중 적의 이동/새 공격을 막고, 기절·빙결·유인/화상 혼란·사망·층 전환·전투 연출 전환 시 남은 발사를 취소합니다. 일시정지 중에는 연사 간격도 정지합니다.
+- 기존 스토리 임원/비서의 부채꼴 7장/5장 공격과 보안 서버의 종이 패턴, 경비 총기, 로봇 광선 공격은 유지합니다.
+- 수정: `Combat/OfficeRampageGame.Combat.cs`, `Enemies/OfficeDefender.cs`. 추가: `Combat/OfficeRampageGame.PaperBurst.cs` 및 meta. 경로 기준 `Assets/OfficeRampage/Scripts`; 기존 씬·프리팹·GUID 보존.
+- 검증: 격리된 Unity 6000.6.10f1 컴파일/Play 이동·상승 이동·바닥·벽 충돌, 실제 직선 5발 생성 및 플레이어 후속 피해, 일시정지/재개, 기절에 따른 남은 발사 취소, 기존 임원·비서 부채꼴 발수 확인. Web 빌드와 전체 전투 밸런스는 미검증입니다.
+- 확인: Unity Refresh 후 Play → 일반 종이 공격 적 앞에서 5장 연사 확인 → 옆으로 회피/기절시키기 → 일시정지 후 재개 확인. 무한 모드에서도 같은 단발 종이 공격 적에게 적용됩니다.

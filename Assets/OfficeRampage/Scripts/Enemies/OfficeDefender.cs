@@ -82,6 +82,8 @@ namespace OfficeRampage
         {
             if (label != null) label.text = displayName + "  " + Mathf.CeilToInt(Health) + " / " + MaxHealth + (Dormant ? "\n호위 보호 중" : Enraged ? "\n분노 +50%" : "");
         }
+        internal bool paperBurstActive;
+        internal bool PaperBurstInterrupted => distracted;
         private void Update()
         {
             if (label != null && Camera.main != null) label.transform.rotation = Camera.main.transform.rotation;
@@ -91,6 +93,7 @@ namespace OfficeRampage
             if(frozen || stunned) return;
             if (rising > 0) { rising = Mathf.Max(0, rising - dt); game.SetBossPose(this, 1 - rising); return; }
             if (TickDistraction(dt)) return;
+            if (paperBurstActive) return;
             Vector3 toward = game.PlayerPosition - transform.position; toward.y = 0;
             if(PhaseTwo) { TickRobot(dt,toward); return; }
             if (recovery > 0) { recovery -= dt; game.AnimateDefenderAttack(this, 1 - recovery / (storyRole==2?1.4f:.35f)); return; }

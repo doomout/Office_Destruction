@@ -189,10 +189,9 @@ namespace OfficeRampage
             float range = (kind == 0 ? 2.4f : kind == 1 ? 6 : 16) * unit.RangeScale;
             if (kind == 2)
             {
-                Vector3 origin = unit.AimPoint + direction * .5f;
                 if(unit.storyRole>0){ReleasePaperFan(unit,direction,range);return;}
-                SpawnProjectile(origin, unit.PhaseTwo ? (PlayerPosition+Vector3.up*1.1f-origin).normalized : direction, unit.transform, false, false, 10, range, unit.boss ? 18 : 10, unit.RangeScale);
-                audioBus.EnemyAttack("paper", origin, .25f); return;
+                if(!unit.paperBurstActive)StartCoroutine(ReleasePaperBurst(unit,direction,range));
+                return;
             }
             Vector3 delta = player.position - unit.transform.position;
             float height = Mathf.Abs(delta.y); delta.y = 0;
