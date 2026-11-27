@@ -1,7 +1,7 @@
-﻿using UnityEngine;
+using UnityEngine;
 namespace OfficeRampage
 {
-    public sealed class OfficeCharacterVisual : MonoBehaviour
+    public sealed partial class OfficeCharacterVisual : MonoBehaviour
     {
         private OfficeRampageGame game;
         private GameObject model;
@@ -25,14 +25,14 @@ namespace OfficeRampage
             if(model!=null) { model.SetActive(false); Destroy(model); }
             model=Instantiate(choices[(index+rank)%choices.Length],transform,false); model.name="Character model";
             animationPlayer=model.GetComponentInChildren<Animation>(); playing=null; actionLeft=0;
-            Play("idle"); HidePrimitives();
+            CacheHandBones(); Play("idle"); HidePrimitives();
         }
         public void RefreshLegacy() { HidePrimitives(); }
         private void HidePrimitives()
         {
             foreach(Transform child in transform)
             {
-                if(child==model?.transform || child.name=="Baton" || child.name=="A4 hand" || child.name=="Security weapon" || child.name=="Security cap" || child.name=="Security badge") continue;
+                if(child==model?.transform || IsHeldItem(child.name) || child.name=="Security cap" || child.name=="Security badge") continue;
                 var renderer=child.GetComponent<Renderer>(); if(renderer!=null) renderer.enabled=false;
             }
         }
@@ -48,6 +48,11 @@ namespace OfficeRampage
             animationPlayer.CrossFade(clip,.12f); playing=clip;
         }
         private void LateUpdate()
+        {
+            UpdateAnimation();
+            FollowHeldItems();
+        }
+        private void UpdateAnimation()
         {
             HidePrimitives();
             if(game==null || animationPlayer==null) return;
