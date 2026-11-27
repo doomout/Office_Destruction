@@ -486,3 +486,10 @@ OS 폰트 생성 3곳을 OfficeGameFont 공통 로더로 교체했습니다. Res
 - 수정: `Combat/OfficeRampageGame.Combat.cs`, `Enemies/OfficeDefender.cs`. 추가: `Combat/OfficeRampageGame.PaperBurst.cs` 및 meta. 경로 기준 `Assets/OfficeRampage/Scripts`; 기존 씬·프리팹·GUID 보존.
 - 검증: 격리된 Unity 6000.6.10f1 컴파일/Play 이동·상승 이동·바닥·벽 충돌, 실제 직선 5발 생성 및 플레이어 후속 피해, 일시정지/재개, 기절에 따른 남은 발사 취소, 기존 임원·비서 부채꼴 발수 확인. Web 빌드와 전체 전투 밸런스는 미검증입니다.
 - 확인: Unity Refresh 후 Play → 일반 종이 공격 적 앞에서 5장 연사 확인 → 옆으로 회피/기절시키기 → 일시정지 후 재개 확인. 무한 모드에서도 같은 단발 종이 공격 적에게 적용됩니다.
+
+
+## 2026-11-28 — 일반 무기 7종 모델 개선
+
+- 방망이·권총·기관총·샷건은 Quaternius Zombie Apocalypse Kit의 CC0 모델을 사용합니다. 망치·로켓런처·BFG는 둥근 손잡이/발사관, 모서리 처리, 에너지 코어를 갖춘 프로젝트 전용 모델로 제작했습니다.
+- 손에 든 무기와 무한 모드 바닥 무기 미리보기에 동일한 프리팹을 적용합니다. 공격 판정/데미지/탄약/쿨다운은 유지합니다. 미인계 더미·위성 빨간 버튼은 기존 분기를 유지합니다. 기타 소환 도구/광선검은 이번 교체 대상이 아닙니다.
+- 추가: Art/WeaponModels 모델·텍스처·URP 재질·라이선스/교체 가이드, Resources/OfficeWeapons 프리팹 7종, Scripts/Player/OfficeRampageGame.WeaponModels.cs. 수정: Scripts/Combat/OfficeRampageGame.Combat.cs. 경로 기준은 Assets/OfficeRampage입니다.

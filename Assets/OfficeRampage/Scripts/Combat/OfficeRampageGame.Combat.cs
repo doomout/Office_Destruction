@@ -31,6 +31,7 @@ namespace OfficeRampage
             if(endlessMode&&endlessSaber){BuildEndlessSaber();return;}
             if(BuildEndlessSpecialModel())return;
             if(weaponIndex==7 && orbitalReady) { BuildRedButton(weapon); return; }
+            if(TryBuildWeaponModel())return;
             Color steel = new Color(.5f, .62f, .68f);
             if (weaponIndex == 0 || weaponIndex == 1)
             {

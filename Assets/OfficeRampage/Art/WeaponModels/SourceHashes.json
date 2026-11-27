@@ -1,0 +1,22 @@
+[
+  {
+    "file": "WoodenBat_Barbed.gltf",
+    "sha256": "d097933c7d41da7ba37a45fdc8d1421bf431a3c341365fbf2b947c591bde645f"
+  },
+  {
+    "file": "Pistol.gltf",
+    "sha256": "29b0b12467be7d11c9deb8d08867d6de61222aa86db8fe5c0cc57fdbeaf11ec3"
+  },
+  {
+    "file": "SMG.gltf",
+    "sha256": "ab3d953e70d045b9bf2d69459be7342165af0fb3b9629c346a0ebbf56cf51c54"
+  },
+  {
+    "file": "Shotgun.gltf",
+    "sha256": "b30b0470684722384362f2118924ceacc1865692e2dbeb7da9c3d1c4b83e3064"
+  },
+  {
+    "file": "License.txt",
+    "sha256": "de990ef6fc68cffd7fd1ae342c4d0c823b541b8848d8f76bca5d3339f4de6f6e"
+  }
+]
