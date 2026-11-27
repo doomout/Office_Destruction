@@ -3,7 +3,7 @@ namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
     {
-        private GUIStyle storyTopStyle,storyWeaponStyle;
+        private GUIStyle storyTopStyle;
         private string StoryProgressText()
         {
             if(current.number==1)return "퇴근 "+(lobbyRequested?"거부":"요청 대기")+" · 단말기 "+(lobbyTerminalBroken?"1/1":"0/1")+" · 방어 "+RequiredStoryEnemiesLeft+(current.unlocked?" · 출구 열림":"");
@@ -30,16 +30,8 @@ namespace OfficeRampage
         }
         private void DrawStoryWeaponCard()
         {
-            if(storyWeaponStyle==null)storyWeaponStyle=new GUIStyle(labelStyle){fontSize=16,wordWrap=false,padding=new RectOffset(0,0,0,0),alignment=TextAnchor.MiddleLeft};
-            Box(new Rect(1050,590,208,107),Navy);
-            DrawWeaponIcon(new Rect(1004,598,38,38),weaponIndex,ammunition[weaponIndex]==0?Color.gray:Color.white);
-            string name=weaponIndex==7&&orbitalRequested?"???":weaponNames[weaponIndex];
-            var content=new GUIContent(name);storyWeaponStyle.fontSize=16;
-            while(storyWeaponStyle.fontSize>11&&storyWeaponStyle.CalcSize(content).x>188)storyWeaponStyle.fontSize--;
-            GUI.Label(new Rect(1060,596,188,26),content,storyWeaponStyle);
             string amount=weaponIndex==4?Mathf.Max(0,DecoysPerOffice-decoysUsed[current.number]).ToString():weaponIndex==7?(orbitalReady||(bfgReady&&!bfgUsed)?"1":"0"):ammunition[weaponIndex]<0?"무제한":ammunition[weaponIndex].ToString();
-            GUI.Label(new Rect(1060,630,188,30),amount,labelStyle);
-            GUI.Label(new Rect(1060,668,188,22),(weaponIndex+1)+"  /  1~8 무기 전환",smallStyle);
+            DrawEquippedWeaponCard(weaponIndex,false,amount=="무제한"?"∞":amount,(weaponIndex+1)+" / 1–8",ammunition[weaponIndex]==0);
         }
     }
 }

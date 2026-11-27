@@ -458,3 +458,11 @@ OS 폰트 생성 3곳을 OfficeGameFont 공통 로더로 교체했습니다. Res
 - 수정: `Assets/OfficeRampage/Scripts/Player/OfficeCharacterVisual.cs`; 추가: 같은 폴더의 `OfficeCharacterVisual.Hands.cs` 및 `.meta`. 씬/프리팹 및 기존 GUID를 유지했습니다.
 - 실제 검증: Unity 6000.6.10f1 격리 프로젝트에서 컴파일, Play 이동·상승 이동·바닥/벽 충돌, 일반 무기 8종 교체, 남녀 모델 교체, 손잡이가 있는 무기의 실제 프레임 손 위치 오차 검사, 무기 부모/크기 유지, 무한 모드 광선검과 로봇/공중 지원/지진/운석 리모컨 연결을 통과했습니다. 권총 근접 화면도 확인했습니다.
 - 확인 순서: Unity에서 Refresh 후 Play → 무기 교체 → 이동/달리기/공격 시 오른손과 손잡이 확인. 특수 스킬, 모든 적의 공격 장면과 모든 무기의 시각적 자연스러움은 추가 플레이 확인이 필요합니다. Web 빌드와 전체 스토리 완주는 이번에 실행하지 않았습니다.
+
+
+## 2026-11-27 — 오른쪽 하단 장착 무기를 아이콘으로 표시
+
+- 스토리·무한 모드의 오른쪽 하단 무기 이름을 큰 아이콘으로 교체하고, 오른쪽에 탄약/사용 횟수와 조작 키를 배치했습니다. 무제한은 ∞, 로봇 탑승 시간은 숫자+s로 표시합니다.
+- 일반 무기 8종은 기존 아이콘 에셋을 재사용합니다. 무한 모드의 광선검, 스테이플러, 프린터, 커피포트, UFO, 퇴근 종, 위성 버튼, 지옥문, 교통사고, 로봇, 드론, 전투기, 블랙홀, 지진, 운석은 각각 구별되는 도형/아이콘으로 표시합니다.
+- 수정: `UI/OfficeRampageGame.StoryHUD.cs`, `Endless/UI/OfficeRampageGame.EndlessHUD.cs`. 추가: `UI/OfficeRampageGame.EquippedWeaponCard.cs` 및 meta. 경로 기준은 `Assets/OfficeRampage/Scripts`입니다. 기존 씬·프리팹·아이콘·GUID를 유지합니다.
+- 검증: 격리된 Unity 6000.6.10f1에서 컴파일 및 Play 이동/상승 이동/바닥·벽 충돌 검사. 스토리 권총, 무한 광선검·운석 HUD와 전체 무기 아이콘 모음 화면을 캡처하여 확인했습니다.

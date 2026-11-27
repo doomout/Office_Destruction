@@ -13,16 +13,8 @@ namespace OfficeRampage
             Box(new Rect(38,610,270,9),new Color(.2f,.25f,.3f));Box(new Rect(38,610,270*hp/100,9),Color.green);
             GUI.Label(new Rect(38,632,280,26),"갑옷 "+Mathf.CeilToInt(endlessArmor)+" / 100",labelStyle);
             Box(new Rect(38,665,270,9),new Color(.2f,.25f,.3f));Box(new Rect(38,665,270*endlessArmor/100,9),Cyan);
-            Box(new Rect(1050,590,208,107),Navy);
-            if(!endlessSaber&&endlessWeapon==11)HudIcon(new Rect(1008,600,32,32),HudSymbol.UFO,Color.green);
-            if(!endlessSaber&&endlessWeapon==EarthquakeWeaponId)HudIcon(new Rect(1008,600,32,32),HudSymbol.Volcano,Orange);
-            if(!endlessSaber&&endlessWeapon==MeteorWeaponId)HudIcon(new Rect(1008,600,32,32),HudSymbol.Meteor,Orange);
-            var weaponLabel=new GUIStyle(labelStyle){fontSize=16,wordWrap=false,padding=new RectOffset(0,0,0,0),alignment=TextAnchor.MiddleLeft};
-            var ammoLabel=new GUIStyle(weaponLabel){fontSize=18};
-            GUI.Label(new Rect(1060,596,188,26),endlessSaber?"광선검":EndlessWeapons[endlessWeapon],weaponLabel);
             string amount=EndlessMechActive?endlessMechLeft.ToString("0.0")+"초 탑승":endlessSaber?"무제한":endlessWeapon>=7?endlessSpecialAmmo.ToString():endlessWeapon==4?(3-decoysUsed[1]).ToString():ammunition[weaponIndex]<0?"무제한":ammunition[weaponIndex].ToString();
-            GUI.Label(new Rect(1060,630,188,30),amount,ammoLabel);
-            GUI.Label(new Rect(1060,668,188,22),EndlessMechActive?"L / R":"E",smallStyle);
+            DrawEquippedWeaponCard(EndlessMechActive?16:endlessWeapon,endlessSaber&&!EndlessMechActive,amount.Replace("무제한","∞").Replace("초 탑승","s"),EndlessMechActive?"L / R":"E",!endlessSaber&&!EndlessMechActive&&(endlessWeapon>=7?endlessSpecialAmmo==0:ammunition[weaponIndex]==0));
             GUI.Label(new Rect(623,338,35,35),"+",labelStyle);DrawWeaponSkills();DrawSprintHUD();
             if(weaponIndex==4)DrawDecoyHUD();
             DrawCompactPickup();
