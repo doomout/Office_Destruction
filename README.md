@@ -1,4 +1,4 @@
-﻿# Office Rampage — 사무실 파괴
+# Office Rampage — 사무실 파괴
 
 주말 출근을 강요받은 직장인이 사무실을 돌파하는 **Unity 3D 3인칭 액션 게임**입니다.
 
@@ -331,4 +331,4 @@ OS 설치 폰트를 가져오지 않고 `Assets/Fonts/NotoSansKR-VariableFont_wg
 | [아이콘·추가 효과음 라이선스](Assets/OfficeRampage/Art/CombatRefresh-LICENSES.md) | 외부 에셋 이용 조건 |
 | [지구 지도 라이선스](Assets/OfficeRampage/Art/Earth-LICENSE.md) | 우주 연출 지도 출처 |
 
-Kenney Mini Characters 원본·출처는 `Assets/OfficeRampage/Art/KenneyMiniCharacters/`에 있습니다. 새 에셋을 넣을 때는 출처와 배포 조건도 함께 기록하고, 배포 시 프로젝트에 보관된 각 라이선스 원문을 확인하세요.
+현재 인간 캐릭터는 **Quaternius의 성인 비율 저폴리곤 정장 모델**입니다. 남성 정장 3색과 여성 바지 정장·치마 정장 3종을 사용하며 이름·성별 설정은 유지됩니다. 원본·라이선스·편집 안내는 `Assets/OfficeRampage/Art/AdultCharacters/README.md`에 있습니다. 기존 Kenney Mini Characters 원본은 `Assets/OfficeRampage/Art/KenneyMiniCharacters/`에 보관합니다. 새 에셋을 넣을 때는 출처와 배포 조건도 함께 기록하고, 배포 시 프로젝트에 보관된 각 라이선스 원문을 확인하세요.

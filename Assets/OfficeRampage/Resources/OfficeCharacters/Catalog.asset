@@ -13,16 +13,10 @@ MonoBehaviour:
   m_Name: Catalog
   m_EditorClassIdentifier: Assembly-CSharp::OfficeRampage.OfficeCharacterCatalog
   male:
-  - {fileID: 5151504525338948639, guid: d46f947af79922842a57beb00758a3f7, type: 3}
-  - {fileID: 1641461039252660176, guid: 3858f89392568df439bed0e56a7e98a9, type: 3}
-  - {fileID: 7591644946026233996, guid: 1e05bf727c6dfaf4badffcadde751aa0, type: 3}
-  - {fileID: 8134928742783660532, guid: aead197e6be0a7346aae5878ff44fd76, type: 3}
-  - {fileID: 1926603529141241605, guid: 3e4935eddc2936c42954fb17346552e6, type: 3}
-  - {fileID: 4624801822053175401, guid: 6bea25d3963f219428212d4113aec30f, type: 3}
+  - {fileID: 6324804927968682794, guid: 667d0c7ad0579564abd521c7deb2c2f9, type: 3}
+  - {fileID: 2960265329211965774, guid: d318c3ef7c820744c912047b83af7cd6, type: 3}
+  - {fileID: 6803883366802707400, guid: d0792fa34e44ec84eac731c37d5a24d9, type: 3}
   female:
-  - {fileID: 6046614469637095743, guid: 56f4cbd30abeadb4fab7bc7810b8fb3f, type: 3}
-  - {fileID: 5119805918869998657, guid: 36306bf839091b340a393ebc39949907, type: 3}
-  - {fileID: 8619671205358903859, guid: cd9d5fbc379883c41922ff988d045c76, type: 3}
-  - {fileID: 42754557682444197, guid: 8dc55cb4781cfc0448aad42f89abbcc1, type: 3}
-  - {fileID: 7250164408119198813, guid: 0e7dbcf835eebfe419a0a24e8d23bc86, type: 3}
-  - {fileID: 982156378820579911, guid: fcc6d68b2f2672d4fbf9035c02e9eb4b, type: 3}
+  - {fileID: 6895741031801439064, guid: 756b3d453042fa545a774e0d7eae10dc, type: 3}
+  - {fileID: 6615269690294184728, guid: 8203cc44c616fa74f9b8bef7b7040763, type: 3}
+  - {fileID: 5267348915554100251, guid: 5e6a80f622099a746b66c0ae5247f914, type: 3}

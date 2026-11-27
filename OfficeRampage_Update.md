@@ -439,3 +439,12 @@ OS 폰트 생성 3곳을 OfficeGameFont 공통 로더로 교체했습니다. Res
 
 - 첫 대사 구간에서 모든 오디오를 정지하던 BeginIntro를 수정했다. 기존 음악 초기화 함수를 사용해 포함된 1층 배경곡을 재생하고 이전 전투 효과음을 정리한다. 게임 시간은 정지 상태를 유지하며 음악 볼륨·음소거 설정을 따른다.
 - 변경: Assets/OfficeRampage/Scripts/Story/OfficeRampageGame.Intro.cs, Core/OfficeRampageGame.cs. Esc로 프롤로그를 나갈 때도 메뉴 복귀 처리를 호출하여 음악을 정지한다. 
+
+
+## 2026-11-27 — 성인 비율 직장인 캐릭터 교체
+
+- Quaternius Ultimate Modular Men/Women의 CC0 정장 모델을 도입했다. 남성 정장 3색, 여성 바지 정장 2색과 치마 정장 1종을 Catalog에 연결했다. 실사 텍스처 모델은 아닌 성인 체형 저폴리곤 모델이다.
+- 주인공·직원·임원·대표·비서·구출 동료 등 기존 BuildPerson 경로의 인간 모델이 새 목록을 사용한다. 이름·성별 설정, AI, 체력·공격·충돌 판정은 변경하지 않았다. 경비견과 로봇 등 비인간 모델은 유지한다.
+- Blender FBX 변환 시 단위 배율 중복을 수정하고, 원본의 부속 권총·미리보기 구체를 제외했다. 기존 게임의 idle/walk/sprint/melee/shoot 이름으로 Legacy 클립을 별도 저장했다. 모델 높이는 약 1.95 Unity 단위로 맞췄다.
+- 변경 경로: Assets/OfficeRampage/Art/AdultCharacters/ 신규 에셋, Resources/OfficeCharacters/Catalog.asset, README.md. 기존 Catalog GUID와 기존 캐릭터 원본은 보존한다. 층 프리팹의 기존 편집용 인물 미리보기는 그대로이며, 실제 플레이 모델은 Catalog를 사용한다.
+- 라이선스와 출처: 공식 제작자 페이지의 CC0 표시, 원본 공개 미러의 License.txt를 확인하고 보관했다. Google Drive 원본은 할당량 제한으로 내려받지 못해 공개 CC0 glTF 미러를 사용했다. 출처·변환 내역은 새 에셋 폴더 README 참고.
