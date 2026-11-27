@@ -26,7 +26,7 @@ namespace OfficeRampage
                 GUI.Label(new Rect(320,290,650,65),"생존 "+SurvivalClock(endlessTime)+"  ·  처치 "+endlessKills+"  ·  점수 "+score.ToString("N0"),menuText);
                 if(MenuButton(new Rect(320,385,300,58),ended?"다시 도전":"계속하기",true))
                 {if(ended)BeginEndless();else{paused=false;Time.timeScale=1;LockCursor(true);audioBus.SetPaused(false);}}
-                if(MenuButton(new Rect(650,385,300,58),"첫 메뉴로")){SaveEndlessRecord();ReturnToMainMenu();}
+                if(MenuButton(new Rect(650,385,300,58),"기록 남기고 종료"))ReturnToMainMenu();
             }
         }
         private GUIStyle endlessTopStyle;

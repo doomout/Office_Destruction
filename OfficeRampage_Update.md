@@ -466,3 +466,12 @@ OS 폰트 생성 3곳을 OfficeGameFont 공통 로더로 교체했습니다. Res
 - 일반 무기 8종은 기존 아이콘 에셋을 재사용합니다. 무한 모드의 광선검, 스테이플러, 프린터, 커피포트, UFO, 퇴근 종, 위성 버튼, 지옥문, 교통사고, 로봇, 드론, 전투기, 블랙홀, 지진, 운석은 각각 구별되는 도형/아이콘으로 표시합니다.
 - 수정: `UI/OfficeRampageGame.StoryHUD.cs`, `Endless/UI/OfficeRampageGame.EndlessHUD.cs`. 추가: `UI/OfficeRampageGame.EquippedWeaponCard.cs` 및 meta. 경로 기준은 `Assets/OfficeRampage/Scripts`입니다. 기존 씬·프리팹·아이콘·GUID를 유지합니다.
 - 검증: 격리된 Unity 6000.6.10f1에서 컴파일 및 Play 이동/상승 이동/바닥·벽 충돌 검사. 스토리 권총, 무한 광선검·운석 HUD와 전체 무기 아이콘 모음 화면을 캡처하여 확인했습니다.
+
+## 2026-11-27 — 무한 모드 중도 종료 시 랭킹 등록
+
+- 이전에는 일시정지에서 첫 메뉴로 이동하면 최고 시간/점수만 저장되고, 이름을 입력하는 Top 10 등록 화면을 건너뛰었습니다.
+- 일시정지의 버튼을 ‘기록 남기고 종료’로 변경했습니다. 진행 중인 무한 모드에서 메뉴 이동을 요청하면 중도 종료 결과 화면을 열고, 해당 시점의 시간·처치·게임 점수로 기존 이름 입력/Top 10 등록 절차를 진행합니다. 결과 화면에서는 게임 시간이 정지합니다.
+- 사용 순서: Esc → 기록 남기고 종료 → 이름 입력 → 기록 등록 → 첫 메뉴로. Top 10 밖의 기록은 기존 순위 규칙에 따라 목록에 남지 않습니다. 사용자가 명시적으로 선택하는 ‘등록 없이 메뉴로/재도전’은 유지합니다.
+- 수정: `Assets/OfficeRampage/Scripts/UI/OfficeRampageGame.Menu.cs`, `Assets/OfficeRampage/Scripts/Endless/UI/OfficeRampageGame.EndlessHUD.cs`, `Assets/OfficeRampage/Scripts/Endless/UI/OfficeRampageGame.EndlessRanking.cs`. 씬·프리팹·meta 변경 없음.
+- 검증: 격리된 Unity에서 컴파일, Play 이동/상승 이동/바닥·벽 충돌, 중도 종료 기록 스냅샷과 시간 정지, 한글 이름 데이터 등록 및 재로드, 중복 등록 방지, 메뉴 복귀/새 게임 상태 초기화, 사망 후 기존 등록, 명시적 등록 건너뛰기를 확인했습니다. 검사 전 랭킹/이름 저장값은 복구했습니다.
+- 범위: 게임 내 종료 버튼에 적용합니다. 브라우저 탭 강제 종료·새로고침 자동 등록은 추가하지 않았으며 Web 빌드/실제 키보드 IME 입력은 이번에 검증하지 않았습니다. 랭킹은 기존처럼 해당 PC·브라우저의 로컬 Top 10입니다.

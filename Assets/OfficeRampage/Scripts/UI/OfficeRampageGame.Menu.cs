@@ -37,6 +37,14 @@ namespace OfficeRampage
 
         private void ReturnToMainMenu()
         {
+            // A live Endless run must reach the same name/ranking screen as a defeat.
+            if(endlessMode && menuPage==MenuPage.Game && !ended)
+            {
+                endlessQuitEarly=true;
+                End(false);
+                paused=true;Time.timeScale=0;
+                return;
+            }
             CancelElevatorReward();
             if(meteorActive)ResetMeteor();
             if (nameEditor != null) nameEditor.Close();

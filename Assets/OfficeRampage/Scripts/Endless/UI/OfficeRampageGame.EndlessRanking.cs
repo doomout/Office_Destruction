@@ -6,10 +6,10 @@ namespace OfficeRampage
         private string endlessRunId,rankMessage="";
         private OfficeEndlessRecord pendingRank;
         private OfficeEndlessLeaderboard rankTable;
-        private bool rankSubmitted;
+        private bool rankSubmitted,endlessQuitEarly;
         private GUIStyle rankInput,rankText,rankName;
         private void ResetEndlessRanking()
-        {endlessRunId=System.Guid.NewGuid().ToString("N");pendingRank=null;rankSubmitted=false;rankMessage="";rankTable=null;}
+        {endlessQuitEarly=false;endlessRunId=System.Guid.NewGuid().ToString("N");pendingRank=null;rankSubmitted=false;rankMessage="";rankTable=null;}
         private void PrepareEndlessRank()
         {
             pendingRank=new OfficeEndlessRecord{runId=endlessRunId,seconds=Mathf.Max(0,Mathf.FloorToInt(endlessTime)),kills=Mathf.Max(0,endlessKills),score=Mathf.Max(0,score),utcTicks=System.DateTime.UtcNow.Ticks};
@@ -62,7 +62,7 @@ namespace OfficeRampage
         private void DrawEndlessResult()
         {
             EnsureRankingStyles();Box(new Rect(20,20,1240,680),new Color(.015f,.025f,.045f,.98f));
-            GUI.Label(new Rect(50,32,1180,45),"생존 종료 · 무한 파괴 Top 10",menuHeading);
+            GUI.Label(new Rect(50,32,1180,45),endlessQuitEarly?"중도 종료 · 무한 파괴 Top 10":"생존 종료 · 무한 파괴 Top 10",menuHeading);
             if(pendingRank==null)return;
             GUI.Label(new Rect(50,82,1180,30),"이번 기록: "+SurvivalClock(pendingRank.seconds)+" · "+pendingRank.kills+"킬 · 게임 점수 "+pendingRank.score.ToString("N0")+" · 종합점수 "+pendingRank.Total.ToString("N0"),rankText);
             if(!rankSubmitted)
