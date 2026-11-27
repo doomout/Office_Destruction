@@ -9,7 +9,6 @@ namespace OfficeRampage
         private int difficulty = 1;
         private Font menuFont;
         private GUIStyle menuTitle, menuHeading, menuText, menuSmall, menuButton;
-        private GUIStyle volumeTrack, volumeThumb;
         private const string SettingsPrefix = "OfficeRampage.Menu.";
 
         private void InitializeMenu()
@@ -73,7 +72,7 @@ namespace OfficeRampage
         {
             Color before = GUI.backgroundColor;
             GUI.backgroundColor = primary ? Cyan : new Color(.38f, .48f, .58f);
-            bool pressed = GUI.Button(rect, text, menuButton);
+            bool pressed = OfficeUIInput.Button(rect, text, menuButton);
             GUI.backgroundColor = before;
             return pressed;
         }
@@ -129,15 +128,10 @@ namespace OfficeRampage
             GUI.Label(new Rect(567, 572, 590, 36), "음량과 직원 이름·성별은 ‘설정’에서 바꿀 수 있어요.", menuSmall);
         }
 
-        // Keep Unity's slider interaction, but draw high-contrast graphics independent of its dark skin.
+        // Input System handles dragging; keep the high-contrast slider presentation.
         private float DrawVolumeSlider(Rect rect, float value, float maximum)
         {
-            if (volumeTrack == null)
-            {
-                volumeTrack = new GUIStyle(GUIStyle.none) { fixedHeight = 40, padding = new RectOffset(0, 0, 0, 0), margin = new RectOffset(0, 0, 0, 0) };
-                volumeThumb = new GUIStyle(GUIStyle.none) { fixedWidth = 20, fixedHeight = 40, margin = new RectOffset(0, 0, 0, 0) };
-            }
-            float updated = GUI.HorizontalSlider(rect, value, 0, maximum, volumeTrack, volumeThumb);
+            float updated = OfficeUIInput.Slider(rect,value,0,maximum);
             float left = rect.x + 10;
             float width = rect.width - 20;
             float centerY = rect.center.y;

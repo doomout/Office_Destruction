@@ -42,7 +42,7 @@ namespace OfficeRampage
                 countStyle.normal.textColor=empty?Orange:Color.white;
                 GUI.Label(new Rect(x+8,635,88,26),amount,countStyle);
                 if(i==7 && orbitalReady) GUI.Label(new Rect(x+24,610,60,25),"???",menuSmall);
-                if(slot.Contains(Event.current.mousePosition))
+                if(slot.Contains(OfficeUIInput.Pointer))
                 { Box(new Rect(x-20,545,160,31),Navy);GUI.Label(new Rect(x-12,548,150,26),i==7 && orbitalRequested?"???":weaponNames[i],menuSmall); }
             }
         }

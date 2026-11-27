@@ -1,7 +1,5 @@
 using UnityEngine;
-#if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
-#endif
 
 namespace CodexStarter
 {
@@ -25,7 +23,6 @@ namespace CodexStarter
         {
             Vector2 input = Vector2.zero;
             bool jump = false;
-#if ENABLE_INPUT_SYSTEM
             var keyboard = Keyboard.current;
             if (keyboard != null)
             {
@@ -35,10 +32,6 @@ namespace CodexStarter
                         - (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed ? 1f : 0f);
                 jump = keyboard.spaceKey.wasPressedThisFrame;
             }
-#else
-            input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-            jump = Input.GetKeyDown(KeyCode.Space);
-#endif
             input = Vector2.ClampMagnitude(input, 1f);
             if (controller.isGrounded && verticalSpeed < 0f) verticalSpeed = -2f;
             if (controller.isGrounded && jump) verticalSpeed = Mathf.Sqrt(jumpHeight * -2f * gravity);

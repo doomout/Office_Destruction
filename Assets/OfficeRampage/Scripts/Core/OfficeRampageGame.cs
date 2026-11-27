@@ -636,9 +636,9 @@ namespace OfficeRampage
                 DrawReturnToMenu();
                 GUI.changed = false;
                 GUI.Label(new Rect(420, 525, 150, 28), "음악", smallStyle);
-                audioBus.MusicVolume = GUI.HorizontalSlider(new Rect(560, 534, 270, 20), audioBus.MusicVolume, 0, .6f);
+                audioBus.MusicVolume = DrawVolumeSlider(new Rect(560, 534, 270, 20), audioBus.MusicVolume, .6f);
                 GUI.Label(new Rect(420, 565, 150, 28), "효과음", smallStyle);
-                audioBus.EffectsVolume = GUI.HorizontalSlider(new Rect(560, 574, 270, 20), audioBus.EffectsVolume, 0, 1);
+                audioBus.EffectsVolume = DrawVolumeSlider(new Rect(560, 574, 270, 20), audioBus.EffectsVolume, 1);
                 GUI.Label(new Rect(420, 608, 430, 28), audioBus.Muted ? "M: 소리 꺼짐" : "M: 전체 소리 끄기", smallStyle);
                 if (GUI.changed) SaveMenuSettings();
             }

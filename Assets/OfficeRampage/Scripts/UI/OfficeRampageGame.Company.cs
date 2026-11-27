@@ -39,23 +39,23 @@ namespace OfficeRampage
             for(int rank=0;rank<OfficeCompanySettings.Ranks.Length;rank++)
             {
                 Color old=GUI.backgroundColor; GUI.backgroundColor=rank==selectedCompanyRank?Cyan:new Color(.38f,.48f,.58f);
-                if(GUI.Button(new Rect(80,286+rank*28,230,26),OfficeCompanySettings.Ranks[rank]+" · "+OfficeCompanySettings.Counts[rank]+"명",companyTab))
+                if(OfficeUIInput.Button(new Rect(80,286+rank*28,230,26),OfficeCompanySettings.Ranks[rank]+" · "+OfficeCompanySettings.Counts[rank]+"명",companyTab))
                 { selectedCompanyRank=rank; companyScroll=Vector2.zero; GUI.FocusControl(null); }
                 GUI.backgroundColor=old;
             }
             var people=companyDraft.ranks[selectedCompanyRank].people;
             GUI.Label(new Rect(340,286,800,30),OfficeCompanySettings.Ranks[selectedCompanyRank]+" "+people.Length+"명 · 이름 최대 24자",menuText);
-            companyScroll=GUI.BeginScrollView(new Rect(330,328,870,250),companyScroll,new Rect(0,0,840,Mathf.Max(250,people.Length*62)));
+            companyScroll=OfficeUIInput.BeginScrollView(new Rect(330,328,870,250),companyScroll,new Rect(0,0,840,Mathf.Max(250,people.Length*62)));
             for(int i=0;i<people.Length;i++)
             {
                 float y=i*62; var person=people[i];
                 Box(new Rect(0,y,840,57),i%2==0?new Color(.05f,.09f,.13f):Navy);
                 GUI.Label(new Rect(10,y+12,100,32),(i+1)+"번",menuText);
-                if(GUI.Button(new Rect(100,y+8,490,42),person.name+"  [편집]",companyInput)) OpenNameEditor(selectedCompanyRank,i);
+                if(OfficeUIInput.Button(new Rect(100,y+8,490,42),person.name+"  [편집]",companyInput)) OpenNameEditor(selectedCompanyRank,i);
                 if(MenuButton(new Rect(620,y+8,90,42),"남",!person.female)) person.female=false;
                 if(MenuButton(new Rect(720,y+8,90,42),"여",person.female)) person.female=true;
             }
-            GUI.EndScrollView();
+            OfficeUIInput.EndScrollView();
             if(companyError!="") GUI.Label(new Rect(330,580,870,30),companyError,menuSmall);
             if(MenuButton(new Rect(650,615,230,46),"취소")) { companyDraft=null; menuPage=MenuPage.Settings; }
             if(MenuButton(new Rect(900,615,300,46),"저장",true) && CommitCompanySettings()) menuPage=MenuPage.Settings;

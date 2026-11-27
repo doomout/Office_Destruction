@@ -493,3 +493,12 @@ OS 폰트 생성 3곳을 OfficeGameFont 공통 로더로 교체했습니다. Res
 - 방망이·권총·기관총·샷건은 Quaternius Zombie Apocalypse Kit의 CC0 모델을 사용합니다. 망치·로켓런처·BFG는 둥근 손잡이/발사관, 모서리 처리, 에너지 코어를 갖춘 프로젝트 전용 모델로 제작했습니다.
 - 손에 든 무기와 무한 모드 바닥 무기 미리보기에 동일한 프리팹을 적용합니다. 공격 판정/데미지/탄약/쿨다운은 유지합니다. 미인계 더미·위성 빨간 버튼은 기존 분기를 유지합니다. 기타 소환 도구/광선검은 이번 교체 대상이 아닙니다.
 - 추가: Art/WeaponModels 모델·텍스처·URP 재질·라이선스/교체 가이드, Resources/OfficeWeapons 프리팹 7종, Scripts/Player/OfficeRampageGame.WeaponModels.cs. 수정: Scripts/Combat/OfficeRampageGame.Combat.cs. 경로 기준은 Assets/OfficeRampage입니다.
+
+## 2026-11-28 — Input System 전용으로 이전
+
+- 사용자 요청에 따라 Active Input Handling을 Both(2)에서 Input System Package (New)(1)로 변경했습니다. Unity/URP/Input System 패키지 버전은 유지했습니다.
+- 이름 편집의 Input.compositionString/imeCompositionMode를 제거했습니다. Keyboard.onTextInput/onIMECompositionChange/SetIMEEnabled/SetIMECursorPosition으로 확정 문자·조합 중 문자·후보 창 위치를 처리합니다. GUI.TextField 대신 기존 스킨을 사용한 표시와 새 입력 이벤트를 연결합니다.
+- 커서 이동, Home/End, Backspace/Delete, Shift 선택, Ctrl+A/C/X/V, 24자 제한, 누르고 있기 반복, 키보드 교체 및 편집 종료 시 이벤트 해제를 처리합니다. 한글 조합 도중 등록 방지용 Composition 속성을 유지합니다.
+- Input System 1.20.1의 공식 패키지 문서에서 런타임 IMGUI 입력을 지원하지 않는 점을 확인했습니다. 따라서 메뉴/설정/직원 목록/일시정지 등의 기존 UI 모양은 유지하고 클릭·슬라이더·휠/스크롤바를 새 OfficeUIInput에 연결했습니다. 화면 배율과 직원 목록의 스크롤 좌표를 반영하며, 음량 변경 시 자동 저장도 유지합니다.
+- 샘플 StarterPlayer의 기존 Input.GetAxisRaw/GetKeyDown 폴백도 제거했습니다. 게임 이동·전투는 이미 Keyboard/Mouse 입력을 사용하고 있어 로직을 변경하지 않았습니다.
+- 수정: ProjectSettings/ProjectSettings.asset; Assets/Samples/CodexStarter/StarterPlayer.cs; Assets/OfficeRampage/Scripts/UI의 OfficeNameEditor.cs, OfficeRampageGame.Menu.cs, OfficeRampageGame.Company.cs, OfficeRampageGame.WeaponHUD.cs; Scripts/Core/OfficeRampageGame.cs. 추가: Scripts/UI/OfficeUIInput.cs 및 meta. 기존 씬/프리팹/meta GUID 유지.
