@@ -35,7 +35,7 @@ namespace OfficeRampage
             const float width=1150;
             if(endlessTopStyle==null)endlessTopStyle=new GUIStyle(smallStyle)
             {wordWrap=false,alignment=TextAnchor.MiddleCenter,padding=new RectOffset(0,0,0,0),richText=false};
-            string text="무한 파괴  ·  생존 "+SurvivalClock(endlessTime)
+            string text="무한 · "+EndlessThemeNames[endlessEnvironment]+"  |  생존 "+SurvivalClock(endlessTime)
                 +"  |  처치 "+endlessKills.ToString("N0")+"  |  점수 "+score.ToString("N0")
                 +"  |  콤보 "+combo.ToString("N0")+"  |  적 "+defenders.Count+"/"+EndlessEnemyCap
                 +"  |  최고 "+SurvivalClock(PlayerPrefs.GetFloat("OfficeRampage.Endless.BestTime",0));

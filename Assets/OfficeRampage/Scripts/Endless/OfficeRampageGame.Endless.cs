@@ -47,7 +47,7 @@ namespace OfficeRampage
             controller.enabled=false;player.position=new Vector3(0,.08f,32);controller.enabled=true;pitch=30;
             SeedEndlessEquipment();
             FloorSign(endlessRoot,"무한 파괴 · 오래 버티고 마음껏 부수세요",new Vector3(0,4,63),.24f);
-            ApplyKoreanWorldFont(endlessRoot);endlessEquipAllowed=false;return room;
+            ApplyKoreanWorldFont(endlessRoot);SetEndlessEnvironment(0);endlessEquipAllowed=false;return room;
         }
         private void TickEndless(float dt)
         {

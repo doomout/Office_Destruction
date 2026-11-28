@@ -4,7 +4,7 @@ namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
     {
-        // 0: original plaza, 1: desert, 2: tropical island. Nature themes alternate thereafter.
+        // Ten deterministic themes: a full circuit before repeating; combat bounds never change.
         private int endlessEnvironment;
         private float endlessEnvironmentNext=300,endlessWaveClock;
         private Transform endlessScenery;
@@ -32,10 +32,15 @@ namespace OfficeRampage
         private void ChangeEndlessEnvironment()
         {
             if(!endlessMode||endlessRoot==null)return;
-            endlessEnvironment=endlessEnvironment==1?2:1;
+            SetEndlessEnvironment((endlessEnvironment+1)%EndlessThemeNames.Length);
+        }
+        private void SetEndlessEnvironment(int index)
+        {
+            if(!endlessMode||endlessRoot==null)return;
+            endlessEnvironment=Mathf.Clamp(index,0,EndlessThemeNames.Length-1);
             if(endlessScenery!=null){endlessScenery.gameObject.SetActive(false);Destroy(endlessScenery.gameObject);}
             endlessShoreWaves.Clear();endlessWaveClock=0;
-            endlessScenery=new GameObject(endlessEnvironment==1?"Endless desert scenery":"Endless island scenery").transform;
+            endlessScenery=new GameObject("Endless scenery · "+EndlessThemeNames[endlessEnvironment]).transform;
             endlessScenery.SetParent(endlessRoot,false);
             // Keep original collision walls/floor and combat objects. Only their scenery renderers change.
             foreach(Transform child in endlessRoot)
@@ -44,29 +49,30 @@ namespace OfficeRampage
                 {var renderer=child.GetComponent<Renderer>();if(renderer!=null)renderer.enabled=false;}
             }
             var floor=endlessRoot.Find("Arena floor");
-            if(floor!=null)floor.GetComponent<Renderer>().sharedMaterial=Mat(endlessEnvironment==1?DesertSand:IslandSand);
-            if(endlessEnvironment==1)BuildEndlessDesert();else BuildEndlessIsland();
+            if(floor!=null)floor.GetComponent<Renderer>().sharedMaterial=Mat(ThemeFloors[endlessEnvironment]);
+            if(endlessEnvironment==1)BuildEndlessDesert();else if(endlessEnvironment==2)BuildEndlessIsland();else BuildExtraEndlessTheme();
             foreach(var pickup in endlessPickups)if(pickup!=null)StyleEndlessEnvironmentPickup(pickup.transform);
             ApplyEndlessEnvironmentLighting();
         }
         private static readonly Color DesertSand=new Color(.65f,.48f,.29f),IslandSand=new Color(.66f,.63f,.49f);
         private void StyleEndlessEnvironmentPickup(Transform pickup)
         {
-            if(endlessEnvironment==0)return;
-            var label=pickup.GetComponentInChildren<TextMesh>();if(label!=null)label.color=new Color(.07f,.12f,.16f);
+            bool bright=endlessEnvironment==1||endlessEnvironment==2||endlessEnvironment==7;
+            var label=pickup.GetComponentInChildren<TextMesh>();if(label!=null)label.color=bright?new Color(.07f,.12f,.16f):new Color(.91f,.97f,1);
         }
         private GameObject Scenery(string name,Vector3 at,Vector3 size,Color color,PrimitiveType type=PrimitiveType.Cube)
-        {return Shape(endlessScenery,name,at,size,color,false,type);}
+        {var obj=Shape(endlessScenery,name,at,size,color,false,type);var renderer=obj.GetComponent<Renderer>();renderer.shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.Off;renderer.receiveShadows=false;return obj;}
         private void ApplyEndlessEnvironmentLighting()
         {
-            if(!endlessMode||view==null||endlessEnvironment==0)return;
-            bool desertTheme=endlessEnvironment==1;
-            view.backgroundColor=desertTheme?new Color(.83f,.66f,.43f):new Color(.34f,.74f,.91f);
-            view.farClipPlane=240;RenderSettings.fog=true;RenderSettings.fogColor=view.backgroundColor;
-            RenderSettings.fogStartDistance=75;RenderSettings.fogEndDistance=195;
-            RenderSettings.ambientLight=desertTheme?new Color(.5f,.48f,.43f):new Color(.45f,.52f,.55f);
-            var light=world.Find("Office daylight");if(light!=null){var sun=light.GetComponent<Light>();sun.color=desertTheme?new Color(1,.95f,.86f):new Color(1,.98f,.94f);sun.intensity=1.1f;}
+            if(!endlessMode||view==null)return;
+            bool dark=endlessEnvironment==4||endlessEnvironment==5||endlessEnvironment==6;
+            view.backgroundColor=ThemeSkies[endlessEnvironment];
+            view.farClipPlane=260;RenderSettings.fog=endlessEnvironment!=4;RenderSettings.fogMode=FogMode.Linear;RenderSettings.fogColor=view.backgroundColor;
+            RenderSettings.fogStartDistance=endlessEnvironment==6?45:85;RenderSettings.fogEndDistance=endlessEnvironment==6?150:230;
+            RenderSettings.ambientLight=dark?new Color(.43f,.44f,.49f):new Color(.52f,.54f,.56f);
+            var light=world.Find("Office daylight");if(light!=null){var sun=light.GetComponent<Light>();sun.color=endlessEnvironment==5?new Color(1,.78f,.65f):endlessEnvironment==7?new Color(.88f,.94f,1):Color.white;sun.intensity=dark?.95f:1.1f;}
         }
+
         private void BoundaryStones(Color color)
         {
             // Visible low stones mark the same 64m arena; no new collider is introduced.
