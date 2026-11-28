@@ -1,113 +1,139 @@
+using System;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.UIElements;
+
 namespace OfficeRampage
 {
+    // Use a real focused text control for native IME; Web uses the browser's native input.
     public sealed class OfficeNameEditor : MonoBehaviour
     {
         public bool Active { get; private set; }
-        public string Text { get; private set; }="";
-        public string Composition { get; private set; }="";
+        public string Text { get; private set; } = "";
+        public string Composition { get; private set; } = "";
+        private UIDocument document;
+        private PanelSettings panel;
+        private TextField field;
         private Keyboard keyboard;
-        private int cursor,anchor;
-        private float repeatAt,scroll;
-        private Key repeatKey;
-        private char pendingSurrogate;
-        private GUIStyle textStyle;
+        private bool needsFocus;
+        private GUIStyle displayStyle;
+        private float textScroll;
+#if UNITY_WEBGL && !UNITY_EDITOR
+        private bool previousCapture;
+        [DllImport("__Internal")] private static extern void OfficeNameOpen(string receiver,string value);
+        [DllImport("__Internal")] private static extern void OfficeNameRect(float x,float y,float w,float h,float sw,float sh,float fontSize);
+        [DllImport("__Internal")] private static extern void OfficeNameClose();
+#endif
         public void Open(string value)
-        {Close();Text=Limit(value??"");cursor=anchor=Text.Length;Active=true;scroll=0;BindKeyboard();}
+        {
+            Close(); Text=Limit(value??""); Active=true; Composition="";textScroll=0;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            previousCapture=WebGLInput.captureAllKeyboardInput; WebGLInput.captureAllKeyboardInput=false;
+            OfficeNameOpen(gameObject.name,Text);
+#else
+            EnsureField(); field.SetValueWithoutNotify(Text); document.rootVisualElement.style.display=DisplayStyle.Flex;
+            keyboard=Keyboard.current;
+            if(keyboard!=null)keyboard.onIMECompositionChange+=OnComposition;
+            needsFocus=true;
+#endif
+        }
         public void Close()
         {
-            if(keyboard!=null){keyboard.onTextInput-=OnText;keyboard.onIMECompositionChange-=OnComposition;keyboard.SetIMEEnabled(false);}
-            keyboard=null;Active=false;Composition="";repeatKey=Key.None;pendingSurrogate='\0';
-        }
-        private void BindKeyboard()
-        {
-            if(keyboard==Keyboard.current)return;
-            if(keyboard!=null){keyboard.onTextInput-=OnText;keyboard.onIMECompositionChange-=OnComposition;keyboard.SetIMEEnabled(false);}
-            keyboard=Keyboard.current;Composition="";
-            if(keyboard!=null){keyboard.onTextInput+=OnText;keyboard.onIMECompositionChange+=OnComposition;keyboard.SetIMEEnabled(true);}
-        }
-        private void OnDisable(){Close();}
-        private void OnApplicationFocus(bool focus)
-        {if(Active&&keyboard!=null){keyboard.SetIMEEnabled(focus);if(!focus)Composition="";}}
-        private void OnComposition(IMECompositionString value){if(Active)Composition=value.ToString();}
-        private void OnText(char value)
-        {
-            if(!Active||char.IsControl(value))return;
-            if(keyboard!=null&&keyboard.ctrlKey.isPressed&&!keyboard.altKey.isPressed)return;
-            if(char.IsHighSurrogate(value)){pendingSurrogate=value;return;}
-            if(char.IsLowSurrogate(value))
-            {if(pendingSurrogate!='\0')Insert(new string(new[]{pendingSurrogate,value}));pendingSurrogate='\0';return;}
-            pendingSurrogate='\0';Insert(value.ToString());
+            if(!Active)return;
+            Active=false;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            OfficeNameClose(); WebGLInput.captureAllKeyboardInput=previousCapture;
+#else
+            if(keyboard!=null)keyboard.onIMECompositionChange-=OnComposition;
+            if(field!=null)field.Blur();
+            if(document!=null)document.rootVisualElement.style.display=DisplayStyle.None;
+            keyboard?.SetIMEEnabled(false);keyboard=null;
+#endif
+            Composition="";
         }
         private static string Limit(string value)
-        {if(value.Length<=24)return value;value=value.Substring(0,24);return char.IsHighSurrogate(value[23])?value.Substring(0,23):value;}
-        private int Start=>Mathf.Min(cursor,anchor);
-        private int End=>Mathf.Max(cursor,anchor);
-        private void Insert(string value)
         {
-            var clean=new System.Text.StringBuilder();foreach(char c in value)if(!char.IsControl(c))clean.Append(c);
-            int start=Start,end=End,space=24-(Text.Length-(end-start));string insert=clean.ToString();
-            if(insert.Length>space)insert=insert.Substring(0,space);
-            if(insert.Length>0&&char.IsHighSurrogate(insert[insert.Length-1]))insert=insert.Substring(0,insert.Length-1);
-            Text=Text.Substring(0,start)+insert+Text.Substring(end);cursor=anchor=start+insert.Length;
+            value=value.Replace("\r","").Replace("\n","");
+            if(value.Length<=24)return value;
+            value=value.Substring(0,24);return char.IsHighSurrogate(value[23])?value.Substring(0,23):value;
         }
-        private int Previous(int at)=>at>1&&char.IsLowSurrogate(Text[at-1])?at-2:Mathf.Max(0,at-1);
-        private int Next(int at)=>at<Text.Length&&char.IsHighSurrogate(Text[at])?Mathf.Min(Text.Length,at+2):Mathf.Min(Text.Length,at+1);
-        private void Edit(Key key,bool shift)
+        private void EnsureField()
         {
-            if(key==Key.Backspace||key==Key.Delete)
-            {if(cursor==anchor){if(key==Key.Backspace)anchor=Previous(cursor);else anchor=Next(cursor);}Insert("");return;}
-            if(key==Key.Home)cursor=0;
-            else if(key==Key.End)cursor=Text.Length;
-            else if(key==Key.LeftArrow)cursor=!shift&&cursor!=anchor?Start:Previous(cursor);
-            else if(key==Key.RightArrow)cursor=!shift&&cursor!=anchor?End:Next(cursor);
-            if(!shift)anchor=cursor;
+            if(document!=null)return;
+            panel=ScriptableObject.CreateInstance<PanelSettings>();
+            panel.scaleMode=PanelScaleMode.ConstantPixelSize;panel.sortingOrder=1000;
+            panel.themeStyleSheet=Resources.Load<ThemeStyleSheet>("OfficeFonts/NameInputTheme");
+            var host=new GameObject("Name input panel");host.transform.SetParent(transform,false);
+            document=host.AddComponent<UIDocument>();document.panelSettings=panel;
+            var root=document.rootVisualElement;root.pickingMode=PickingMode.Ignore;
+            field=new TextField{maxLength=24,isDelayed=false,multiline=false};
+            field.style.position=Position.Absolute;
+            // IMGUI is drawn above runtime panels. Keep the focused native editor for input,
+            // and mirror its text/caret in the existing IMGUI layer below.
+            field.style.opacity=0;
+            field.style.marginLeft=field.style.marginRight=field.style.marginTop=field.style.marginBottom=0;
+            field.style.unityFontDefinition=FontDefinition.FromFont(OfficeGameFont.Shared);
+            field.RegisterValueChangedCallback(e=>{if(Active)Text=Limit(e.newValue);});
+            root.Add(field);
+            var input=field.Q(className:TextField.inputUssClassName);
+            input.style.backgroundColor=new Color(.10f,.17f,.22f);input.style.color=Color.white;
+            input.style.paddingLeft=input.style.paddingRight=8;
+            input.style.paddingTop=input.style.paddingBottom=0;
+            input.style.unityTextAlign=TextAnchor.MiddleLeft;
         }
-        private void Update()
-        {
-            if(!Active)return;BindKeyboard();if(keyboard==null)return;
-            if(Composition.Length>0){repeatKey=Key.None;return;}
-            bool ctrl=keyboard.ctrlKey.isPressed||keyboard.leftMetaKey.isPressed||keyboard.rightMetaKey.isPressed;
-            if(ctrl)
-            {
-                if(keyboard.aKey.wasPressedThisFrame){anchor=0;cursor=Text.Length;}
-                if(keyboard.cKey.wasPressedThisFrame||keyboard.xKey.wasPressedThisFrame)
-                {if(Start!=End)GUIUtility.systemCopyBuffer=Text.Substring(Start,End-Start);if(keyboard.xKey.wasPressedThisFrame)Insert("");}
-                if(keyboard.vKey.wasPressedThisFrame)Insert(GUIUtility.systemCopyBuffer);
-            }
-            foreach(var key in editKeys)
-                if(keyboard[key].wasPressedThisFrame){Edit(key,keyboard.shiftKey.isPressed);repeatKey=key;repeatAt=Time.unscaledTime+.45f;return;}
-            if(repeatKey!=Key.None)
-            {if(!keyboard[repeatKey].isPressed)repeatKey=Key.None;else if(Time.unscaledTime>=repeatAt){Edit(repeatKey,keyboard.shiftKey.isPressed);repeatAt=Time.unscaledTime+.055f;}}
-        }
-        private static readonly Key[] editKeys={Key.Backspace,Key.Delete,Key.LeftArrow,Key.RightArrow,Key.Home,Key.End};
-        public void DrawField(Rect rect,GUIStyle style)
+        private void OnComposition(IMECompositionString value){if(Active)Composition=value.ToString();}
+        [Serializable] private class BrowserValue { public string text; public bool composing; }
+        // Called by the WebGL plugin. Preserve these names for SendMessage/IL2CPP.
+        [UnityEngine.Scripting.Preserve] public void OnBrowserName(string json)
         {
             if(!Active)return;
-            if(textStyle==null)textStyle=new GUIStyle(GUI.skin.label){richText=false,wordWrap=false,padding=new RectOffset(0,0,0,0),alignment=TextAnchor.MiddleLeft};
-            textStyle.font=style.font;textStyle.fontSize=style.fontSize;textStyle.normal.textColor=style.normal.textColor;
-            var inner=new Rect(rect.x+8,rect.y+3,rect.width-16,rect.height-6);
-            float Width(string text)=>textStyle.CalcSize(new GUIContent(text)).x;
-            var mouse=Mouse.current;
-            if(Event.current.type==EventType.Repaint&&mouse!=null&&mouse.leftButton.wasPressedThisFrame&&rect.Contains(OfficeUIInput.Pointer)&&Composition.Length==0)
-            {
-                float x=OfficeUIInput.Pointer.x-inner.x+scroll;int at=0;
-                while(at<Text.Length&&x>(Width(Text.Substring(0,at))+Width(Text.Substring(0,Next(at))))*.5f)at=Next(at);
-                cursor=at;if(keyboard==null||!keyboard.shiftKey.isPressed)anchor=cursor;
-            }
-            string before=Text.Substring(0,cursor),display=before+Composition+Text.Substring(cursor);
-            float caret=Width(before+Composition);scroll=Mathf.Clamp(scroll,Mathf.Max(0,caret-inner.width+3),Mathf.Max(0,caret));
-            GUI.Box(rect,GUIContent.none,style);
+            var value=JsonUtility.FromJson<BrowserValue>(json);
+            Composition=value.composing?"…":"";
+            if(!value.composing)Text=Limit(value.text??"");
+        }
+        private void OnDisable(){Close();}
+        private void OnDestroy(){Close();if(document!=null)Destroy(document.gameObject);if(panel!=null)Destroy(panel);}
+        public void DrawField(Rect rect,GUIStyle style)
+        {
+            if(!Active||Event.current.type!=EventType.Repaint)return;
+            Vector3 top=GUI.matrix.MultiplyPoint3x4(new Vector3(rect.x,rect.y,0));
+            Vector3 bottom=GUI.matrix.MultiplyPoint3x4(new Vector3(rect.xMax,rect.yMax,0));
+            float fontSize=style.fontSize*Mathf.Abs(GUI.matrix.m11);
+#if UNITY_WEBGL && !UNITY_EDITOR
+            OfficeNameRect(top.x,top.y,bottom.x-top.x,bottom.y-top.y,Screen.width,Screen.height,fontSize);
+#else
+            field.style.left=top.x;field.style.top=top.y;field.style.width=bottom.x-top.x;
+            field.style.height=Mathf.Max(bottom.y-top.y,fontSize*1.65f);field.style.fontSize=fontSize;
+            if(needsFocus){needsFocus=false;field.schedule.Execute(()=>{if(Active){field.Focus();field.SelectAll();}});}
+            DrawNativeField(rect,style);
+#endif
+        }
+        // TextField owns IME preview and committed text. Never append a second IME stream.
+        private string NativeDisplayText => field != null ? field.text : Text;
+        private void DrawNativeField(Rect rect,GUIStyle source)
+        {
+            if(displayStyle==null)displayStyle=new GUIStyle(GUI.skin.label){richText=false,wordWrap=false,padding=new RectOffset(0,0,0,0),alignment=TextAnchor.MiddleLeft,clipping=TextClipping.Overflow};
+            displayStyle.font=source.font;displayStyle.fontSize=source.fontSize;displayStyle.normal.textColor=Color.white;
+            GUI.Box(rect,GUIContent.none,source);
+            string shown=NativeDisplayText;
+            int cursor=Mathf.Clamp(field.cursorIndex,0,shown.Length),anchor=Mathf.Clamp(field.selectIndex,0,shown.Length);
+            string before=shown.Substring(0,cursor);
+            float Width(string value)=>displayStyle.CalcSize(new GUIContent(value)).x;
+            var inner=new Rect(rect.x+8,rect.y,rect.width-16,rect.height);
+            float caret=Width(before);
+            textScroll=Mathf.Clamp(textScroll,Mathf.Max(0,caret-inner.width+3),Mathf.Max(0,caret));
             GUI.BeginGroup(inner);
-            if(Start!=End&&Composition.Length==0)
-            {var color=GUI.color;GUI.color=new Color(.1f,.5f,.7f,.55f);GUI.DrawTexture(new Rect(Width(Text.Substring(0,Start))-scroll,2,Width(Text.Substring(Start,End-Start)),inner.height-4),Texture2D.whiteTexture);GUI.color=color;}
-            GUI.Label(new Rect(-scroll,0,Mathf.Max(inner.width,Width(display)+8),inner.height),display,textStyle);
-            if(Composition.Length>0)GUI.DrawTexture(new Rect(Width(before)-scroll,inner.height-3,Width(Composition),1),Texture2D.whiteTexture);
-            if(Time.unscaledTime%1<.6f)GUI.DrawTexture(new Rect(caret-scroll,3,1,inner.height-6),Texture2D.whiteTexture);
+            if(cursor!=anchor&&Composition.Length==0)
+            {
+                int start=Mathf.Min(cursor,anchor),end=Mathf.Max(cursor,anchor);
+                Color saved=GUI.color;GUI.color=new Color(.15f,.6f,.8f,.65f);
+                GUI.DrawTexture(new Rect(Width(shown.Substring(0,start))-textScroll,3,Width(shown.Substring(start,end-start)),inner.height-6),Texture2D.whiteTexture);GUI.color=saved;
+            }
+            GUI.Label(new Rect(-textScroll,0,Mathf.Max(inner.width,Width(shown)+8),inner.height),shown,displayStyle);
+            if(Time.unscaledTime%1<.6f)GUI.DrawTexture(new Rect(caret-textScroll,5,1,inner.height-10),Texture2D.whiteTexture);
             GUI.EndGroup();
-            var pos=GUI.matrix.MultiplyPoint3x4(new Vector3(inner.x+caret-scroll,inner.yMax,0));keyboard?.SetIMECursorPosition(pos);
         }
     }
 }

@@ -483,22 +483,15 @@ OS 폰트 생성 3곳을 OfficeGameFont 공통 로더로 교체했습니다. Res
 - 방향은 공격 예고 때 정한 방향으로 고정되어 옆으로 피할 수 있습니다. 총 1.2초 동안 발사하므로 기존 피격 무적 1초가 지난 후 후속 종이에 다시 맞을 수 있습니다. 전역 무적 규칙은 변경하지 않았습니다.
 - 연사 중 적의 이동/새 공격을 막고, 기절·빙결·유인/화상 혼란·사망·층 전환·전투 연출 전환 시 남은 발사를 취소합니다. 일시정지 중에는 연사 간격도 정지합니다.
 - 기존 스토리 임원/비서의 부채꼴 7장/5장 공격과 보안 서버의 종이 패턴, 경비 총기, 로봇 광선 공격은 유지합니다.
-- 수정: `Combat/OfficeRampageGame.Combat.cs`, `Enemies/OfficeDefender.cs`. 추가: `Combat/OfficeRampageGame.PaperBurst.cs` 및 meta. 경로 기준 `Assets/OfficeRampage/Scripts`; 기존 씬·프리팹·GUID 보존.
-- 검증: 격리된 Unity 6000.6.10f1 컴파일/Play 이동·상승 이동·바닥·벽 충돌, 실제 직선 5발 생성 및 플레이어 후속 피해, 일시정지/재개, 기절에 따른 남은 발사 취소, 기존 임원·비서 부채꼴 발수 확인. Web 빌드와 전체 전투 밸런스는 미검증입니다.
-- 확인: Unity Refresh 후 Play → 일반 종이 공격 적 앞에서 5장 연사 확인 → 옆으로 회피/기절시키기 → 일시정지 후 재개 확인. 무한 모드에서도 같은 단발 종이 공격 적에게 적용됩니다.
-
 
 ## 2026-11-28 — 일반 무기 7종 모델 개선
 
 - 방망이·권총·기관총·샷건은 Quaternius Zombie Apocalypse Kit의 CC0 모델을 사용합니다. 망치·로켓런처·BFG는 둥근 손잡이/발사관, 모서리 처리, 에너지 코어를 갖춘 프로젝트 전용 모델로 제작했습니다.
 - 손에 든 무기와 무한 모드 바닥 무기 미리보기에 동일한 프리팹을 적용합니다. 공격 판정/데미지/탄약/쿨다운은 유지합니다. 미인계 더미·위성 빨간 버튼은 기존 분기를 유지합니다. 기타 소환 도구/광선검은 이번 교체 대상이 아닙니다.
-- 추가: Art/WeaponModels 모델·텍스처·URP 재질·라이선스/교체 가이드, Resources/OfficeWeapons 프리팹 7종, Scripts/Player/OfficeRampageGame.WeaponModels.cs. 수정: Scripts/Combat/OfficeRampageGame.Combat.cs. 경로 기준은 Assets/OfficeRampage입니다.
 
-## 2026-11-28 — Input System 전용으로 이전
 
-- 사용자 요청에 따라 Active Input Handling을 Both(2)에서 Input System Package (New)(1)로 변경했습니다. Unity/URP/Input System 패키지 버전은 유지했습니다.
-- 이름 편집의 Input.compositionString/imeCompositionMode를 제거했습니다. Keyboard.onTextInput/onIMECompositionChange/SetIMEEnabled/SetIMECursorPosition으로 확정 문자·조합 중 문자·후보 창 위치를 처리합니다. GUI.TextField 대신 기존 스킨을 사용한 표시와 새 입력 이벤트를 연결합니다.
-- 커서 이동, Home/End, Backspace/Delete, Shift 선택, Ctrl+A/C/X/V, 24자 제한, 누르고 있기 반복, 키보드 교체 및 편집 종료 시 이벤트 해제를 처리합니다. 한글 조합 도중 등록 방지용 Composition 속성을 유지합니다.
-- Input System 1.20.1의 공식 패키지 문서에서 런타임 IMGUI 입력을 지원하지 않는 점을 확인했습니다. 따라서 메뉴/설정/직원 목록/일시정지 등의 기존 UI 모양은 유지하고 클릭·슬라이더·휠/스크롤바를 새 OfficeUIInput에 연결했습니다. 화면 배율과 직원 목록의 스크롤 좌표를 반영하며, 음량 변경 시 자동 저장도 유지합니다.
-- 샘플 StarterPlayer의 기존 Input.GetAxisRaw/GetKeyDown 폴백도 제거했습니다. 게임 이동·전투는 이미 Keyboard/Mouse 입력을 사용하고 있어 로직을 변경하지 않았습니다.
-- 수정: ProjectSettings/ProjectSettings.asset; Assets/Samples/CodexStarter/StarterPlayer.cs; Assets/OfficeRampage/Scripts/UI의 OfficeNameEditor.cs, OfficeRampageGame.Menu.cs, OfficeRampageGame.Company.cs, OfficeRampageGame.WeaponHUD.cs; Scripts/Core/OfficeRampageGame.cs. 추가: Scripts/UI/OfficeUIInput.cs 및 meta. 기존 씬/프리팹/meta GUID 유지.
+## 2026-11-28 — 한글 입력 경로, UI 글자 여백, 스토리 배치 보완
+- 이름 입력: 직접 문자 이벤트를 조립하던 편집 처리를 Windows/Editor에서는 포커스된 UI Toolkit TextField로 교체. 글자/선택/커서는 기존 IMGUI 표시층에 그려 메뉴 배경에 가려지지 않도록 함. 기존 설정/랭킹 저장 방식, 24자 제한과 New Input System 유지.
+- Web에서는 브라우저 HTML input이 IME 조합/확정을 처리하고 게임에 확정 문자열을 전달. 입력 중 captureAllKeyboardInput을 해제하고 닫을 때 기존 값 복구. 적용/취소 버튼은 기존 UI 사용.
+- 메뉴/설정/게임 HUD의 기본 상하 패딩과 클리핑을 조정하여 한글 획 잘림 완화.
+- 2~5층: 가구·서버·감금실·수행원 생성 완료 후 캐릭터 캡슐과 장애물/다른 인원의 겹침을 검사하고 가까운 빈 위치로 이동. 씬/프리팹 좌표와 GUID는 보존.

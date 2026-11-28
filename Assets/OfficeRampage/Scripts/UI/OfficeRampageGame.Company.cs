@@ -31,7 +31,7 @@ namespace OfficeRampage
             bool oldEnabled=GUI.enabled; GUI.enabled=oldEnabled && (nameEditor==null || !nameEditor.Active);
             if(companyInput==null)
             {
-                companyInput=new GUIStyle(GUI.skin.textField) { font=menuFont,fontSize=21,alignment=TextAnchor.MiddleLeft,richText=false };
+                companyInput=new GUIStyle(GUI.skin.textField) { font=menuFont,fontSize=21,alignment=TextAnchor.MiddleLeft,richText=false,padding=new RectOffset(8,8,0,0),clipping=TextClipping.Overflow };
                 companyTab=new GUIStyle(menuButton) { fontSize=18 };
             }
             GUI.Label(new Rect(80,202,1120,40),"유닛 설정 · 이름과 성별만 변경",menuHeading);

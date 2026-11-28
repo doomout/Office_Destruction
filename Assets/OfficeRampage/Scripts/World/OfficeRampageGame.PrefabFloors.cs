@@ -28,6 +28,7 @@ namespace OfficeRampage
             controller.enabled=false;player.position=activeFloor.playerSpawn.position;controller.enabled=true;
             yaw=activeFloor.playerSpawn.eulerAngles.y;avatar.rotation=Quaternion.Euler(0,yaw,0);vertical=0;
             SetupStoryFloor();
+            ResolveStorySpawnOverlaps();
         }
         private bool InsideElevator()
         {

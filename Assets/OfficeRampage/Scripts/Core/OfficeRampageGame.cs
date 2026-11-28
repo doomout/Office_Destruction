@@ -600,9 +600,9 @@ namespace OfficeRampage
             EnsureMenuStyles();
             if (titleStyle == null)
             {
-                titleStyle = new GUIStyle(GUI.skin.label) { font = menuFont, fontSize = 30, fontStyle = FontStyle.Bold };
-                labelStyle = new GUIStyle(GUI.skin.label) { font = menuFont, fontSize = 19, fontStyle = FontStyle.Bold };
-                smallStyle = new GUIStyle(GUI.skin.label) { font = menuFont, fontSize = 14 };
+                titleStyle = new GUIStyle(GUI.skin.label) { font = menuFont, fontSize = 30, fontStyle = FontStyle.Bold, padding = new RectOffset(0,0,0,0), clipping = TextClipping.Overflow };
+                labelStyle = new GUIStyle(GUI.skin.label) { font = menuFont, fontSize = 19, fontStyle = FontStyle.Bold, padding = new RectOffset(0,0,0,0), clipping = TextClipping.Overflow };
+                smallStyle = new GUIStyle(GUI.skin.label) { font = menuFont, fontSize = 14, padding = new RectOffset(0,0,0,0), clipping = TextClipping.Overflow };
                 centeredStyle = new GUIStyle(labelStyle) { alignment = TextAnchor.MiddleCenter };
                 titleStyle.normal.textColor = labelStyle.normal.textColor = smallStyle.normal.textColor = centeredStyle.normal.textColor = Color.white;
             }

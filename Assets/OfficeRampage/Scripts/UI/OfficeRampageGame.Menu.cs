@@ -59,13 +59,13 @@ namespace OfficeRampage
         {
             if (menuTitle != null) return;
             menuFont = OfficeGameFont.Shared;
-            menuText = new GUIStyle(GUI.skin.label) { font = menuFont, fontSize = 21, wordWrap = true };
+            menuText = new GUIStyle(GUI.skin.label) { font = menuFont, fontSize = 21, wordWrap = true, padding = new RectOffset(0,0,0,0), clipping = TextClipping.Overflow };
             menuText.normal.textColor = new Color(.84f, .89f, .93f);
             menuTitle = new GUIStyle(menuText) { fontSize = 52, fontStyle = FontStyle.Bold };
             menuTitle.normal.textColor = Color.white;
             menuHeading = new GUIStyle(menuTitle) { fontSize = 30 };
             menuSmall = new GUIStyle(menuText) { fontSize = 17 };
-            menuButton = new GUIStyle(GUI.skin.button) { font = menuFont, fontSize = 24, fontStyle = FontStyle.Bold };
+            menuButton = new GUIStyle(GUI.skin.button) { font = menuFont, fontSize = 24, fontStyle = FontStyle.Bold, padding = new RectOffset(10,10,0,0), clipping = TextClipping.Overflow };
         }
 
         private bool MenuButton(Rect rect, string text, bool primary = false)
