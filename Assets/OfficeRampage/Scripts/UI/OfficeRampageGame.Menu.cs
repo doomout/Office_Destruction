@@ -4,7 +4,7 @@ namespace OfficeRampage
 {
     public sealed partial class OfficeRampageGame
     {
-        private enum MenuPage { Main, Settings, Units, Story, Endless, EndlessRanks, Quit, Intro, Game }
+        private enum MenuPage { Main, Settings, Units, Story, Endless, EndlessRanks, Quit, Intro, Game, Weapons }
         private MenuPage menuPage = MenuPage.Main;
         private int difficulty = 1;
         private Font menuFont;
@@ -99,6 +99,7 @@ namespace OfficeRampage
                 GUI.Label(new Rect(83, 125, 800, 32), "오늘의 스트레스, 여기서 부수고 퇴근하세요.", menuText);
                 Box(new Rect(80, 183, 1120, 2), new Color(.22f, .32f, .4f));
                 if (menuPage == MenuPage.Main) DrawMainPage();
+                else if (menuPage == MenuPage.Weapons) DrawWeaponGuide();
                 else if (menuPage == MenuPage.Settings) DrawSettingsPage();
                 else if (menuPage == MenuPage.Units) DrawCompanySettings();
                 else if (menuPage == MenuPage.Intro) DrawIntro();
@@ -125,6 +126,7 @@ namespace OfficeRampage
             GUI.Label(new Rect(567, 240, 600, 45), "처음 오셨나요?", menuHeading);
             GUI.Label(new Rect(567, 302, 590, 105), "스토리: 퇴근을 막은 원인을 추적하고 대표에게 도전!\n무한 파괴: 장비를 주우며 끝없이 버티세요.", menuText);
             GUI.Label(new Rect(567, 422, 590, 150), "WASD 이동 · 마우스 조준 · 왼쪽 클릭 공격\n스토리: 숫자키 무기 선택 / 무한 파괴: E로 줍기\nEsc 일시정지 · M 음소거", menuText);
+            if(MenuButton(new Rect(567,525,590,42),"무기 도감 · 특징과 스킬")) { guidePage=guideSelection=0;menuPage=MenuPage.Weapons; }
             GUI.Label(new Rect(567, 572, 590, 36), "음량과 직원 이름·성별은 ‘설정’에서 바꿀 수 있어요.", menuSmall);
         }
 

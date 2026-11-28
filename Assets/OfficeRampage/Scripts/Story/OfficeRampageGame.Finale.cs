@@ -84,7 +84,7 @@ namespace OfficeRampage
             if(orbitalRequested || bossUnit==null || !bossUnit.PhaseTwo || ended) return;
             storySkipRequested=false;
             StoryLine(executiveAccessGranted?"결재 권한 인증 · 대표의 위성 장비를 사용할 수 있다.":"위성 장비 비상 권한 인증 · 마지막 기회다.",7);
-            orbitalRequested=true;orbitalDropElapsed=0;combatLocked=true;
+            orbitalRequested=true;orbitalDropElapsed=0;combatLocked=true;ClearBossCombatForCinematic();
             ResetElements();whirlwindLeft=whirlwindReady=0;ClearDecoy();
             orbitalDropRoutine=StartCoroutine(DropOrbitalButton());
         }
@@ -124,7 +124,7 @@ namespace OfficeRampage
         private void ActivateOrbital()
         {
             if(!RunActive || combatLocked || !orbitalReady || orbitalUsed || bossUnit==null || !bossUnit.Alive) return;
-            orbitalUsed=true;orbitalReady=false;combatLocked=true;ClearDecoy();ResetElements();whirlwindLeft=0;
+            orbitalUsed=true;orbitalReady=false;combatLocked=true;ClearBossCombatForCinematic();ClearDecoy();ResetElements();whirlwindLeft=0;
             StartCoroutine(OrbitalStrike());
         }
         private IEnumerator CameraFlight(Vector3 destination,Vector3 target,float duration)

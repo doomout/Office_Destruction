@@ -108,6 +108,7 @@ namespace OfficeRampage
                 ClearDecoy(); endingLine="오늘은 대표가 없군요. 이제 퇴근합시다!"; End(true); return;
             }
             if(bossChair!=null) bossChair.SetActive(false);
+            ClearBossEntrance();
             bossUnit.patrolStart=-1;
             if(activeFloor!=null)bossUnit.navigation=new OfficeNavigation(activeFloor.ReadLayout().CreateLayout());
             bossUnit.Wake(); audioBus.ChangeRoom(6);

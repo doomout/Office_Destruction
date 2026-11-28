@@ -87,11 +87,13 @@ namespace OfficeRampage
         private void Update()
         {
             if (label != null && Camera.main != null) label.transform.rotation = Camera.main.transform.rotation;
-            if (!game.RunActive || game.CombatLocked || !game.IsCurrentRoom(room) || !Alive || Dormant) return;
+            if(game.CombatLocked || !Alive || Dormant){CancelBossHook();return;}
+            if (!game.RunActive || !game.IsCurrentRoom(room)) return;
             float dt = Time.deltaTime;
             bool frozen=TickFrozen(dt), stunned=TickStun(dt);
-            if(frozen || stunned) return;
+            if(frozen || stunned) { CancelBossHook(); return; }
             if (rising > 0) { rising = Mathf.Max(0, rising - dt); game.SetBossPose(this, 1 - rising); return; }
+            if(boss && TickBossHook(dt))return;
             if (TickDistraction(dt)) return;
             if (paperBurstActive) return;
             Vector3 toward = game.PlayerPosition - transform.position; toward.y = 0;

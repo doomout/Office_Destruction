@@ -159,6 +159,7 @@ namespace OfficeRampage
             unit.warning.position = unit.transform.position + Vector3.up * .045f;
             unit.warning.rotation = Quaternion.LookRotation(forward);
             Color color = kind == 1 ? Cyan : kind == 2 ? new Color(1, .85f, .25f) : Orange;
+            if(kind==7){Shape(unit.warning,"Capture lane",new Vector3(0,0,range/2),new Vector3(1.7f,.025f,range),Orange,false);return;}
             if(kind==6){DrawExecutiveRing(unit.warning,range,Cyan);return;}
             if(kind==2&&unit.storyRole>0){DrawPaperFanWarning(unit.warning,range,unit.storyRole==1?70:60);return;}
             if(kind==5) Shape(unit.warning,"Robot charge warning",new Vector3(0,0,range/2),new Vector3(6.4f,.025f,range),Orange,false);
@@ -224,7 +225,7 @@ namespace OfficeRampage
             storySkipRequested=false;
             StoryLine("비서: 저도… 이번 주에 집에 못 갔어요.",5);
             whirlwindLeft = whirlwindReady = 0;
-            combatLocked = true; cinematicText = "비서: 이걸 쓰세요! 비에프지 18, 딱 한 발이에요!";
+            combatLocked = true; ClearBossCombatForCinematic(); cinematicText = "비서: 이걸 쓰세요! 비에프지 18, 딱 한 발이에요!";
             var secretary=waitingSecretary;
             secretary.GetComponent<OfficeSecretaryIdle>().enabled=false;
             Vector3 start=secretary.position;
@@ -247,7 +248,7 @@ namespace OfficeRampage
         private IEnumerator NuclearTransition()
         {
             storySkipRequested=false;ClearDecoy();
-            combatLocked = true; cinematicText = "";
+            combatLocked = true; ClearBossCombatForCinematic(); cinematicText = "";
             audioBus.Play("rocket", .8f); shake = 3;
             var core = Fx("BFG energy", player.position + Vector3.up * 1.4f, Vector3.one * .7f, Color.green, 2, Vector3.zero, 2, PrimitiveType.Sphere);
             Vector3 origin = core.transform.position, target = bossUnit.AimPoint; float t = 0;
